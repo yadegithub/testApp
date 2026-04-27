@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Pendule de Newton AR</title>
+    <link rel="stylesheet" href="style.css?v=20260427-1">
+    <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/build/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/examples/js/loaders/GLTFLoader.js"></script>
+    <script async src="https://docs.opencv.org/4.5.4/opencv.js"></script>
+</head>
+<body>
+    <video id="videoInput" autoplay muted playsinline style="display:none"></video>
+    <canvas id="canvasOutput" style="position:absolute; top:0; left:0;"></canvas>
+    <canvas id="canvasThree" style="position:absolute; top:0; left:0;"></canvas>
+
+    <div id="status">Initialisation...</div>
+
+    <div id="ui-layer">
+        <div id="app-title">PENDULE DE NEWTON</div>
+
+        <div id="side-menu" class="glass">
+            <div class="menu-btn active" id="btn-rotate">
+                <span class="icon">&#8635;</span>
+                <span class="label">Rotation</span>
+            </div>
+            <div class="menu-btn" id="btn-scale">
+                <span class="icon">&#128269;</span>
+                <span class="label">Zoom</span>
+            </div>
+            <button class="menu-btn action-btn" id="btn-launch" type="button">
+                <span class="icon">&#9654;</span>
+                <span class="label">Lancer</span>
+            </button>
+        </div>
+
+        <div id="info-card" class="glass">
+            <div class="card-content">
+                <div class="physics-icon">
+                    <span style="font-size: 30px;">&#9881;</span>
+                </div>
+                <div class="text-area">
+                    <h3 id="part-name">Pendule de Newton</h3>
+                    <p id="part-info">
+                        Cet appareil illustre la conservation de la quantite de mouvement et de l'energie. Quand une bille entre en collision, l'impulsion traverse les billes immobiles et ressort de l'autre cote.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js?v=20260427-1"></script>
+</body>
+</html>

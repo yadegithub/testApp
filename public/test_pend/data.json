@@ -1,0 +1,13 @@
+{
+  "assets": {
+    "models": {
+      "pendulum": {
+        "name": "Pendule de Newton",
+        "path": "./assets/newtons_cradle (1).glb"
+      }
+    }
+  },
+  "settings": {
+    "arScale": 2.0
+  }
+}
