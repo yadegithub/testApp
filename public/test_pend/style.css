@@ -1,107 +1,15 @@
-body, html {
-    margin: 0;
-    padding: 0;
-    width: 100%;
-    height: 100%;
-    overflow: hidden;
-    background-color: #000;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-}
-
-#status {
-    position: absolute;
-    top: 10px;
-    left: 10px;
-    color: white;
-    background: rgba(0, 0, 0, 0.5);
-    padding: 5px 10px;
-    border-radius: 5px;
-    z-index: 100;
-    font-size: 12px;
-}
-
-.glass {
-    background: rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    border-radius: 15px;
-    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
-}
-
-#app-title {
-    position: absolute;
-    top: 20px;
-    width: 100%;
-    text-align: center;
-    color: white;
-    font-size: 24px;
-    font-weight: bold;
-    letter-spacing: 2px;
-    text-shadow: 0 0 10px rgba(0, 229, 255, 0.5);
-    z-index: 50;
-}
+@import "../test_solar/style.css";
 
 #side-menu {
-    position: absolute;
-    left: 20px;
-    top: 50%;
-    transform: translateY(-50%);
-    padding: 15px;
     display: flex;
-    flex-direction: column;
-    gap: 20px;
-    z-index: 100;
-}
-
-.menu-btn {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    color: white;
-    cursor: pointer;
-    opacity: 0.6;
-    transition: 0.3s;
-}
-
-.menu-btn.active {
-    opacity: 1 !important;
-    color: #00e5ff !important;
-}
-
-.menu-btn .icon { font-size: 24px; }
-.menu-btn .label { font-size: 10px; margin-top: 5px; text-transform: uppercase; }
-
-.action-btn {
-    width: 100%;
-    border: 1px solid rgba(0, 229, 255, 0.35);
-    border-radius: 12px;
-    background: rgba(0, 229, 255, 0.12);
-    color: #00e5ff;
-    opacity: 1;
-    padding: 10px 8px;
-    font: inherit;
-}
-
-.action-btn:hover,
-.action-btn:focus-visible {
-    background: rgba(0, 229, 255, 0.2);
-    outline: none;
 }
 
 #info-card {
-    position: absolute;
-    bottom: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 80%;
-    max-width: 500px;
-    padding: 15px;
-    z-index: 100;
+    display: block;
+    opacity: 1;
+    visibility: visible;
 }
 
-.card-content { display: flex; align-items: center; gap: 15px; }
-.text-area { color: white; }
-.text-area h3 { margin: 0; font-size: 16px; color: #00e5ff; }
-.text-area p { margin: 5px 0; font-size: 12px; opacity: 0.8; }
-
+#btn-launch .menu-icon {
+    font-size: 15px;
+}

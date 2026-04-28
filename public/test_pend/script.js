@@ -1,3 +1,11 @@
+const query = new URLSearchParams(window.location.search);
+const currentTheme = query.get("theme") === "light" ? "light" : "dark";
+const currentLanguage = query.get("lang") === "ar" ? "ar" : "en";
+
+document.documentElement.dataset.theme = currentTheme;
+document.documentElement.lang = currentLanguage;
+document.documentElement.dir = currentLanguage === "ar" ? "rtl" : "ltr";
+
 const UI = {
     video: document.getElementById("videoInput"),
     status: document.getElementById("status"),
@@ -8,7 +16,7 @@ const UI = {
 let src, cap, qrDetector, camMatrix, distCoeffs, rvec, tvec, rotMatr, objectPoints;
 let renderer, scene, camera, arGroup, mainModel;
 let AR_SCALE = 2.0;
-const BUILD_VERSION = "20260427-1";
+const BUILD_VERSION = "20260428-1";
 const DEFAULT_MODEL_PATH = "./assets/newtons_cradle (1).glb";
 
 let currentMode = "rotate";
@@ -18,6 +26,7 @@ let pointerStart = null;
 let pointerMoved = false;
 let pressedBall = null;
 let selectedPendulumBall = null;
+let launchButton = null;
 let pendulumBalls = [];
 let pendulumPhases = [];
 let pendulumPhaseIndex = 0;
@@ -79,6 +88,14 @@ function lerp(start, end, amount) {
 
 function easeInOutSine(amount) {
     return -(Math.cos(Math.PI * amount) - 1) / 2;
+}
+
+function setLaunchButtonActive(isActive) {
+    if (!launchButton) {
+        return;
+    }
+
+    launchButton.classList.toggle("active", isActive);
 }
 
 async function initProject() {
@@ -268,16 +285,19 @@ function getLaunchBall() {
 
 function startPendulumAnimation(ball) {
     if (!ball) {
+        setLaunchButtonActive(false);
         UI.status.innerText = "Aucune bille disponible";
         return;
     }
 
     if (!ball.isOuter) {
+        setLaunchButtonActive(false);
         UI.status.innerText = "Cliquez sur une bille laterale";
         return;
     }
 
     selectedPendulumBall = ball;
+    setLaunchButtonActive(true);
 
     const oppositeBall = ball.index === 0
         ? pendulumBalls[pendulumBalls.length - 1]
@@ -343,6 +363,7 @@ function updatePendulumAnimation(now) {
     if (pendulumPhaseIndex >= pendulumPhases.length) {
         pendulumPhases = [];
         pendulumPhaseIndex = 0;
+        setLaunchButtonActive(false);
         UI.status.innerText = "Pret : Scannez le QR Code";
     }
 }
@@ -351,6 +372,7 @@ function setupControls() {
     const btnRotate = document.getElementById("btn-rotate");
     const btnScale = document.getElementById("btn-scale");
     const btnLaunch = document.getElementById("btn-launch");
+    launchButton = btnLaunch;
     btnRotate.onclick = () => {
         currentMode = "rotate";
         btnRotate.classList.add("active");

@@ -14,6 +14,7 @@ import SceneArtwork from "../components/SceneArtwork";
 import { getExperienceById, getSubjectById } from "../data/arData";
 import { getExperienceCopy, getSubjectCopy } from "../i18n/appCopy";
 import HeartArPage from "./HeartArPage";
+import PendulumArPage from "./PendulumArPage";
 import { recordExperienceLaunch } from "../profile/userProgressStore";
 import { useAppSettings } from "../settings/AppSettingsContext";
 import SolarSystemArPage from "./SolarSystemArPage";
@@ -70,6 +71,17 @@ const ViewerPage: React.FC = () => {
   if (experience.id === "solar-system-model") {
     return (
       <SolarSystemArPage
+        experienceTitle={localizedExperience.title}
+        language={settings.language}
+        onBack={handleBack}
+        theme={settings.theme}
+      />
+    );
+  }
+
+  if (experience.id === "simple-pendulum") {
+    return (
+      <PendulumArPage
         experienceTitle={localizedExperience.title}
         language={settings.language}
         onBack={handleBack}
