@@ -1,0 +1,13 @@
+{
+  "assets": {
+    "models": {
+      "lung": {
+        "name": "Poumons humains",
+        "path": "./assets/realistic_human_lungs.glb"
+      }
+    }
+  },
+  "settings": {
+    "arScale": 2
+  }
+}

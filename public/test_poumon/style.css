@@ -1,0 +1,15 @@
+@import "../test_solar/style.css";
+
+#side-menu {
+    display: flex;
+}
+
+#info-card {
+    display: block;
+    opacity: 1;
+    visibility: visible;
+}
+
+#btn-launch .menu-icon {
+    font-size: 15px;
+}

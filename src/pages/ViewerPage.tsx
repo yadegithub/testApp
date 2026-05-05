@@ -18,6 +18,7 @@ import FemaleReproductiveSystemArPage from "./FemaleReproductiveSystemArPage";
 import HeartArPage from "./HeartArPage";
 import HumanSkinArPage from "./HumanSkinArPage";
 import KidneyArPage from "./KidneyArPage";
+import LungArPage from "./LungArPage";
 import PendulumArPage from "./PendulumArPage";
 import { recordExperienceLaunch } from "../profile/userProgressStore";
 import { useAppSettings } from "../settings/AppSettingsContext";
@@ -64,6 +65,17 @@ const ViewerPage: React.FC = () => {
   if (experience.id === "human-heart") {
     return (
       <HeartArPage
+        experienceTitle={localizedExperience.title}
+        language={settings.language}
+        onBack={handleBack}
+        theme={settings.theme}
+      />
+    );
+  }
+
+  if (experience.id === "human-lung") {
+    return (
+      <LungArPage
         experienceTitle={localizedExperience.title}
         language={settings.language}
         onBack={handleBack}

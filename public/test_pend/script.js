@@ -15,9 +15,16 @@ const UI = {
 
 let src, cap, qrDetector, camMatrix, distCoeffs, rvec, tvec, rotMatr, objectPoints;
 let renderer, scene, camera, arGroup, mainModel;
-let AR_SCALE = 2.0;
-const BUILD_VERSION = "20260428-1";
+let AR_SCALE = 0.1;
+const BUILD_VERSION = "20260503-4";
 const DEFAULT_MODEL_PATH = "./assets/newtons_cradle (1).glb";
+const MARKER_LOST_GRACE_FRAMES = 3;
+const INITIAL_CONFIRM_FRAMES = 3;
+const TRACKED_CONFIRM_FRAMES = 1;
+const MIN_QR_AREA_RATIO = 0.006;
+const MIN_QR_EDGE = 56;
+const MAX_QR_EDGE_RATIO = 2.8;
+const MAX_CENTER_JUMP_RATIO = 0.2;
 
 let currentMode = "rotate";
 let isDragging = false;
@@ -31,15 +38,32 @@ let pendulumBalls = [];
 let pendulumPhases = [];
 let pendulumPhaseIndex = 0;
 let pendulumPhaseStartedAt = 0;
+let lostMarkerFrames = 0;
+let hasTrackingPose = false;
+let detectionStreak = 0;
+let lastDetectionCenter = null;
+let hasLockedOnQr = false;
 
 const raycaster = new THREE.Raycaster();
 const pointer = new THREE.Vector2();
+const trackedMatrix = new THREE.Matrix4();
+const trackedPosition = new THREE.Vector3();
+const trackedQuaternion = new THREE.Quaternion();
+const trackedScale = new THREE.Vector3();
 const CLICK_MOVE_THRESHOLD = 8;
 const DEFAULT_SWING_ANGLE = 0.95;
 const SWING_DAMPING = 0.72;
 const MIN_SWING_ANGLE = 0.18;
 
 window.addEventListener("resize", fitToScreen);
+
+function setStatus(message) {
+    if (!UI.status || UI.status.innerText === message) {
+        return;
+    }
+
+    UI.status.innerText = message;
+}
 
 function withCacheBuster(url) {
     const separator = url.includes("?") ? "&" : "?";
@@ -99,7 +123,7 @@ function setLaunchButtonActive(isActive) {
 }
 
 async function initProject() {
-    UI.status.innerText = "Chargement du pendule...";
+    setStatus("Chargement du pendule...");
     try {
         const response = await fetch(withCacheBuster("./data.json"));
         if (!response.ok) {
@@ -120,7 +144,7 @@ function startAR(modelPath) {
     UI.video.muted = true;
     UI.video.autoplay = true;
     UI.video.playsInline = true;
-    UI.status.innerText = "Demande d'acces a la camera...";
+    setStatus("Demande d'acces a la camera...");
 
     navigator.mediaDevices.getUserMedia({
         video: {
@@ -155,7 +179,7 @@ function startAR(modelPath) {
         };
     }).catch(err => {
         console.error("Camera error:", err);
-        UI.status.innerText = `Erreur camera: ${err.name || "Acces refuse"}`;
+        setStatus(`Erreur camera: ${err.name || "Acces refuse"}`);
     });
 }
 
@@ -168,13 +192,14 @@ function setupThreeJS(modelPath) {
         antialias: true
     });
     renderer.setSize(width, height, false);
+    renderer.setPixelRatio(window.devicePixelRatio || 1);
 
     scene = new THREE.Scene();
     camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 1000);
 
     arGroup = new THREE.Group();
     arGroup.visible = false;
-    arGroup.matrixAutoUpdate = false;
+    arGroup.matrixAutoUpdate = true;
     scene.add(arGroup);
 
     scene.add(new THREE.AmbientLight(0xffffff, 1.5));
@@ -188,11 +213,11 @@ function setupThreeJS(modelPath) {
         arGroup.add(mainModel);
         setupPendulumBalls();
 
-        UI.status.innerText = "Pret : Scannez le QR Code";
+        setStatus("Pret : Scannez le QR Code");
         setupInteraction();
     }, undefined, (err) => {
         console.error("Model error:", err);
-        UI.status.innerText = "Erreur chargement modele";
+        setStatus("Erreur chargement modele");
     });
 }
 
@@ -286,13 +311,13 @@ function getLaunchBall() {
 function startPendulumAnimation(ball) {
     if (!ball) {
         setLaunchButtonActive(false);
-        UI.status.innerText = "Aucune bille disponible";
+        setStatus("Aucune bille disponible");
         return;
     }
 
     if (!ball.isOuter) {
         setLaunchButtonActive(false);
-        UI.status.innerText = "Cliquez sur une bille laterale";
+        setStatus("Cliquez sur une bille laterale");
         return;
     }
 
@@ -339,7 +364,7 @@ function startPendulumAnimation(ball) {
     }
 
     pendulumPhaseStartedAt = performance.now();
-    UI.status.innerText = "Collision en cours...";
+    setStatus("Collision en cours...");
 }
 
 function updatePendulumAnimation(now) {
@@ -364,7 +389,7 @@ function updatePendulumAnimation(now) {
         pendulumPhases = [];
         pendulumPhaseIndex = 0;
         setLaunchButtonActive(false);
-        UI.status.innerText = "Pret : Scannez le QR Code";
+        setStatus("Pret : Scannez le QR Code");
     }
 }
 
@@ -487,6 +512,123 @@ function initOpenCV() {
     );
 }
 
+function getDetectedCorners(points) {
+    if (!points?.data32F || points.data32F.length < 8) {
+        return null;
+    }
+
+    return [
+        { x: points.data32F[0], y: points.data32F[1] },
+        { x: points.data32F[2], y: points.data32F[3] },
+        { x: points.data32F[4], y: points.data32F[5] },
+        { x: points.data32F[6], y: points.data32F[7] }
+    ];
+}
+
+function getQrMetrics(points) {
+    const corners = getDetectedCorners(points);
+    if (!corners) {
+        return null;
+    }
+
+    let area = 0;
+    for (let index = 0; index < corners.length; index += 1) {
+        const current = corners[index];
+        const next = corners[(index + 1) % corners.length];
+        area += (current.x * next.y) - (next.x * current.y);
+    }
+
+    const edgeLengths = corners.map((corner, index) => {
+        const next = corners[(index + 1) % corners.length];
+        return Math.hypot(next.x - corner.x, next.y - corner.y);
+    });
+
+    const center = corners.reduce((accumulator, corner) => ({
+        x: accumulator.x + (corner.x / corners.length),
+        y: accumulator.y + (corner.y / corners.length)
+    }), { x: 0, y: 0 });
+
+    return {
+        area: Math.abs(area) * 0.5,
+        center,
+        maxEdge: Math.max(...edgeLengths),
+        minEdge: Math.min(...edgeLengths)
+    };
+}
+
+function isReliableDetection(metrics) {
+    if (!metrics) {
+        return false;
+    }
+
+    const frameArea = UI.video.width * UI.video.height;
+
+    if (metrics.area < frameArea * MIN_QR_AREA_RATIO) {
+        return false;
+    }
+
+    if (metrics.minEdge < MIN_QR_EDGE) {
+        return false;
+    }
+
+    if (metrics.maxEdge / Math.max(metrics.minEdge, 1) > MAX_QR_EDGE_RATIO) {
+        return false;
+    }
+
+    return true;
+}
+
+function updateDetectionConfidence(metrics) {
+    if (!isReliableDetection(metrics)) {
+        detectionStreak = 0;
+        lastDetectionCenter = null;
+        return false;
+    }
+
+    if (lastDetectionCenter) {
+        const maxJump = Math.min(UI.video.width, UI.video.height) * MAX_CENTER_JUMP_RATIO;
+        const currentJump = Math.hypot(
+            metrics.center.x - lastDetectionCenter.x,
+            metrics.center.y - lastDetectionCenter.y
+        );
+        detectionStreak = currentJump <= maxJump ? detectionStreak + 1 : 1;
+    } else {
+        detectionStreak = 1;
+    }
+
+    lastDetectionCenter = metrics.center;
+    const requiredFrames = hasLockedOnQr ? TRACKED_CONFIRM_FRAMES : INITIAL_CONFIRM_FRAMES;
+    return detectionStreak >= requiredFrames;
+}
+
+function resetDetectionConfidence() {
+    detectionStreak = 0;
+    lastDetectionCenter = null;
+}
+
+function isPendulumAnimating() {
+    return pendulumPhases.length > 0 && pendulumPhaseIndex < pendulumPhases.length;
+}
+
+function updateTrackingStatus(markerFound, shouldHoldSteady) {
+    if (markerFound && isPendulumAnimating()) {
+        setStatus("Collision en cours...");
+        return;
+    }
+
+    if (markerFound) {
+        setStatus("Modele stabilise");
+        return;
+    }
+
+    if (shouldHoldSteady && detectionStreak > 0) {
+        setStatus("QR detecte, gardez-le stable...");
+        return;
+    }
+
+    setStatus("Pret : Scannez le QR Code");
+}
+
 function processFrame() {
     if (!cap || !src) {
         requestAnimationFrame(processFrame);
@@ -497,38 +639,77 @@ function processFrame() {
     cv.imshow("canvasOutput", src);
 
     const points = new cv.Mat();
+    let markerFound = false;
+    let shouldHoldSteady = false;
 
     if (qrDetector.detect(src, points)) {
-        const imgPts = cv.matFromArray(4, 1, cv.CV_32FC2, [
-            points.data32F[0], points.data32F[1],
-            points.data32F[2], points.data32F[3],
-            points.data32F[4], points.data32F[5],
-            points.data32F[6], points.data32F[7]
-        ]);
+        const metrics = getQrMetrics(points);
+        const confirmedDetection = updateDetectionConfidence(metrics);
+        shouldHoldSteady = Boolean(metrics);
 
-        if (cv.solvePnP(objectPoints, imgPts, camMatrix, distCoeffs, rvec, tvec)) {
-            cv.Rodrigues(rvec, rotMatr);
-            const r = rotMatr.data64F;
-            const t = tvec.data64F;
-            const m = new THREE.Matrix4();
+        if (confirmedDetection) {
+            const imgPts = cv.matFromArray(4, 1, cv.CV_32FC2, [
+                points.data32F[0], points.data32F[1],
+                points.data32F[2], points.data32F[3],
+                points.data32F[4], points.data32F[5],
+                points.data32F[6], points.data32F[7]
+            ]);
 
-            m.set(
-                r[0] * AR_SCALE,  r[1] * AR_SCALE,  r[2] * AR_SCALE,  t[0],
-               -r[3] * AR_SCALE, -r[4] * AR_SCALE, -r[5] * AR_SCALE, -t[1],
-               -r[6] * AR_SCALE, -r[7] * AR_SCALE, -r[8] * AR_SCALE, -t[2],
-                0,                0,                0,                1
-            );
+            if (cv.solvePnP(objectPoints, imgPts, camMatrix, distCoeffs, rvec, tvec)) {
+                cv.Rodrigues(rvec, rotMatr);
+                const r = rotMatr.data64F;
+                const t = tvec.data64F;
 
-            arGroup.matrix.copy(m);
-            arGroup.visible = true;
+                trackedMatrix.set(
+                    r[0] * AR_SCALE,  r[1] * AR_SCALE,  r[2] * AR_SCALE,  t[0],
+                   -r[3] * AR_SCALE, -r[4] * AR_SCALE, -r[5] * AR_SCALE, -t[1],
+                   -r[6] * AR_SCALE, -r[7] * AR_SCALE, -r[8] * AR_SCALE, -t[2],
+                    0,                0,                0,                1
+                );
+
+                trackedMatrix.decompose(
+                    trackedPosition,
+                    trackedQuaternion,
+                    trackedScale
+                );
+
+                if (!hasTrackingPose) {
+                    arGroup.position.copy(trackedPosition);
+                    arGroup.quaternion.copy(trackedQuaternion);
+                    arGroup.scale.copy(trackedScale);
+                    hasTrackingPose = true;
+                    hasLockedOnQr = true;
+                } else {
+                    arGroup.position.copy(trackedPosition);
+                    arGroup.quaternion.copy(trackedQuaternion);
+                    arGroup.scale.copy(trackedScale);
+                }
+
+                arGroup.visible = true;
+                markerFound = true;
+                lostMarkerFrames = 0;
+            }
+
+            imgPts.delete();
         }
-
-        imgPts.delete();
     } else {
-        arGroup.visible = false;
+        resetDetectionConfidence();
+    }
+
+    if (!markerFound) {
+        if (hasTrackingPose && lostMarkerFrames < MARKER_LOST_GRACE_FRAMES) {
+            lostMarkerFrames += 1;
+            arGroup.visible = true;
+            markerFound = true;
+        } else {
+            arGroup.visible = false;
+            hasTrackingPose = false;
+            lostMarkerFrames = 0;
+        }
     }
 
     updatePendulumAnimation(performance.now());
+    updateTrackingStatus(markerFound, shouldHoldSteady);
     renderer.render(scene, camera);
     points.delete();
     requestAnimationFrame(processFrame);
@@ -541,6 +722,9 @@ function fitToScreen() {
     [UI.canvasOutput, UI.canvasThree].forEach(canvas => {
         canvas.style.width = `${width * scale}px`;
         canvas.style.height = `${height * scale}px`;
+        canvas.style.left = "50%";
+        canvas.style.top = "50%";
+        canvas.style.transform = "translate(-50%, -50%)";
     });
 
 }

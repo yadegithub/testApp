@@ -1,0 +1,7 @@
+{
+  "name": "test_poumon",
+  "dependencies": {
+    "npm": "^11.13.0",
+    "run": "^1.5.0"
+  }
+}
