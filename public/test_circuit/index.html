@@ -4,15 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>Circuit electrique AR</title>
-    <link rel="stylesheet" href="style.css?v=20260505-3">
+    <link rel="stylesheet" href="style.css">
     <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/build/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/examples/js/loaders/GLTFLoader.js"></script>
     <script async src="https://docs.opencv.org/4.5.4/opencv.js"></script>
 </head>
 <body>
-    <video id="videoInput" autoplay muted playsinline style="display:none"></video>
-    <canvas id="canvasOutput" style="position:absolute; top:0; left:0;"></canvas>
-    <canvas id="canvasThree" style="position:absolute; top:0; left:0;"></canvas>
+    <video id="videoInput" autoplay muted playsinline></video>
+    <canvas id="canvasOutput"></canvas>
+    <canvas id="canvasThree"></canvas>
 
     <div id="ui-layer">
         <div id="app-header">
@@ -33,15 +33,18 @@
                 <span class="menu-icon">S</span>
                 <span class="label">Scale</span>
             </button>
-            <hr class="sep">
             <button class="menu-btn action-btn" id="btn-launch" type="button">
                 <span class="menu-icon">&#9654;</span>
                 <span class="label">Allumer</span>
             </button>
-            <button class="menu-btn active" id="btn-labels" type="button" aria-pressed="true">
-                <span class="menu-icon">L</span>
-                <span class="label">Labels</span>
-            </button>
+            <hr class="sep">
+            <div class="toggle-box">
+                <label class="switch">
+                    <input type="checkbox" id="btn-labels" checked aria-pressed="true">
+                    <span class="slider"></span>
+                </label>
+                <span class="label">Labels On/Off</span>
+            </div>
         </div>
 
         <div id="info-card" class="glass info-card--visible">
@@ -60,6 +63,6 @@
         </div>
     </div>
 
-    <script src="script.js?v=20260505-3"></script>
+    <script src="script.js"></script>
 </body>
 </html>

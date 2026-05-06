@@ -1,0 +1,102 @@
+{
+  "assets": {
+    "models": {
+      "primary": {
+        "name": "Human Kidney",
+        "path": "assets/kidney.glb",
+        "scale": { "x": 0.16, "y": 0.16, "z": 0.16 },
+        "position": { "x": 0.0, "y": 0.0, "z": 0.0 },
+        "rotation": { "x": 0.0, "y": 3.141592653589793, "z": 0.0 },
+        "autoCenter": true
+      }
+    },
+    "audio": "assets/heartbeat.mp3",
+    "icon": "assets/Human kidney icon.jpg"
+  },
+  "content": {
+    "defaultPart": {
+      "en": {
+        "tag": "Kidney anatomy",
+        "name": "HUMAN KIDNEY",
+        "info": "Inspect the kidney in AR and tap the numbered notes to understand the main filtering structures.",
+        "hint": "Use rotate, scale and labels while the kidney model is active."
+      }
+    },
+    "ui": {
+      "en": {
+        "appEyebrow": "AR Learn live scan",
+        "appTitle": "HUMAN KIDNEY",
+        "statusLoading": "Loading human kidney model...",
+        "statusTracking": "Human kidney placed",
+        "focusTag": "Kidney structure"
+      }
+    },
+    "parts": [
+      {
+        "id": "capsule",
+        "label": "Capsule",
+        "title": "CAPSULE",
+        "info": "The capsule is the thin outer covering that helps protect the kidney.",
+        "hint": "This outer layer wraps around the kidney surface.",
+        "normalizedPosition": [-0.34, 0.25, 0.18]
+      },
+      {
+        "id": "cortex",
+        "label": "Cortex",
+        "title": "CORTEX",
+        "info": "The cortex is the outer region where blood filtration begins inside the kidney.",
+        "hint": "This layer sits just beneath the capsule.",
+        "normalizedPosition": [0.16, 0.21, 0.18]
+      },
+      {
+        "id": "renal-medulla",
+        "label": "Renal Medulla",
+        "title": "RENAL MEDULLA",
+        "info": "The renal medulla contains the pyramids that help concentrate urine as it moves inward.",
+        "hint": "This deeper region lies toward the center of the kidney.",
+        "normalizedPosition": [0.0, 0.02, 0.22]
+      },
+      {
+        "id": "renal-artery",
+        "label": "Renal Artery",
+        "title": "RENAL ARTERY",
+        "info": "The renal artery brings oxygen-rich blood into the kidney for filtration.",
+        "hint": "This red vessel feeds blood into the kidney.",
+        "normalizedPosition": [-0.14, -0.06, 0.26]
+      },
+      {
+        "id": "renal-vein",
+        "label": "Renal Vein",
+        "title": "RENAL VEIN",
+        "info": "The renal vein carries filtered blood away from the kidney and back toward circulation.",
+        "hint": "This blue vessel exits the kidney after filtration.",
+        "normalizedPosition": [0.18, -0.02, 0.24]
+      },
+      {
+        "id": "ureter",
+        "label": "Ureter",
+        "title": "URETER",
+        "info": "The ureter transports urine from the kidney down toward the bladder.",
+        "hint": "This narrow tube leaves the lower side of the kidney.",
+        "normalizedPosition": [0.14, -0.34, 0.12]
+      }
+    ]
+  },
+  "settings": {
+    "arScale": 2.6,
+    "tracking": {
+      "markerLostGraceFrames": 3,
+      "trackingLerpAlpha": 0.26,
+      "trackingScaleLerpAlpha": 0.22,
+      "confirmFrames": 2,
+      "qrScanIntervalMs": 20,
+      "qrSearchIntervalMs": 40,
+      "positionDeadzone": 0.02,
+      "scaleDeadzone": 0.018,
+      "rotationDeadzoneRad": 0.03,
+      "fastFollowDistance": 0.12,
+      "fastFollowAlpha": 0.62
+    },
+    "debugMode": false
+  }
+}

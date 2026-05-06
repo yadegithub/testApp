@@ -1,0 +1,160 @@
+{
+  "assets": {
+    "models": {
+      "tectonicPlates": {
+        "name": "Tectonic Plates",
+        "path": "assets/animated_tectonic_plates_collide_loop.glb",
+        "scale": { "x": 0.9, "y": 0.9, "z": 0.9 },
+        "position": { "x": 0.0, "y": 0.18, "z": 0.0 },
+        "rotation": { "x": 0.0, "y": 3.141592653589793, "z": 0.0 },
+        "autoCenter": true
+      }
+    },
+    "audio": "assets/heartbeat.mp3",
+    "icon": "assets/tectonic_plates_icon.jpg"
+  },
+  "content": {
+    "defaultPart": {
+      "en": {
+        "tag": "Geography model",
+        "name": "TECTONIC PLATES",
+        "info": "Inspect tectonic plates in AR and tap the numbered labels to learn how plate collisions shape Earth's surface.",
+        "hint": "Use rotate, scale and labels while the model is active."
+      },
+      "ar": {
+        "tag": "نموذج جغرافي",
+        "name": "الصفائح التكتونية",
+        "info": "استكشف الصفائح التكتونية في الواقع المعزز واضغط على العلامات المرقمة لفهم كيف تشكل حركة الصفائح سطح الأرض.",
+        "hint": "استخدم التدوير والتحجيم والتسميات أثناء عرض النموذج."
+      }
+    },
+    "ui": {
+      "en": {
+        "appEyebrow": "AR Learn live scan",
+        "appTitle": "TECTONIC PLATES",
+        "rotate": "Rotate",
+        "scale": "Scale",
+        "launchCollision": "Launch",
+        "pauseCollision": "Pause",
+        "labels": "Numbers On/Off",
+        "statusStarting": "Starting camera...",
+        "statusLoading": "Loading tectonic plates model...",
+        "statusReady": "Camera ready",
+        "statusTracking": "Tectonic plates placed",
+        "statusHoldSteady": "Hold steady while locking QR...",
+        "statusSearching": "Searching for QR code...",
+        "statusCameraError": "Camera access was denied.",
+        "statusModelError": "The tectonic plates model could not be loaded.",
+        "focusTag": "Plate boundary"
+      },
+      "ar": {
+        "appEyebrow": "مسح مباشر",
+        "appTitle": "الصفائح التكتونية",
+        "rotate": "تدوير",
+        "scale": "تحجيم",
+        "launchCollision": "ابدأ",
+        "pauseCollision": "إيقاف",
+        "labels": "الأرقام تشغيل/إيقاف",
+        "statusStarting": "جار تشغيل الكاميرا...",
+        "statusLoading": "جار تحميل نموذج الصفائح التكتونية...",
+        "statusReady": "الكاميرا جاهزة",
+        "statusTracking": "تم وضع الصفائح التكتونية",
+        "statusHoldSteady": "ثبت الجهاز أثناء التقاط رمز QR...",
+        "statusSearching": "جار البحث عن رمز QR...",
+        "statusCameraError": "تم رفض الوصول إلى الكاميرا.",
+        "statusModelError": "تعذر تحميل نموذج الصفائح التكتونية.",
+        "focusTag": "حد الصفائح"
+      }
+    },
+    "parts": [
+      {
+        "id": "convergent-boundary",
+        "label": { "en": "Convergent Boundary", "ar": "حد تقاربي" },
+        "title": { "en": "CONVERGENT BOUNDARY", "ar": "حد تقاربي" },
+        "info": {
+          "en": "A convergent boundary forms where two tectonic plates move toward each other.",
+          "ar": "يتشكل الحد التقاربي عندما تتحرك صفيحتان تكتونيتان باتجاه بعضهما."
+        },
+        "hint": {
+          "en": "Watch the collision zone to see how crust can fold, rise, or sink.",
+          "ar": "راقب منطقة التصادم لترى كيف تنثني القشرة أو ترتفع أو تهبط."
+        },
+        "normalizedPosition": [0.0, 0.16, 0.3]
+      },
+      {
+        "id": "subduction-zone",
+        "label": { "en": "Subduction Zone", "ar": "منطقة الانغراز" },
+        "title": { "en": "SUBDUCTION ZONE", "ar": "منطقة الانغراز" },
+        "info": {
+          "en": "Subduction happens when one plate dives beneath another into the mantle.",
+          "ar": "يحدث الانغراز عندما تنزلق صفيحة تحت أخرى نحو الوشاح."
+        },
+        "hint": {
+          "en": "This downward motion can create trenches, volcanoes, and earthquakes.",
+          "ar": "قد تسبب هذه الحركة الخنادق والبراكين والزلازل."
+        },
+        "normalizedPosition": [0.22, -0.08, 0.25]
+      },
+      {
+        "id": "uplift",
+        "label": { "en": "Uplift", "ar": "ارتفاع القشرة" },
+        "title": { "en": "UPLIFT", "ar": "ارتفاع القشرة" },
+        "info": {
+          "en": "Uplift raises crustal material as plates compress and deform the surface.",
+          "ar": "يرفع الضغط مواد القشرة عندما تتقارب الصفائح ويتغير شكل السطح."
+        },
+        "hint": {
+          "en": "Mountain ranges often grow slowly from repeated uplift.",
+          "ar": "تنمو السلاسل الجبلية غالبا ببطء نتيجة الارتفاع المتكرر."
+        },
+        "normalizedPosition": [-0.08, 0.26, 0.35]
+      },
+      {
+        "id": "oceanic-plate",
+        "label": { "en": "Oceanic Plate", "ar": "صفيحة محيطية" },
+        "title": { "en": "OCEANIC PLATE", "ar": "صفيحة محيطية" },
+        "info": {
+          "en": "Oceanic plates are dense sections of lithosphere that can sink below lighter crust.",
+          "ar": "الصفائح المحيطية أجزاء كثيفة من الغلاف الصخري وقد تنغرز تحت قشرة أخف."
+        },
+        "hint": {
+          "en": "Density helps explain why one plate may slide underneath another.",
+          "ar": "تساعد الكثافة في تفسير سبب انزلاق صفيحة تحت أخرى."
+        },
+        "normalizedPosition": [0.34, 0.02, 0.2]
+      },
+      {
+        "id": "continental-plate",
+        "label": { "en": "Continental Plate", "ar": "صفيحة قارية" },
+        "title": { "en": "CONTINENTAL PLATE", "ar": "صفيحة قارية" },
+        "info": {
+          "en": "Continental plates are thicker and less dense, so they often crumple and rise during collision.",
+          "ar": "الصفائح القارية أكثر سماكة وأقل كثافة، لذلك تنثني وترتفع غالبا أثناء التصادم."
+        },
+        "hint": {
+          "en": "Compression along these edges can build high terrain.",
+          "ar": "يمكن للضغط على هذه الحواف أن يبني تضاريس مرتفعة."
+        },
+        "normalizedPosition": [-0.32, 0.04, 0.22]
+      },
+      {
+        "id": "earthquake-focus",
+        "label": { "en": "Earthquake Focus", "ar": "بؤرة الزلزال" },
+        "title": { "en": "EARTHQUAKE FOCUS", "ar": "بؤرة الزلزال" },
+        "info": {
+          "en": "Earthquakes begin where stress suddenly releases along a plate boundary.",
+          "ar": "تبدأ الزلازل عندما تتحرر الطاقة فجأة على امتداد حدود الصفائح."
+        },
+        "hint": {
+          "en": "The strongest shaking usually follows active faults near moving plates.",
+          "ar": "غالبا ما يتبع الاهتزاز الأقوى الصدوع النشطة قرب الصفائح المتحركة."
+        },
+        "normalizedPosition": [0.08, -0.2, 0.28]
+      }
+    ]
+  },
+  "settings": {
+    "arScale": 1,
+    "debugMode": false
+  }
+}

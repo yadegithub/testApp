@@ -1,0 +1,89 @@
+{
+  "assets": {
+    "models": {
+      "primary": {
+        "name": "Human Skin",
+        "path": "assets/human_anatomy_skin.glb",
+        "scale": { "x": 0.58, "y": 0.58, "z": 0.58 },
+        "position": { "x": 0.5, "y": 0.55, "z": 0.0 },
+        "rotation": { "x": 0.0, "y": 3.141592653589793, "z": 0.0 },
+        "autoCenter": true
+      }
+    },
+    "audio": "assets/heartbeat.mp3",
+    "icon": "assets/human skin icon.jpg"
+  },
+  "content": {
+    "defaultPart": {
+      "en": {
+        "tag": "Skin anatomy",
+        "name": "HUMAN SKIN",
+        "info": "Inspect the layers of the skin in AR and tap the numbered labels to understand each protective and sensory structure.",
+        "hint": "Use rotate, scale and labels while the skin model is active."
+      }
+    },
+    "ui": {
+      "en": {
+        "appEyebrow": "AR Learn live scan",
+        "appTitle": "HUMAN SKIN",
+        "statusLoading": "Loading human skin model...",
+        "statusTracking": "Human skin placed",
+        "focusTag": "Skin structure"
+      }
+    },
+    "parts": [
+      {
+        "id": "epidermis",
+        "label": "Epidermis",
+        "title": "EPIDERMIS",
+        "info": "The epidermis is the thin outer layer that protects the body from the environment.",
+        "hint": "This surface layer forms the skin's first protective barrier.",
+        "normalizedPosition": [0.02, 0.43, 0.18]
+      },
+      {
+        "id": "dermis",
+        "label": "Dermis",
+        "title": "DERMIS",
+        "info": "The dermis supports the epidermis and contains vessels, nerves, follicles and glands.",
+        "hint": "This middle layer gives the skin strength and sensation.",
+        "normalizedPosition": [-0.12, 0.22, 0.16]
+      },
+      {
+        "id": "hair-follicle",
+        "label": "Hair Follicle",
+        "title": "HAIR FOLLICLE",
+        "info": "The hair follicle anchors a hair strand and supports its growth beneath the surface.",
+        "hint": "Look for the tube-like structure surrounding the hair root.",
+        "normalizedPosition": [0.28, 0.12, 0.22]
+      },
+      {
+        "id": "sebaceous-gland",
+        "label": "Sebaceous Gland",
+        "title": "SEBACEOUS GLAND",
+        "info": "The sebaceous gland releases oil that helps keep the skin and hair from drying out.",
+        "hint": "This gland connects closely to the hair follicle.",
+        "normalizedPosition": [0.34, -0.01, 0.18]
+      },
+      {
+        "id": "sweat-gland",
+        "label": "Sweat Gland",
+        "title": "SWEAT GLAND",
+        "info": "The sweat gland produces sweat to help regulate body temperature.",
+        "hint": "Its coiled shape sits deeper in the skin layers.",
+        "normalizedPosition": [-0.05, -0.16, 0.24]
+      },
+      {
+        "id": "hypodermis",
+        "label": "Hypodermis",
+        "title": "HYPODERMIS",
+        "info": "The hypodermis is the deeper fatty layer that cushions the body and helps store energy.",
+        "hint": "This bottom layer helps anchor the skin to the tissues below.",
+        "normalizedPosition": [-0.18, -0.33, 0.12]
+      }
+    ]
+  },
+  "settings": {
+    "arScale": 2.6,
+    "debugMode": false
+  }
+}

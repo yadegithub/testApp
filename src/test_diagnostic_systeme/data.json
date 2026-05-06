@@ -1,0 +1,35 @@
+{
+  "assets": {
+    "models": {
+      "digestive": {
+        "name": "Digestive System",
+        "path": "assets/digestive_system.glb",
+        "scale": { "x": 0.95, "y": 0.95, "z": 0.95 },
+        "position": { "x": 0.5, "y": 0.55, "z": 0.0 },
+        "rotation": { "x": 0.0, "y": 3.141592653589793, "z": 0.0 }
+      }
+    },
+    "audio": "assets/heartbeat.mp3",
+    "icon": "assets/heart-icon.jpeg"
+  },
+  "content": {
+    "defaultPart": {
+      "en": {
+        "tag": "Digestive anatomy",
+        "name": "DIGESTIVE SYSTEM",
+        "info": "Inspect the full digestive system in AR and tap the numbered labels to read the role of each main structure.",
+        "hint": "Use rotate, scale and labels while the model is active."
+      },
+      "ar": {
+        "tag": "تشريح الجهاز الهضمي",
+        "name": "الجهاز الهضمي",
+        "info": "استكشف الجهاز الهضمي كاملا في الواقع المعزز واضغط على العلامات المرقمة لقراءة دور كل بنية رئيسية.",
+        "hint": "استخدم التدوير والتحجيم والصوت والتسميات أثناء عرض النموذج."
+      }
+    }
+  },
+  "settings": {
+    "arScale": 2.6,
+    "debugMode": false
+  }
+}

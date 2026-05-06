@@ -218,7 +218,7 @@ function createOrganLabels() {
         const button = document.createElement("button");
         button.type = "button";
         button.className = "organ-label";
-        button.textContent = part.label;
+        button.textContent = String(index + 1);
         button.setAttribute("aria-label", part.label);
         button.setAttribute("aria-pressed", "false");
         button.addEventListener("click", (event) => {

@@ -1,6 +1,7 @@
 const query = new URLSearchParams(window.location.search);
 const currentTheme = query.get("theme") === "light" ? "light" : "dark";
-const currentLanguage = query.get("lang") === "ar" ? "ar" : "en";
+const languageParam = query.get("lang");
+const currentLanguage = languageParam === "ar" ? "ar" : languageParam === "fr" ? "fr" : "en";
 
 document.documentElement.dataset.theme = currentTheme;
 document.documentElement.lang = currentLanguage;
@@ -14,10 +15,14 @@ const UI = {
     card: document.getElementById("info-card"),
     cardTag: document.getElementById("card-tag"),
     labelsLayer: document.getElementById("organ-labels"),
-    labelsButton: document.getElementById("btn-labels"),
+    labelToggle: document.getElementById("label-toggle"),
+    modelTitle: document.getElementById("model-title-pill"),
+    overviewCard: document.getElementById("overview-card"),
+    overviewTitle: document.getElementById("overview-title"),
+    overviewText: document.getElementById("overview-text"),
     partName: document.getElementById("part-name"),
     partInfo: document.getElementById("part-info"),
-    partHint: document.getElementById("part-hint")
+    partHint: document.getElementById("card-hint")
 };
 
 const STATUS_READY = "Pret : Scannez le QR Code";
@@ -41,6 +46,27 @@ const INFO_COPY = {
         hint: "Ø§Ø³ØªØ®Ø¯Ù… Rotate Ùˆ Scale Ùˆ Respire Ù„Ø§Ø³ØªÙƒØ´Ø§Ù Ø§Ù„Ù†Ù…ÙˆØ°Ø¬."
     }
 };
+
+Object.assign(INFO_COPY.fr, {
+    title: "SYSTEME RESPIRATOIRE",
+    overviewTitle: "Poumons humains",
+    overviewText: "Un modele interactif qui montre les principaux organes respiratoires avec des notes guidees pour chaque structure.",
+    focusTag: "STRUCTURE RESPIRATOIRE"
+});
+
+Object.assign(INFO_COPY.en, {
+    title: "RESPIRATORY SYSTEM",
+    overviewTitle: "Human Lungs",
+    overviewText: "An interactive model that shows the main respiratory organs with guided notes for each structure.",
+    focusTag: "RESPIRATORY STRUCTURE"
+});
+
+Object.assign(INFO_COPY.ar, {
+    title: "RESPIRATORY SYSTEM",
+    overviewTitle: "Human Lungs",
+    overviewText: "An interactive model that shows the main respiratory organs with guided notes for each structure.",
+    focusTag: "RESPIRATORY STRUCTURE"
+});
 
 const ORGAN_PARTS = [
     {
@@ -93,7 +119,7 @@ let activeOrganIndex = -1;
 let labelsVisible = true;
 
 let AR_SCALE = 0.12;
-const BUILD_VERSION = "20260505-3";
+const BUILD_VERSION = "20260506-4";
 const DEFAULT_MODEL_PATH = "./assets/realistic_human_lungs.glb";
 const MARKER_LOST_GRACE_FRAMES = 3;
 const INITIAL_CONFIRM_FRAMES = 6;
@@ -153,8 +179,20 @@ function getCopy() {
 function applyInfoCard() {
     const copy = getCopy();
 
+    if (UI.modelTitle) {
+        UI.modelTitle.innerText = copy.title;
+    }
+
+    if (UI.overviewTitle) {
+        UI.overviewTitle.innerText = copy.overviewTitle;
+    }
+
+    if (UI.overviewText) {
+        UI.overviewText.innerText = copy.overviewText;
+    }
+
     if (UI.cardTag) {
-        UI.cardTag.innerText = "MODELE BIOLOGIQUE";
+        UI.cardTag.innerText = copy.focusTag;
     }
 
     if (UI.partName) {
@@ -170,6 +208,18 @@ function applyInfoCard() {
     }
 
     activeOrganIndex = -1;
+    if (UI.card) {
+        UI.card.classList.remove("info-card--visible", "info-card--selected");
+    }
+    updateOrganLabels();
+    positionInfoCard();
+}
+
+function hideSelectedInfoCard() {
+    activeOrganIndex = -1;
+    if (UI.card) {
+        UI.card.classList.remove("info-card--visible", "info-card--selected");
+    }
     updateOrganLabels();
     positionInfoCard();
 }
@@ -178,18 +228,19 @@ function setOrganInfo(index) {
     activeOrganIndex = activeOrganIndex === index ? -1 : index;
 
     if (activeOrganIndex < 0) {
-        applyInfoCard();
+        hideSelectedInfoCard();
         return;
     }
 
     const part = ORGAN_PARTS[activeOrganIndex];
+    const copy = getCopy();
 
     if (UI.cardTag) {
-        UI.cardTag.innerText = "ORGANE SELECTIONNE";
+        UI.cardTag.innerText = copy.focusTag;
     }
 
     if (UI.partName) {
-        UI.partName.innerText = part.label;
+        UI.partName.innerText = part.label.toUpperCase();
     }
 
     if (UI.partInfo) {
@@ -218,7 +269,7 @@ function createOrganLabels() {
         const button = document.createElement("button");
         button.type = "button";
         button.className = "organ-label";
-        button.textContent = part.label;
+        button.textContent = String(index + 1);
         button.setAttribute("aria-label", part.label);
         button.setAttribute("aria-pressed", "false");
         button.addEventListener("click", (event) => {
@@ -245,9 +296,8 @@ function updateOrganLabels() {
         entry.button.setAttribute("aria-pressed", String(isActive));
     });
 
-    if (UI.labelsButton) {
-        UI.labelsButton.classList.toggle("active", labelsVisible);
-        UI.labelsButton.setAttribute("aria-pressed", String(labelsVisible));
+    if (UI.labelToggle) {
+        UI.labelToggle.checked = labelsVisible;
     }
 }
 
@@ -256,6 +306,10 @@ function positionOrganLabels() {
         organLabels.forEach((entry) => {
             entry.button.classList.remove("organ-label--visible");
         });
+        if (activeOrganIndex >= 0 || UI.card?.classList.contains("info-card--visible")) {
+            hideSelectedInfoCard();
+        }
+        syncFloatingUi(false);
         return;
     }
 
@@ -269,7 +323,9 @@ function positionOrganLabels() {
     const spread = clamp(Math.min(window.innerWidth, window.innerHeight) * 0.18, 82, 150);
     const sidePadding = Math.min(120, Math.max(76, window.innerWidth * 0.16));
 
-    organLabels.forEach((entry) => {
+    let activeLabelIsVisible = false;
+
+    organLabels.forEach((entry, index) => {
         const x = clamp(
             centerX + (entry.screenOffset.x * spread),
             sidePadding,
@@ -290,7 +346,47 @@ function positionOrganLabels() {
         entry.button.classList.toggle("organ-label--visible", isOnScreen);
         entry.button.style.left = `${x}px`;
         entry.button.style.top = `${y}px`;
+
+        if (index === activeOrganIndex) {
+            activeLabelIsVisible = isOnScreen;
+        }
     });
+
+    if (activeOrganIndex >= 0 && !activeLabelIsVisible) {
+        hideSelectedInfoCard();
+    }
+
+    positionTitlePill(centerX, centerY, spread, centerIsVisible);
+    syncFloatingUi(centerIsVisible);
+}
+
+function positionTitlePill(centerX, centerY, spread, isVisible) {
+    if (!UI.modelTitle) {
+        return;
+    }
+
+    if (!isVisible || !arGroup?.visible) {
+        UI.modelTitle.classList.remove("model-title-pill--visible");
+        return;
+    }
+
+    const pillWidth = UI.modelTitle.offsetWidth || 190;
+    const left = clamp(centerX - (pillWidth / 2), 18, window.innerWidth - pillWidth - 18);
+    const top = clamp(centerY - (spread * 1.55), 18, window.innerHeight - 96);
+
+    UI.modelTitle.style.left = `${left}px`;
+    UI.modelTitle.style.top = `${top}px`;
+    UI.modelTitle.classList.add("model-title-pill--visible");
+}
+
+function syncFloatingUi(isVisible) {
+    const shouldShow = Boolean(isVisible && arGroup?.visible);
+
+    if (UI.modelTitle && !shouldShow) {
+        UI.modelTitle.classList.remove("model-title-pill--visible");
+    }
+
+    void shouldShow;
 }
 
 function positionInfoCard() {
@@ -298,12 +394,37 @@ function positionInfoCard() {
         return;
     }
 
-    UI.card.classList.remove("info-card--floating");
-    UI.card.style.left = "50%";
-    UI.card.style.top = "";
-    UI.card.style.right = "";
-    UI.card.style.bottom = "18px";
-    UI.card.style.transform = "translateX(-50%)";
+    const selectedEntry = activeOrganIndex >= 0 ? organLabels[activeOrganIndex] : null;
+
+    if (!selectedEntry || !arGroup?.visible || window.innerWidth <= 820) {
+        UI.card.classList.remove("info-card--floating");
+        UI.card.style.left = "50%";
+        UI.card.style.top = "";
+        UI.card.style.right = "";
+        UI.card.style.bottom = window.innerWidth <= 600 ? "12px" : "18px";
+        UI.card.style.transform = "translateX(-50%)";
+        return;
+    }
+
+    const markerRect = selectedEntry.button.getBoundingClientRect();
+    const cardWidth = UI.card.offsetWidth || 300;
+    const cardHeight = UI.card.offsetHeight || 150;
+
+    let left = markerRect.right + 22;
+    if (left + cardWidth > window.innerWidth - 18) {
+        left = markerRect.left - cardWidth - 22;
+    }
+
+    let top = markerRect.top + (markerRect.height / 2) - (cardHeight / 2);
+    left = clamp(left, 18, window.innerWidth - cardWidth - 18);
+    top = clamp(top, 18, window.innerHeight - cardHeight - 18);
+
+    UI.card.classList.add("info-card--floating");
+    UI.card.style.left = `${left}px`;
+    UI.card.style.top = `${top}px`;
+    UI.card.style.right = "auto";
+    UI.card.style.bottom = "auto";
+    UI.card.style.transform = "none";
 }
 
 function setStatus(message) {
@@ -585,9 +706,9 @@ function setupControls() {
         };
     }
 
-    if (UI.labelsButton) {
-        UI.labelsButton.onclick = () => {
-            labelsVisible = !labelsVisible;
+    if (UI.labelToggle) {
+        UI.labelToggle.onchange = (event) => {
+            labelsVisible = event.target.checked;
             if (!labelsVisible && activeOrganIndex >= 0) {
                 activeOrganIndex = -1;
                 applyInfoCard();

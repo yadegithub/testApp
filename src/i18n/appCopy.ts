@@ -113,6 +113,30 @@ const experienceCopy: Record<
       duration: "درس 7 دقائق",
     },
   },
+  "digestive-system": {
+    en: {
+      title: "Digestive System",
+      shortDescription:
+        "Scan a QR code to place the full digestive system and explore its main structures with guided notes.",
+      teaser:
+        "Follow the full digestive pathway in AR and tap numbered labels to understand each major structure.",
+      focusTitle: "Digestive System",
+      focusCopy:
+        "This model presents the digestive system as a complete pathway, from food entry to nutrient absorption and waste processing.",
+      duration: "9 min lesson",
+    },
+    ar: {
+      title: "Ø§Ù„Ø¬Ù‡Ø§Ø² Ø§Ù„Ù‡Ø¶Ù…ÙŠ",
+      shortDescription:
+        "Ø§Ù…Ø³Ø­ Ø±Ù…Ø² QR Ù„Ø¹Ø±Ø¶ Ø§Ù„Ø¬Ù‡Ø§Ø² Ø§Ù„Ù‡Ø¶Ù…ÙŠ ÙÙŠ Ø§Ù„ÙˆØ§Ù‚Ø¹ Ø§Ù„Ù…Ø¹Ø²Ø² ÙˆØ§Ø³ØªÙƒØ´Ù Ø§Ù„Ø£Ø¹Ø¶Ø§Ø¡ Ø¨Ù…Ù„Ø§Ø­Ø¸Ø§Øª Ø¥Ø±Ø´Ø§Ø¯ÙŠØ©.",
+      teaser:
+        "ØªØªØ¨Ø¹ Ù…Ø³Ø§Ø± Ø§Ù„Ù‡Ø¶Ù… ÙÙŠ Ø§Ù„ÙˆØ§Ù‚Ø¹ Ø§Ù„Ù…Ø¹Ø²Ø² ÙˆØ§Ø¶ØºØ· Ø¹Ù„Ù‰ Ø§Ù„Ø£Ø±Ù‚Ø§Ù… Ù„ÙÙ‡Ù… ÙƒÙ„ Ø¹Ø¶Ùˆ.",
+      focusTitle: "Ø§Ù„Ø£Ù…Ø¹Ø§Ø¡ Ø§Ù„Ø¯Ù‚ÙŠÙ‚Ø©",
+      focusCopy:
+        "ÙŠØ­Ø¯Ø« Ù…Ø¹Ø¸Ù… Ø§Ù…ØªØµØ§Øµ Ø§Ù„Ù…ØºØ°ÙŠØ§Øª ÙÙŠ Ø§Ù„Ø£Ù…Ø¹Ø§Ø¡ Ø§Ù„Ø¯Ù‚ÙŠÙ‚Ø© Ø¨Ø¹Ø¯ Ø£Ù† ÙŠÙÙƒÙƒ Ø§Ù„Ù…Ø¹Ø¯Ø© Ø§Ù„Ø·Ø¹Ø§Ù….",
+      duration: "Ø¯Ø±Ø³ 9 Ø¯Ù‚Ø§Ø¦Ù‚",
+    },
+  },
   "solar-system-model": {
     en: {
       title: "Solar System Model",
@@ -203,13 +227,14 @@ const experienceCopy: Record<
   },
   "ancient-civilizations": {
     en: {
-      title: "Ancient Civilizations",
+      title: "Castle of Consuegra",
       shortDescription:
-        "Walk through temples, tools and stories from early empires in AR.",
-      teaser: "Bring a miniature archaeological site into the classroom or home.",
-      focusTitle: "Temple Layout",
+        "Explore a medieval Spanish castle and its defensive architecture in AR.",
+      teaser:
+        "Place the Castle of Consuegra on your desk and inspect its fortress design.",
+      focusTitle: "Main Keep",
       focusCopy:
-        "Explore how ceremonial spaces, columns and artifacts were arranged to guide movement and rituals.",
+        "Study how the keep, walls, towers and gate helped protect the fortress and control movement.",
       duration: "10 min lesson",
     },
     ar: {
@@ -242,6 +267,30 @@ const experienceCopy: Record<
       focusCopy:
         "شاهد صفيحة تنزلق أسفل أخرى واكتشف كيف تبدأ الجبال والخنادق والزلازل.",
       duration: "درس 9 دقائق",
+    },
+  },
+  volcano: {
+    en: {
+      title: "Volcano",
+      shortDescription:
+        "Scan the QR code to place a volcano model and explore the crater, vent, magma chamber and lava flow.",
+      teaser:
+        "Launch the volcano in AR and inspect how eruptions move magma from underground to the surface.",
+      focusTitle: "Magma Chamber",
+      focusCopy:
+        "The magma chamber stores molten rock beneath the volcano before pressure pushes it upward through the main vent.",
+      duration: "8 min lesson",
+    },
+    ar: {
+      title: "البركان",
+      shortDescription:
+        "امسح رمز QR لوضع نموذج بركان واستكشاف الفوهة والقناة وغرفة الصهارة وتدفق الحمم.",
+      teaser:
+        "شغل البركان في الواقع المعزز وافحص كيف تحرك الثورانات الصهارة من باطن الأرض إلى السطح.",
+      focusTitle: "غرفة الصهارة",
+      focusCopy:
+        "تخزن غرفة الصهارة الصخور المنصهرة تحت البركان قبل أن يدفعها الضغط صعودا عبر القناة الرئيسية.",
+      duration: "درس 8 دقائق",
     },
   },
 };

@@ -1,0 +1,97 @@
+{
+  "assets": {
+    "models": {
+      "primary": {
+        "name": "Female Reproductive System",
+        "path": "assets/female_reproductive_organs.glb",
+        "scale": { "x": 0.3, "y": 0.3, "z": 0.3 },
+        "position": { "x": 0.0, "y": 0.0, "z": 0.0 },
+        "rotation": { "x": 0.0, "y": 3.141592653589793, "z": 0.0 },
+        "autoCenter": true
+      }
+    },
+    "audio": "assets/heartbeat.mp3",
+    "icon": "assets/female reproductive system icon.png"
+  },
+  "content": {
+    "defaultPart": {
+      "en": {
+        "tag": "Reproductive anatomy",
+        "name": "FEMALE REPRODUCTIVE SYSTEM",
+        "info": "Inspect the main organs of the female reproductive system in AR and tap each note to read its role.",
+        "hint": "Use rotate, scale and labels while the model is active."
+      }
+    },
+    "ui": {
+      "en": {
+        "appEyebrow": "AR Learn live scan",
+        "appTitle": "FEMALE REPRODUCTIVE SYSTEM",
+        "statusLoading": "Loading reproductive system model...",
+        "statusTracking": "Reproductive system placed",
+        "focusTag": "Reproductive structure"
+      }
+    },
+    "parts": [
+      {
+        "id": "ovary",
+        "label": "Ovary",
+        "title": "OVARY",
+        "info": "The ovary stores egg cells and also produces hormones such as estrogen and progesterone.",
+        "hint": "This small rounded structure sits near the end of the reproductive pathway.",
+        "normalizedPosition": [-0.42, 0.18, 0.14]
+      },
+      {
+        "id": "fallopian-tube",
+        "label": "Fallopian Tube",
+        "title": "FALLOPIAN TUBE",
+        "info": "The fallopian tube carries the egg from the ovary toward the uterus.",
+        "hint": "This curved passage links the ovary to the uterus.",
+        "normalizedPosition": [-0.2, 0.34, 0.12]
+      },
+      {
+        "id": "uterus",
+        "label": "Uterus",
+        "title": "UTERUS",
+        "info": "The uterus is the central muscular organ where a fertilized egg can develop during pregnancy.",
+        "hint": "This is the main chamber at the center of the model.",
+        "normalizedPosition": [0.02, 0.12, 0.16]
+      },
+      {
+        "id": "endometrium",
+        "label": "Endometrium",
+        "title": "ENDOMETRIUM",
+        "info": "The endometrium is the inner lining of the uterus that thickens and sheds during the menstrual cycle.",
+        "hint": "This inner tissue layer appears inside the uterus cross-section.",
+        "normalizedPosition": [0.12, 0.08, 0.22]
+      },
+      {
+        "id": "cervix",
+        "label": "Cervix",
+        "title": "CERVIX",
+        "info": "The cervix is the lower narrow portion of the uterus that opens into the vaginal canal.",
+        "hint": "It forms the transition between the uterus and the lower tract.",
+        "normalizedPosition": [0.08, -0.18, 0.16]
+      },
+      {
+        "id": "vagina",
+        "label": "Vagina",
+        "title": "VAGINA",
+        "info": "The vagina is the muscular canal that connects the cervix to the outside of the body.",
+        "hint": "This lower passage continues downward from the cervix.",
+        "normalizedPosition": [0.08, -0.42, 0.14]
+      }
+    ]
+  },
+  "settings": {
+    "arScale": 2.6,
+    "tracking": {
+      "markerLostGraceFrames": 6,
+      "trackingLerpAlpha": 0.24,
+      "trackingScaleLerpAlpha": 0.18,
+      "confirmFrames": 2,
+      "qrScanIntervalMs": 28,
+      "qrSearchIntervalMs": 48
+    },
+    "debugMode": false
+  }
+}
