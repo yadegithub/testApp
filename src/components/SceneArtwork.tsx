@@ -27,6 +27,11 @@ const hotspotMap: Record<ExperienceArtworkId, Hotspot[]> = {
     { label: "Inner orbit", style: { top: "25%", right: "18%" } },
     { label: "Gas giant", style: { bottom: "24%", right: "18%" } },
   ],
+  circuit: [
+    { label: "Battery", style: { top: "30%", left: "16%" } },
+    { label: "Switch", style: { bottom: "22%", left: "42%" } },
+    { label: "Bulb", style: { top: "30%", right: "16%" } },
+  ],
   magnetic: [
     { label: "North pole", style: { top: "18%", left: "50%" } },
     { label: "Field arc", style: { top: "48%", right: "14%" } },
@@ -219,6 +224,16 @@ const SceneArtwork: React.FC<SceneArtworkProps> = ({ variant, showLabels }) => (
         <span className="solar-scene__planet solar-scene__planet--2" />
         <span className="solar-scene__planet solar-scene__planet--3" />
         <span className="solar-scene__planet solar-scene__planet--4" />
+      </div>
+    )}
+
+    {variant === "circuit" && (
+      <div className="circuit-scene" aria-hidden="true">
+        <span className="circuit-scene__wire circuit-scene__wire--top" />
+        <span className="circuit-scene__wire circuit-scene__wire--bottom" />
+        <span className="circuit-scene__battery" />
+        <span className="circuit-scene__switch" />
+        <span className="circuit-scene__bulb" />
       </div>
     )}
 

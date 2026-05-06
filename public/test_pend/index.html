@@ -4,15 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>Pendule de Newton AR</title>
-    <link rel="stylesheet" href="style.css?v=20260503-4">
+    <link rel="stylesheet" href="style.css">
     <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/build/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/examples/js/loaders/GLTFLoader.js"></script>
     <script async src="https://docs.opencv.org/4.5.4/opencv.js"></script>
 </head>
 <body>
-    <video id="videoInput" autoplay muted playsinline style="display:none"></video>
-    <canvas id="canvasOutput" style="position:absolute; top:0; left:0;"></canvas>
-    <canvas id="canvasThree" style="position:absolute; top:0; left:0;"></canvas>
+    <video id="videoInput" autoplay muted playsinline></video>
+    <canvas id="canvasOutput"></canvas>
+    <canvas id="canvasThree"></canvas>
 
     <div id="ui-layer">
         <div id="app-header">
@@ -20,7 +20,7 @@
             <div id="app-title">SIMPLE PENDULUM</div>
         </div>
 
-        <div id="status" class="solar-status glass">Initialisation...</div>
+        <div id="status" class="status-text">Initialisation...</div>
 
         <div id="side-menu" class="glass">
             <button class="menu-btn active" id="btn-rotate" type="button">
@@ -54,6 +54,6 @@
         </div>
     </div>
 
-    <script src="script.js?v=20260503-4"></script>
+    <script src="script.js"></script>
 </body>
 </html>

@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>AR Learn - Volcano</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/build/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/examples/js/loaders/GLTFLoader.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/examples/js/renderers/CSS2DRenderer.js"></script>
+    <script async src="https://docs.opencv.org/4.5.4/opencv.js"></script>
+</head>
+<body>
+    <video id="videoInput" playsinline muted></video>
+    <canvas id="canvasOutput"></canvas>
+    <canvas id="canvasThree"></canvas>
+
+    <div id="ui-layer">
+        <div id="app-header">
+            <span id="app-eyebrow">AR Learn live scan</span>
+            <div id="app-title">VOLCANO</div>
+        </div>
+
+        <div id="side-menu" class="glass">
+            <button class="menu-btn active" id="btn-rotate" type="button">
+                <span class="menu-icon">R</span>
+                <span class="label" id="rotate-label">Rotate</span>
+            </button>
+            <button class="menu-btn" id="btn-scale" type="button">
+                <span class="menu-icon">S</span>
+                <span class="label" id="scale-label">Scale</span>
+            </button>
+            <hr class="sep">
+            <div class="toggle-box">
+                <label class="switch">
+                    <input type="checkbox" id="label-toggle" checked>
+                    <span class="slider"></span>
+                </label>
+                <span class="label" id="labels-label">Labels On/Off</span>
+            </div>
+        </div>
+
+        <div id="info-card" class="glass">
+            <div class="card-content">
+                <div class="text-area">
+                    <span class="card-tag" id="card-tag">Geography model</span>
+                    <h3 id="part-name">VOLCANO</h3>
+                    <p id="part-info">
+                        Tap a numbered marker to read how each volcano feature works.
+                    </p>
+                    <span class="card-hint" id="card-hint">
+                        Use Rotate and Scale to inspect the model more closely while the labels stay visible.
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,7 @@
+{
+  "name": "test_circuit",
+  "dependencies": {
+    "npm": "^11.13.0",
+    "run": "^1.5.0"
+  }
+}

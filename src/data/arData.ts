@@ -1,5 +1,6 @@
 import civilizationsImage from "../assets/images/Ancient Civilizations.jpg";
 import digestiveSystemImage from "../assets/images/digestive system.jpg";
+import electricCircuitImage from "../assets/images/electric circuit.png";
 import femaleReproductiveSystemImage from "../assets/images/female reproductive system.jpg";
 import heartImage from "../assets/images/Coeur humain.jpg";
 import kidneyImage from "../assets/images/Human kidney.jpg";
@@ -7,8 +8,10 @@ import lungImage from "../assets/images/human lung.jpg";
 import skinImage from "../assets/images/human skin.jpg";
 import magneticImage from "../assets/images/Magnetic Fields.png";
 import pendulumImage from "../assets/images/Simple Pendulum.png";
+import physicsImage from "../assets/images/physics.jpg";
 import solarImage from "../assets/images/Solar System Model.jpg";
 import tectonicsImage from "../assets/images/Tectonic Plates.jpg";
+import volcanoImage from "../assets/images/volcano.png";
 
 export type SubjectId = "biology" | "physics" | "history" | "geography";
 
@@ -16,6 +19,7 @@ export type ExperienceArtworkId =
   | "heart"
   | "lung"
   | "solar"
+  | "circuit"
   | "magnetic"
   | "pendulum"
   | "civilizations"
@@ -208,6 +212,22 @@ export const experiences: Experience[] = [
     featured: true,
   },
   {
+    id: "electric-circuit",
+    title: "Electric Circuit",
+    shortDescription:
+      "Explore a battery, wires, switch and bulb in a simple closed circuit.",
+    teaser: "Place a classroom circuit on your desk and follow the current path.",
+    focusTitle: "Closed Circuit",
+    focusCopy:
+      "See how current flows only when every component is connected in one complete loop.",
+    duration: "6 min lesson",
+    xp: 150,
+    subjectId: "physics",
+    artwork: "circuit",
+    image: electricCircuitImage,
+    featured: false,
+  },
+  {
     id: "magnetic-fields",
     title: "Magnetic Fields",
     shortDescription:
@@ -241,13 +261,13 @@ export const experiences: Experience[] = [
   },
   {
     id: "ancient-civilizations",
-    title: "Ancient Civilizations",
+    title: "Castle of Consuegra",
     shortDescription:
-      "Walk through temples, tools and stories from early empires in AR.",
-    teaser: "Bring a miniature archaeological site into the classroom or home.",
-    focusTitle: "Temple Layout",
+      "Explore a medieval Spanish castle and its defensive architecture in AR.",
+    teaser: "Place the Castle of Consuegra on your desk and inspect its fortress design.",
+    focusTitle: "Main Keep",
     focusCopy:
-      "Explore how ceremonial spaces, columns and artifacts were arranged to guide movement and rituals.",
+      "Study how the keep, walls, towers and gate helped protect the fortress and control movement.",
     duration: "10 min lesson",
     xp: 170,
     subjectId: "history",
@@ -270,6 +290,23 @@ export const experiences: Experience[] = [
     artwork: "tectonics",
     image: tectonicsImage,
     featured: true,
+  },
+  {
+    id: "volcano",
+    title: "Volcano",
+    shortDescription:
+      "Scan the QR code to place a volcano model and explore the crater, vent, magma chamber and lava flow.",
+    teaser:
+      "Launch the volcano in AR and inspect how eruptions move magma from underground to the surface.",
+    focusTitle: "Magma Chamber",
+    focusCopy:
+      "The magma chamber stores molten rock beneath the volcano before pressure pushes it upward through the main vent.",
+    duration: "8 min lesson",
+    xp: 155,
+    subjectId: "geography",
+    artwork: "tectonics",
+    image: volcanoImage,
+    featured: false,
   },
 ];
 

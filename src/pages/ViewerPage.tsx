@@ -13,6 +13,8 @@ import { useAuth } from "../auth/useAuth";
 import SceneArtwork from "../components/SceneArtwork";
 import { getExperienceById, getSubjectById } from "../data/arData";
 import { getExperienceCopy, getSubjectCopy } from "../i18n/appCopy";
+import CircuitArPage from "./CircuitArPage";
+import CivilisationArPage from "./CivilisationArPage";
 import DigestiveSystemArPage from "./DigestiveSystemArPage";
 import FemaleReproductiveSystemArPage from "./FemaleReproductiveSystemArPage";
 import HeartArPage from "./HeartArPage";
@@ -23,6 +25,8 @@ import PendulumArPage from "./PendulumArPage";
 import { recordExperienceLaunch } from "../profile/userProgressStore";
 import { useAppSettings } from "../settings/AppSettingsContext";
 import SolarSystemArPage from "./SolarSystemArPage";
+import TectonicPlatesArPage from "./TectonicPlatesArPage";
+import VolcanoArPage from "./VolcanoArPage";
 
 type ToolMode = "rotate" | "scale";
 
@@ -142,6 +146,50 @@ const ViewerPage: React.FC = () => {
   if (experience.id === "simple-pendulum") {
     return (
       <PendulumArPage
+        experienceTitle={localizedExperience.title}
+        language={settings.language}
+        onBack={handleBack}
+        theme={settings.theme}
+      />
+    );
+  }
+
+  if (experience.id === "electric-circuit") {
+    return (
+      <CircuitArPage
+        experienceTitle={localizedExperience.title}
+        language={settings.language}
+        onBack={handleBack}
+        theme={settings.theme}
+      />
+    );
+  }
+
+  if (experience.id === "tectonic-plates") {
+    return (
+      <TectonicPlatesArPage
+        experienceTitle={localizedExperience.title}
+        language={settings.language}
+        onBack={handleBack}
+        theme={settings.theme}
+      />
+    );
+  }
+
+  if (experience.id === "volcano") {
+    return (
+      <VolcanoArPage
+        experienceTitle={localizedExperience.title}
+        language={settings.language}
+        onBack={handleBack}
+        theme={settings.theme}
+      />
+    );
+  }
+
+  if (experience.id === "ancient-civilizations") {
+    return (
+      <CivilisationArPage
         experienceTitle={localizedExperience.title}
         language={settings.language}
         onBack={handleBack}

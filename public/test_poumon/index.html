@@ -4,15 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>Poumons humains AR</title>
-    <link rel="stylesheet" href="style.css?v=20260504-1">
+    <link rel="stylesheet" href="style.css">
     <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/build/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/examples/js/loaders/GLTFLoader.js"></script>
     <script async src="https://docs.opencv.org/4.5.4/opencv.js"></script>
 </head>
 <body>
-    <video id="videoInput" autoplay muted playsinline style="display:none"></video>
-    <canvas id="canvasOutput" style="position:absolute; top:0; left:0;"></canvas>
-    <canvas id="canvasThree" style="position:absolute; top:0; left:0;"></canvas>
+    <video id="videoInput" autoplay muted playsinline></video>
+    <canvas id="canvasOutput"></canvas>
+    <canvas id="canvasThree"></canvas>
 
     <div id="ui-layer">
         <div id="app-header">
@@ -20,7 +20,10 @@
             <div id="app-title">POUMONS HUMAINS</div>
         </div>
 
-        <div id="status" class="solar-status glass">Initialisation...</div>
+        <div id="status" class="status-text">Initialisation...</div>
+
+        <div id="model-title-pill" class="model-title-pill">RESPIRATORY SYSTEM</div>
+        <div id="organ-labels" aria-label="Labels des organes du poumon"></div>
 
         <div id="side-menu" class="glass">
             <button class="menu-btn active" id="btn-rotate" type="button">
@@ -36,24 +39,41 @@
                 <span class="menu-icon">&#9654;</span>
                 <span class="label">Respire</span>
             </button>
+            <div class="toggle-box">
+                <label class="switch">
+                    <input type="checkbox" id="label-toggle" checked>
+                    <span class="slider"></span>
+                </label>
+                <span class="label" id="labels-label">Labels On/Off</span>
+            </div>
         </div>
 
-        <div id="info-card" class="glass info-card--visible">
+        <div id="info-card" class="glass">
             <div class="card-content">
                 <div class="text-area">
-                    <span class="card-tag">MODELE BIOLOGIQUE</span>
+                    <span class="card-tag" id="card-tag">RESPIRATORY STRUCTURE</span>
                     <h3 id="part-name">Poumons humains</h3>
                     <p id="part-info">
                         Observez la trachee, les bronches et le volume pulmonaire dans un modele 3D place sur votre QR code.
                     </p>
-                    <span id="part-hint" class="card-hint">
+                    <span id="card-hint" class="card-hint">
                         Utilisez Rotate, Scale et Respire pour explorer le modele.
                     </span>
                 </div>
             </div>
         </div>
+
+        <div id="overview-card" class="overview-card glass">
+            <img class="overview-card__image" src="./assets/human-lung.jpg" alt="Human lungs">
+            <div class="overview-card__copy">
+                <strong id="overview-title">Human Lungs</strong>
+                <p id="overview-text">
+                    An interactive model that shows the main respiratory organs with guided notes for each structure.
+                </p>
+            </div>
+        </div>
     </div>
 
-    <script src="script.js?v=20260504-2"></script>
+    <script src="script.js"></script>
 </body>
 </html>

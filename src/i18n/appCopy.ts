@@ -159,6 +159,28 @@ const experienceCopy: Record<
       duration: "درس 11 دقيقة",
     },
   },
+  "electric-circuit": {
+    en: {
+      title: "Electric Circuit",
+      shortDescription:
+        "Explore a battery, wires, switch and bulb in a simple closed circuit.",
+      teaser: "Place a classroom circuit on your desk and follow the current path.",
+      focusTitle: "Closed Circuit",
+      focusCopy:
+        "See how current flows only when every component is connected in one complete loop.",
+      duration: "6 min lesson",
+    },
+    ar: {
+      title: "Electric Circuit",
+      shortDescription:
+        "Explore a battery, wires, switch and bulb in a simple closed circuit.",
+      teaser: "Place a classroom circuit on your desk and follow the current path.",
+      focusTitle: "Closed Circuit",
+      focusCopy:
+        "See how current flows only when every component is connected in one complete loop.",
+      duration: "6 min lesson",
+    },
+  },
   "magnetic-fields": {
     en: {
       title: "Magnetic Fields",
@@ -205,13 +227,14 @@ const experienceCopy: Record<
   },
   "ancient-civilizations": {
     en: {
-      title: "Ancient Civilizations",
+      title: "Castle of Consuegra",
       shortDescription:
-        "Walk through temples, tools and stories from early empires in AR.",
-      teaser: "Bring a miniature archaeological site into the classroom or home.",
-      focusTitle: "Temple Layout",
+        "Explore a medieval Spanish castle and its defensive architecture in AR.",
+      teaser:
+        "Place the Castle of Consuegra on your desk and inspect its fortress design.",
+      focusTitle: "Main Keep",
       focusCopy:
-        "Explore how ceremonial spaces, columns and artifacts were arranged to guide movement and rituals.",
+        "Study how the keep, walls, towers and gate helped protect the fortress and control movement.",
       duration: "10 min lesson",
     },
     ar: {
@@ -244,6 +267,30 @@ const experienceCopy: Record<
       focusCopy:
         "شاهد صفيحة تنزلق أسفل أخرى واكتشف كيف تبدأ الجبال والخنادق والزلازل.",
       duration: "درس 9 دقائق",
+    },
+  },
+  volcano: {
+    en: {
+      title: "Volcano",
+      shortDescription:
+        "Scan the QR code to place a volcano model and explore the crater, vent, magma chamber and lava flow.",
+      teaser:
+        "Launch the volcano in AR and inspect how eruptions move magma from underground to the surface.",
+      focusTitle: "Magma Chamber",
+      focusCopy:
+        "The magma chamber stores molten rock beneath the volcano before pressure pushes it upward through the main vent.",
+      duration: "8 min lesson",
+    },
+    ar: {
+      title: "البركان",
+      shortDescription:
+        "امسح رمز QR لوضع نموذج بركان واستكشاف الفوهة والقناة وغرفة الصهارة وتدفق الحمم.",
+      teaser:
+        "شغل البركان في الواقع المعزز وافحص كيف تحرك الثورانات الصهارة من باطن الأرض إلى السطح.",
+      focusTitle: "غرفة الصهارة",
+      focusCopy:
+        "تخزن غرفة الصهارة الصخور المنصهرة تحت البركان قبل أن يدفعها الضغط صعودا عبر القناة الرئيسية.",
+      duration: "درس 8 دقائق",
     },
   },
 };

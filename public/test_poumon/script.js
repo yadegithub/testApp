@@ -1,6 +1,7 @@
 const query = new URLSearchParams(window.location.search);
 const currentTheme = query.get("theme") === "light" ? "light" : "dark";
-const currentLanguage = query.get("lang") === "ar" ? "ar" : "en";
+const languageParam = query.get("lang");
+const currentLanguage = languageParam === "ar" ? "ar" : languageParam === "fr" ? "fr" : "en";
 
 document.documentElement.dataset.theme = currentTheme;
 document.documentElement.lang = currentLanguage;
@@ -11,9 +12,17 @@ const UI = {
     status: document.getElementById("status"),
     canvasOutput: document.getElementById("canvasOutput"),
     canvasThree: document.getElementById("canvasThree"),
+    card: document.getElementById("info-card"),
+    cardTag: document.getElementById("card-tag"),
+    labelsLayer: document.getElementById("organ-labels"),
+    labelToggle: document.getElementById("label-toggle"),
+    modelTitle: document.getElementById("model-title-pill"),
+    overviewCard: document.getElementById("overview-card"),
+    overviewTitle: document.getElementById("overview-title"),
+    overviewText: document.getElementById("overview-text"),
     partName: document.getElementById("part-name"),
     partInfo: document.getElementById("part-info"),
-    partHint: document.getElementById("part-hint")
+    partHint: document.getElementById("card-hint")
 };
 
 const STATUS_READY = "Pret : Scannez le QR Code";
@@ -38,6 +47,58 @@ const INFO_COPY = {
     }
 };
 
+Object.assign(INFO_COPY.fr, {
+    title: "SYSTEME RESPIRATOIRE",
+    overviewTitle: "Poumons humains",
+    overviewText: "Un modele interactif qui montre les principaux organes respiratoires avec des notes guidees pour chaque structure.",
+    focusTag: "STRUCTURE RESPIRATOIRE"
+});
+
+Object.assign(INFO_COPY.en, {
+    title: "RESPIRATORY SYSTEM",
+    overviewTitle: "Human Lungs",
+    overviewText: "An interactive model that shows the main respiratory organs with guided notes for each structure.",
+    focusTag: "RESPIRATORY STRUCTURE"
+});
+
+Object.assign(INFO_COPY.ar, {
+    title: "RESPIRATORY SYSTEM",
+    overviewTitle: "Human Lungs",
+    overviewText: "An interactive model that shows the main respiratory organs with guided notes for each structure.",
+    focusTag: "RESPIRATORY STRUCTURE"
+});
+
+const ORGAN_PARTS = [
+    {
+        id: "right-lung",
+        label: "Poumon droit",
+        info: "Le poumon droit reçoit l'air riche en oxygène et aide le corps à rejeter le dioxyde de carbone.",
+        hint: "Il est un peu plus grand que le poumon gauche et comporte trois lobes.",
+        screenOffset: { x: -1, y: 0.12 }
+    },
+    {
+        id: "left-lung",
+        label: "Poumon gauche",
+        info: "Le poumon gauche participe aux échanges respiratoires comme le poumon droit.",
+        hint: "Il est plus petit car il laisse de la place au coeur.",
+        screenOffset: { x: 1, y: 0.12 }
+    },
+    {
+        id: "trachea",
+        label: "Trachée",
+        info: "La trachée est un tube qui transporte l'air depuis le nez et la bouche vers la poitrine.",
+        hint: "En bas, elle se divise en deux bronches qui entrent dans les poumons.",
+        screenOffset: { x: 0, y: -0.9 }
+    },
+    {
+        id: "bronchi",
+        label: "Bronches",
+        info: "Les bronches sont des conduits qui se ramifient dans les poumons pour distribuer l'air.",
+        hint: "Elles deviennent de plus en plus petites à l'intérieur des poumons.",
+        screenOffset: { x: 0, y: -0.22 }
+    }
+];
+
 let src;
 let cap;
 let qrDetector;
@@ -53,9 +114,12 @@ let scene;
 let camera;
 let arGroup;
 let mainModel;
+let organLabels = [];
+let activeOrganIndex = -1;
+let labelsVisible = true;
 
 let AR_SCALE = 0.12;
-const BUILD_VERSION = "20260504-2";
+const BUILD_VERSION = "20260506-4";
 const DEFAULT_MODEL_PATH = "./assets/realistic_human_lungs.glb";
 const MARKER_LOST_GRACE_FRAMES = 3;
 const INITIAL_CONFIRM_FRAMES = 6;
@@ -104,6 +168,7 @@ const poseTargetScale = new THREE.Vector3();
 const baseModelScale = new THREE.Vector3(1, 1, 1);
 const modelCenter = new THREE.Vector3();
 const modelSize = new THREE.Vector3();
+const projectedModelCenter = new THREE.Vector3();
 
 window.addEventListener("resize", fitToScreen);
 
@@ -113,6 +178,22 @@ function getCopy() {
 
 function applyInfoCard() {
     const copy = getCopy();
+
+    if (UI.modelTitle) {
+        UI.modelTitle.innerText = copy.title;
+    }
+
+    if (UI.overviewTitle) {
+        UI.overviewTitle.innerText = copy.overviewTitle;
+    }
+
+    if (UI.overviewText) {
+        UI.overviewText.innerText = copy.overviewText;
+    }
+
+    if (UI.cardTag) {
+        UI.cardTag.innerText = copy.focusTag;
+    }
 
     if (UI.partName) {
         UI.partName.innerText = copy.name;
@@ -125,6 +206,225 @@ function applyInfoCard() {
     if (UI.partHint) {
         UI.partHint.innerText = copy.hint;
     }
+
+    activeOrganIndex = -1;
+    if (UI.card) {
+        UI.card.classList.remove("info-card--visible", "info-card--selected");
+    }
+    updateOrganLabels();
+    positionInfoCard();
+}
+
+function hideSelectedInfoCard() {
+    activeOrganIndex = -1;
+    if (UI.card) {
+        UI.card.classList.remove("info-card--visible", "info-card--selected");
+    }
+    updateOrganLabels();
+    positionInfoCard();
+}
+
+function setOrganInfo(index) {
+    activeOrganIndex = activeOrganIndex === index ? -1 : index;
+
+    if (activeOrganIndex < 0) {
+        hideSelectedInfoCard();
+        return;
+    }
+
+    const part = ORGAN_PARTS[activeOrganIndex];
+    const copy = getCopy();
+
+    if (UI.cardTag) {
+        UI.cardTag.innerText = copy.focusTag;
+    }
+
+    if (UI.partName) {
+        UI.partName.innerText = part.label.toUpperCase();
+    }
+
+    if (UI.partInfo) {
+        UI.partInfo.innerText = part.info;
+    }
+
+    if (UI.partHint) {
+        UI.partHint.innerText = part.hint;
+    }
+
+    if (UI.card) {
+        UI.card.classList.add("info-card--visible", "info-card--selected");
+    }
+
+    updateOrganLabels();
+    positionInfoCard();
+}
+
+function createOrganLabels() {
+    if (!UI.labelsLayer || !mainModel) {
+        return;
+    }
+
+    UI.labelsLayer.replaceChildren();
+    organLabels = ORGAN_PARTS.map((part, index) => {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "organ-label";
+        button.textContent = String(index + 1);
+        button.setAttribute("aria-label", part.label);
+        button.setAttribute("aria-pressed", "false");
+        button.addEventListener("click", (event) => {
+            event.preventDefault();
+            event.stopPropagation();
+            setOrganInfo(index);
+        });
+
+        UI.labelsLayer.appendChild(button);
+
+        return {
+            button,
+            screenOffset: part.screenOffset
+        };
+    });
+
+    updateOrganLabels();
+}
+
+function updateOrganLabels() {
+    organLabels.forEach((entry, index) => {
+        const isActive = index === activeOrganIndex;
+        entry.button.classList.toggle("organ-label--active", isActive);
+        entry.button.setAttribute("aria-pressed", String(isActive));
+    });
+
+    if (UI.labelToggle) {
+        UI.labelToggle.checked = labelsVisible;
+    }
+}
+
+function positionOrganLabels() {
+    if (!labelsVisible || !mainModel || !camera || !arGroup?.visible) {
+        organLabels.forEach((entry) => {
+            entry.button.classList.remove("organ-label--visible");
+        });
+        if (activeOrganIndex >= 0 || UI.card?.classList.contains("info-card--visible")) {
+            hideSelectedInfoCard();
+        }
+        syncFloatingUi(false);
+        return;
+    }
+
+    projectedModelCenter.set(0, 0, 0);
+    arGroup.localToWorld(projectedModelCenter);
+    projectedModelCenter.project(camera);
+
+    const centerIsVisible = projectedModelCenter.z > -1 && projectedModelCenter.z < 1;
+    const centerX = ((projectedModelCenter.x + 1) / 2) * window.innerWidth;
+    const centerY = ((-projectedModelCenter.y + 1) / 2) * window.innerHeight;
+    const spread = clamp(Math.min(window.innerWidth, window.innerHeight) * 0.18, 82, 150);
+    const sidePadding = Math.min(120, Math.max(76, window.innerWidth * 0.16));
+
+    let activeLabelIsVisible = false;
+
+    organLabels.forEach((entry, index) => {
+        const x = clamp(
+            centerX + (entry.screenOffset.x * spread),
+            sidePadding,
+            window.innerWidth - sidePadding
+        );
+        const y = clamp(
+            centerY + (entry.screenOffset.y * spread),
+            42,
+            window.innerHeight - 58
+        );
+        const isOnScreen =
+            centerIsVisible &&
+            centerX > -100 &&
+            centerX < window.innerWidth + 100 &&
+            centerY > -100 &&
+            centerY < window.innerHeight + 100;
+
+        entry.button.classList.toggle("organ-label--visible", isOnScreen);
+        entry.button.style.left = `${x}px`;
+        entry.button.style.top = `${y}px`;
+
+        if (index === activeOrganIndex) {
+            activeLabelIsVisible = isOnScreen;
+        }
+    });
+
+    if (activeOrganIndex >= 0 && !activeLabelIsVisible) {
+        hideSelectedInfoCard();
+    }
+
+    positionTitlePill(centerX, centerY, spread, centerIsVisible);
+    syncFloatingUi(centerIsVisible);
+}
+
+function positionTitlePill(centerX, centerY, spread, isVisible) {
+    if (!UI.modelTitle) {
+        return;
+    }
+
+    if (!isVisible || !arGroup?.visible) {
+        UI.modelTitle.classList.remove("model-title-pill--visible");
+        return;
+    }
+
+    const pillWidth = UI.modelTitle.offsetWidth || 190;
+    const left = clamp(centerX - (pillWidth / 2), 18, window.innerWidth - pillWidth - 18);
+    const top = clamp(centerY - (spread * 1.55), 18, window.innerHeight - 96);
+
+    UI.modelTitle.style.left = `${left}px`;
+    UI.modelTitle.style.top = `${top}px`;
+    UI.modelTitle.classList.add("model-title-pill--visible");
+}
+
+function syncFloatingUi(isVisible) {
+    const shouldShow = Boolean(isVisible && arGroup?.visible);
+
+    if (UI.modelTitle && !shouldShow) {
+        UI.modelTitle.classList.remove("model-title-pill--visible");
+    }
+
+    void shouldShow;
+}
+
+function positionInfoCard() {
+    if (!UI.card) {
+        return;
+    }
+
+    const selectedEntry = activeOrganIndex >= 0 ? organLabels[activeOrganIndex] : null;
+
+    if (!selectedEntry || !arGroup?.visible || window.innerWidth <= 820) {
+        UI.card.classList.remove("info-card--floating");
+        UI.card.style.left = "50%";
+        UI.card.style.top = "";
+        UI.card.style.right = "";
+        UI.card.style.bottom = window.innerWidth <= 600 ? "12px" : "18px";
+        UI.card.style.transform = "translateX(-50%)";
+        return;
+    }
+
+    const markerRect = selectedEntry.button.getBoundingClientRect();
+    const cardWidth = UI.card.offsetWidth || 300;
+    const cardHeight = UI.card.offsetHeight || 150;
+
+    let left = markerRect.right + 22;
+    if (left + cardWidth > window.innerWidth - 18) {
+        left = markerRect.left - cardWidth - 22;
+    }
+
+    let top = markerRect.top + (markerRect.height / 2) - (cardHeight / 2);
+    left = clamp(left, 18, window.innerWidth - cardWidth - 18);
+    top = clamp(top, 18, window.innerHeight - cardHeight - 18);
+
+    UI.card.classList.add("info-card--floating");
+    UI.card.style.left = `${left}px`;
+    UI.card.style.top = `${top}px`;
+    UI.card.style.right = "auto";
+    UI.card.style.bottom = "auto";
+    UI.card.style.transform = "none";
 }
 
 function setStatus(message) {
@@ -309,6 +609,7 @@ function setupThreeJS(modelPath) {
         mainModel = gltf.scene;
         prepareModel(mainModel);
         arGroup.add(mainModel);
+        createOrganLabels();
         setupInteraction();
         setStatus(STATUS_READY);
     }, undefined, (err) => {
@@ -404,6 +705,19 @@ function setupControls() {
             startBreathingAnimation();
         };
     }
+
+    if (UI.labelToggle) {
+        UI.labelToggle.onchange = (event) => {
+            labelsVisible = event.target.checked;
+            if (!labelsVisible && activeOrganIndex >= 0) {
+                activeOrganIndex = -1;
+                applyInfoCard();
+            }
+            updateOrganLabels();
+            positionOrganLabels();
+        };
+    }
+
 }
 
 function setupInteraction() {
@@ -731,6 +1045,8 @@ function processFrame() {
     updateBreathingAnimation(performance.now());
     updateTrackingStatus(markerFound, shouldHoldSteady);
     renderer.render(scene, camera);
+    positionOrganLabels();
+    positionInfoCard();
     points.delete();
     requestAnimationFrame(processFrame);
 }
@@ -746,6 +1062,9 @@ function fitToScreen() {
         canvas.style.top = "50%";
         canvas.style.transform = "translate(-50%, -50%)";
     });
+
+    positionOrganLabels();
+    positionInfoCard();
 }
 
 initProject();

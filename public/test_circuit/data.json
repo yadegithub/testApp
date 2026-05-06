@@ -1,0 +1,14 @@
+{
+  "assets": {
+    "models": {
+      "circuit": {
+        "name": "Electric Circuit",
+        "path": "./assets/electric_circuit.glb",
+        "license": "CC BY-SA"
+      }
+    }
+  },
+  "settings": {
+    "arScale": 2.5
+  }
+}
