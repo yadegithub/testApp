@@ -18,7 +18,7 @@
         "tag": "Digestive anatomy",
         "name": "DIGESTIVE SYSTEM",
         "info": "Inspect the full digestive system in AR and tap the numbered labels to read the role of each main structure.",
-        "hint": "Use rotate, scale, audio and labels while the model is active."
+        "hint": "Use rotate, scale and labels while the model is active."
       },
       "ar": {
         "tag": "تشريح الجهاز الهضمي",

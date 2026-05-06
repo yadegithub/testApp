@@ -23,6 +23,7 @@ const CAMERA_IDEAL_HEIGHT = 540;
 const CAMERA_IDEAL_FRAME_RATE = 24;
 const CAMERA_MAX_FRAME_RATE = 30;
 const SHOW_DEBUG_CAMERA_CANVAS = false;
+const MOBILE_INFO_CARD_BREAKPOINT = 820;
 
 document.documentElement.dataset.theme = currentTheme;
 document.documentElement.lang = currentLanguage;
@@ -124,7 +125,7 @@ const defaultCopy = {
         tag: "Digestive anatomy",
         title: "DIGESTIVE SYSTEM",
         info: "Tap a numbered marker to read the role of each major structure in the digestive system.",
-        hint: "Use Rotate and Scale to inspect the whole system more clearly while the labels stay visible."
+        hint: "Use Rotate, Scale and Labels to inspect the whole system more clearly."
     }
 };
 
@@ -207,7 +208,7 @@ const defaultConfig = {
                 tag: "Digestive anatomy",
                 name: "DIGESTIVE SYSTEM",
                 info: "Inspect the full digestive system in AR and tap the numbered labels to read the role of each main structure.",
-                hint: "Use rotate, scale, audio and labels while the model is active."
+                hint: "Use rotate, scale and labels while the model is active."
             }
         },
         ui: {
@@ -216,7 +217,6 @@ const defaultConfig = {
                 appTitle: "DIGESTIVE SYSTEM",
                 rotate: "Rotate",
                 scale: "Scale",
-                sound: "Audio",
                 labels: "Numbers On/Off",
                 statusStarting: "Starting camera...",
                 statusLoading: "Loading digestive system model...",
@@ -471,6 +471,16 @@ function positionInfoCard() {
         return;
     }
 
+    if (window.innerWidth <= MOBILE_INFO_CARD_BREAKPOINT) {
+        UI.card.classList.remove("info-card--floating");
+        UI.card.style.left = "50%";
+        UI.card.style.top = "";
+        UI.card.style.right = "";
+        UI.card.style.bottom = "12px";
+        UI.card.style.transform = "translateX(-50%)";
+        return;
+    }
+
     const selectedEntry =
         focusedPartIndex >= 0 ? anatomyLabels[focusedPartIndex] : null;
 
@@ -517,7 +527,6 @@ function applyCopy() {
     UI.appTitle.textContent = copy.appTitle;
     UI.rotateLabel.textContent = copy.rotate;
     UI.scaleLabel.textContent = copy.scale;
-    UI.soundLabel.textContent = copy.sound;
     UI.labelsLabel.textContent = copy.labels;
     document.title = `AR Learn - ${copy.appTitle}`;
     updateInfoCard();
@@ -650,7 +659,7 @@ function initThree(config) {
     labelRenderer.domElement.style.top = "0";
     labelRenderer.domElement.style.left = "0";
     labelRenderer.domElement.style.pointerEvents = "none";
-    labelRenderer.domElement.style.zIndex = "25";
+    labelRenderer.domElement.style.zIndex = "18";
     document.body.appendChild(labelRenderer.domElement);
 
     scene = new THREE.Scene();
@@ -784,6 +793,9 @@ function setupControls() {
     };
 
     const syncSoundButton = () => {
+        if (!UI.soundBtn) {
+            return;
+        }
         UI.soundBtn.classList.toggle("active", isSoundPlaying);
         UI.soundBtn.setAttribute("aria-pressed", String(isSoundPlaying));
     };
@@ -818,7 +830,9 @@ function setupControls() {
 
     UI.rotateBtn.onclick = () => setMode("rotate");
     UI.scaleBtn.onclick = () => setMode("scale");
-    UI.soundBtn.onclick = toggleSound;
+    if (UI.soundBtn) {
+        UI.soundBtn.onclick = toggleSound;
+    }
     UI.labelToggle.onchange = (event) => {
         labelsVisible = event.target.checked;
         syncLabels();

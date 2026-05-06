@@ -19,7 +19,7 @@
         "tag": "Kidney anatomy",
         "name": "HUMAN KIDNEY",
         "info": "Inspect the kidney in AR and tap the numbered notes to understand the main filtering structures.",
-        "hint": "Use rotate, scale, audio and labels while the kidney model is active."
+        "hint": "Use rotate, scale and labels while the kidney model is active."
       }
     },
     "ui": {

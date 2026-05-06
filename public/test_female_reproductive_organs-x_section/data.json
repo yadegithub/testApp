@@ -19,7 +19,7 @@
         "tag": "Reproductive anatomy",
         "name": "FEMALE REPRODUCTIVE SYSTEM",
         "info": "Inspect the main organs of the female reproductive system in AR and tap each note to read its role.",
-        "hint": "Use rotate, scale, audio and labels while the model is active."
+        "hint": "Use rotate, scale and labels while the model is active."
       }
     },
     "ui": {

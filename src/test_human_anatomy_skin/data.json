@@ -19,7 +19,7 @@
         "tag": "Skin anatomy",
         "name": "HUMAN SKIN",
         "info": "Inspect the layers of the skin in AR and tap the numbered labels to understand each protective and sensory structure.",
-        "hint": "Use rotate, scale, audio and labels while the skin model is active."
+        "hint": "Use rotate, scale and labels while the skin model is active."
       }
     },
     "ui": {
