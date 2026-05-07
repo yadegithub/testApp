@@ -7,7 +7,7 @@ const DEFAULT_MODEL_ROTATION = {
     y: Math.PI,
     z: 0
 };
-const MARKER_LOST_GRACE_FRAMES = 12;
+const MARKER_LOST_GRACE_FRAMES = 0;
 const TRACKING_LERP_ALPHA = 0.18;
 const TRACKING_SCALE_LERP_ALPHA = 0.12;
 const CONFIRM_FRAMES = 3;
@@ -24,6 +24,10 @@ const CAMERA_IDEAL_FRAME_RATE = 24;
 const CAMERA_MAX_FRAME_RATE = 30;
 const SHOW_DEBUG_CAMERA_CANVAS = false;
 const MOBILE_INFO_CARD_BREAKPOINT = 820;
+const IS_TOUCH_DEVICE = window.matchMedia?.("(pointer: coarse)")?.matches ?? false;
+const DEVICE_MEMORY_GB = navigator.deviceMemory || 4;
+const USE_FAST_CASTLE_MODEL =
+    query.get("quality") !== "high" && (IS_TOUCH_DEVICE || DEVICE_MEMORY_GB <= 4);
 
 document.documentElement.dataset.theme = currentTheme;
 document.documentElement.lang = currentLanguage;
@@ -483,16 +487,6 @@ function positionInfoCard() {
         return;
     }
 
-    if (window.innerWidth <= MOBILE_INFO_CARD_BREAKPOINT) {
-        UI.card.classList.remove("info-card--floating");
-        UI.card.style.left = "50%";
-        UI.card.style.top = "";
-        UI.card.style.right = "";
-        UI.card.style.bottom = "12px";
-        UI.card.style.transform = "translateX(-50%)";
-        return;
-    }
-
     const selectedEntry =
         focusedPartIndex >= 0 ? anatomyLabels[focusedPartIndex] : null;
 
@@ -661,7 +655,8 @@ function initThree(config) {
     renderer = new THREE.WebGLRenderer({
         canvas: UI.canvasThree,
         alpha: true,
-        antialias: true
+        antialias: !IS_TOUCH_DEVICE,
+        powerPreference: "low-power"
     });
     renderer.setSize(UI.video.width, UI.video.height, false);
     renderer.setPixelRatio(
@@ -717,23 +712,21 @@ function initThree(config) {
 
     setStatus(copy.statusLoading);
 
-    loader.load(
-        modelPath,
-        (gltf) => {
-            heartModel = gltf.scene;
-            collisionActions = [];
-            if (Array.isArray(gltf.animations) && gltf.animations.length > 0) {
-                animationMixer = new THREE.AnimationMixer(heartModel);
-                collisionActions = gltf.animations.map((clip) => {
-                    const action = animationMixer.clipAction(clip);
-                    action.setLoop(THREE.LoopRepeat, Infinity);
-                    action.clampWhenFinished = false;
-                    action.enabled = true;
-                    action.paused = true;
-                    action.play();
-                    return action;
-                });
-            }
+    const mountModel = (model, animations = []) => {
+        heartModel = model;
+        collisionActions = [];
+        if (Array.isArray(animations) && animations.length > 0) {
+            animationMixer = new THREE.AnimationMixer(heartModel);
+            collisionActions = animations.map((clip) => {
+                const action = animationMixer.clipAction(clip);
+                action.setLoop(THREE.LoopRepeat, Infinity);
+                action.clampWhenFinished = false;
+                action.enabled = true;
+                action.paused = true;
+                action.play();
+                return action;
+            });
+        }
             const localBounds = new THREE.Box3().setFromObject(heartModel);
             const modelCenter = localBounds.getCenter(new THREE.Vector3());
             const modelSize = localBounds.getSize(new THREE.Vector3());
@@ -774,12 +767,77 @@ function initThree(config) {
             syncLabels();
             positionInfoCard();
             setStatus(copy.statusReady);
+    };
+
+    if (USE_FAST_CASTLE_MODEL && modelPath === DEFAULT_MODEL_PATH) {
+        mountModel(createFastCastleModel());
+        return;
+    }
+
+    loader.load(
+        modelPath,
+        (gltf) => {
+            mountModel(gltf.scene, gltf.animations);
         },
         undefined,
         () => {
-            setStatus(copy.statusModelError);
+            mountModel(createFastCastleModel());
         }
     );
+}
+
+function createFastCastleModel() {
+    const castle = new THREE.Group();
+    const stone = new THREE.MeshStandardMaterial({ color: 0xb6ad9f, roughness: 0.85 });
+    const darkStone = new THREE.MeshStandardMaterial({ color: 0x81796f, roughness: 0.9 });
+    const roof = new THREE.MeshStandardMaterial({ color: 0x7b4b35, roughness: 0.75 });
+
+    const base = new THREE.Mesh(new THREE.BoxGeometry(2.8, 0.16, 1.5), darkStone);
+    base.position.y = -0.46;
+    castle.add(base);
+
+    const keep = new THREE.Mesh(new THREE.BoxGeometry(0.72, 1.1, 0.64), stone);
+    keep.position.set(0, 0.08, 0);
+    castle.add(keep);
+
+    const wallShapes = [
+        [0, -0.18, 0.68, 2.55, 0.42, 0.16],
+        [0, -0.18, -0.68, 2.55, 0.42, 0.16],
+        [-1.2, -0.18, 0, 0.16, 0.42, 1.22],
+        [1.2, -0.18, 0, 0.16, 0.42, 1.22]
+    ];
+
+    wallShapes.forEach(([x, y, z, w, h, d]) => {
+        const wall = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), stone);
+        wall.position.set(x, y, z);
+        castle.add(wall);
+    });
+
+    [
+        [-1.2, 0.03, -0.68],
+        [1.2, 0.03, -0.68],
+        [-1.2, 0.03, 0.68],
+        [1.2, 0.03, 0.68]
+    ].forEach(([x, y, z]) => {
+        const tower = new THREE.Mesh(new THREE.CylinderGeometry(0.18, 0.22, 0.9, 12), stone);
+        tower.position.set(x, y, z);
+        castle.add(tower);
+
+        const towerRoof = new THREE.Mesh(new THREE.ConeGeometry(0.23, 0.32, 12), roof);
+        towerRoof.position.set(x, y + 0.6, z);
+        castle.add(towerRoof);
+    });
+
+    const gate = new THREE.Mesh(new THREE.BoxGeometry(0.34, 0.32, 0.08), darkStone);
+    gate.position.set(0, -0.34, 0.77);
+    castle.add(gate);
+
+    const keepRoof = new THREE.Mesh(new THREE.ConeGeometry(0.52, 0.36, 4), roof);
+    keepRoof.position.set(0, 0.82, 0);
+    keepRoof.rotation.y = Math.PI / 4;
+    castle.add(keepRoof);
+
+    return castle;
 }
 
 function addAnatomyLabel(part, index, modelSize, parentGroup) {

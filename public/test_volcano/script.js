@@ -24,6 +24,7 @@ const CAMERA_IDEAL_FRAME_RATE = 24;
 const CAMERA_MAX_FRAME_RATE = 30;
 const SHOW_DEBUG_CAMERA_CANVAS = false;
 const MOBILE_INFO_CARD_BREAKPOINT = 820;
+const IS_TOUCH_DEVICE = window.matchMedia?.("(pointer: coarse)")?.matches ?? false;
 
 document.documentElement.dataset.theme = currentTheme;
 document.documentElement.lang = currentLanguage;
@@ -485,16 +486,6 @@ function positionInfoCard() {
         return;
     }
 
-    if (window.innerWidth <= MOBILE_INFO_CARD_BREAKPOINT) {
-        UI.card.classList.remove("info-card--floating");
-        UI.card.style.left = "50%";
-        UI.card.style.top = "";
-        UI.card.style.right = "";
-        UI.card.style.bottom = "12px";
-        UI.card.style.transform = "translateX(-50%)";
-        return;
-    }
-
     const selectedEntry =
         focusedPartIndex >= 0 ? anatomyLabels[focusedPartIndex] : null;
 
@@ -660,7 +651,8 @@ function initThree(config) {
     renderer = new THREE.WebGLRenderer({
         canvas: UI.canvasThree,
         alpha: true,
-        antialias: true
+        antialias: !IS_TOUCH_DEVICE,
+        powerPreference: "low-power"
     });
     renderer.setSize(UI.video.width, UI.video.height, false);
     renderer.setPixelRatio(

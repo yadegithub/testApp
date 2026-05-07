@@ -18,6 +18,12 @@ let renderer, scene, camera, arGroup, mainModel;
 let AR_SCALE = 0.1;
 const BUILD_VERSION = "20260503-4";
 const DEFAULT_MODEL_PATH = "./assets/newtons_cradle (1).glb";
+const MAX_RENDER_PIXEL_RATIO = 1.25;
+const CAMERA_IDEAL_WIDTH = 960;
+const CAMERA_IDEAL_HEIGHT = 540;
+const CAMERA_IDEAL_FRAME_RATE = 24;
+const CAMERA_MAX_FRAME_RATE = 30;
+const SHOW_DEBUG_CAMERA_CANVAS = false;
 const MARKER_LOST_GRACE_FRAMES = 3;
 const INITIAL_CONFIRM_FRAMES = 3;
 const TRACKED_CONFIRM_FRAMES = 1;
@@ -141,6 +147,7 @@ async function initProject() {
 }
 
 function startAR(modelPath) {
+    document.body.classList.remove("camera-ready");
     UI.video.muted = true;
     UI.video.autoplay = true;
     UI.video.playsInline = true;
@@ -149,13 +156,18 @@ function startAR(modelPath) {
     navigator.mediaDevices.getUserMedia({
         video: {
             facingMode: "environment",
-            width: { ideal: 1280 },
-            height: { ideal: 720 }
+            width: { ideal: CAMERA_IDEAL_WIDTH },
+            height: { ideal: CAMERA_IDEAL_HEIGHT },
+            frameRate: {
+                ideal: CAMERA_IDEAL_FRAME_RATE,
+                max: CAMERA_MAX_FRAME_RATE
+            }
         }
     }).then(stream => {
         UI.video.srcObject = stream;
         UI.video.onloadedmetadata = async () => {
             await UI.video.play();
+            document.body.classList.add("camera-ready");
 
             const { width, height } = getVideoSize();
             UI.video.width = width;
@@ -186,13 +198,18 @@ function startAR(modelPath) {
 function setupThreeJS(modelPath) {
     const { width, height } = getVideoSize();
 
+    if (UI.canvasOutput) {
+        UI.canvasOutput.style.display = SHOW_DEBUG_CAMERA_CANVAS ? "block" : "none";
+    }
+
     renderer = new THREE.WebGLRenderer({
         canvas: UI.canvasThree,
         alpha: true,
-        antialias: true
+        antialias: window.matchMedia?.("(pointer: fine)")?.matches ?? false,
+        powerPreference: "low-power"
     });
     renderer.setSize(width, height, false);
-    renderer.setPixelRatio(window.devicePixelRatio || 1);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, MAX_RENDER_PIXEL_RATIO));
 
     scene = new THREE.Scene();
     camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 1000);
@@ -636,7 +653,9 @@ function processFrame() {
     }
 
     cap.read(src);
-    cv.imshow("canvasOutput", src);
+    if (SHOW_DEBUG_CAMERA_CANVAS) {
+        cv.imshow("canvasOutput", src);
+    }
 
     const points = new cv.Mat();
     let markerFound = false;
@@ -719,12 +738,12 @@ function fitToScreen() {
     const { width, height } = getVideoSize();
     const scale = Math.max(window.innerWidth / width, window.innerHeight / height);
 
-    [UI.canvasOutput, UI.canvasThree].forEach(canvas => {
-        canvas.style.width = `${width * scale}px`;
-        canvas.style.height = `${height * scale}px`;
-        canvas.style.left = "50%";
-        canvas.style.top = "50%";
-        canvas.style.transform = "translate(-50%, -50%)";
+    [UI.video, UI.canvasOutput, UI.canvasThree].forEach(layer => {
+        layer.style.width = `${width * scale}px`;
+        layer.style.height = `${height * scale}px`;
+        layer.style.left = "50%";
+        layer.style.top = "50%";
+        layer.style.transform = "translate(-50%, -50%)";
     });
 
 }

@@ -35,10 +35,19 @@ canvas {
     position: absolute;
     top: 0;
     left: 0;
+    width: 100vw;
+    height: 100vh;
 }
 
 #videoInput {
-    display: none;
+    display: block;
+    z-index: 0;
+    object-fit: cover;
+    opacity: 0;
+}
+
+body.camera-ready #videoInput {
+    opacity: 1;
 }
 
 #ui-layer {
