@@ -182,7 +182,8 @@ function addBodyLabel(body, index, labelAnchor) {
   const button = document.createElement("button");
   button.className = "hotspot-label";
   button.type = "button";
-  button.textContent = String(body.number);
+  button.textContent = body.label;
+  button.title = body.title;
   button.setAttribute("aria-label", body.label);
   button.addEventListener("click", (event) => {
     event.preventDefault();

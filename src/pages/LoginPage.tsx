@@ -1,13 +1,12 @@
 import { IonContent, IonIcon, IonPage } from "@ionic/react";
 import {
+  arrowForwardOutline,
   eyeOffOutline,
   eyeOutline,
-  arrowForwardOutline,
   lockClosedOutline,
   logInOutline,
   mailOutline,
   personOutline,
-  sparklesOutline,
 } from "ionicons/icons";
 import { useState } from "react";
 import { useHistory, useLocation } from "react-router-dom";
@@ -34,6 +33,7 @@ const LoginPage: React.FC = () => {
     isReady,
     login,
     logout,
+    requestPasswordReset,
     user,
   } = useAuth();
   const { settings } = useAppSettings();
@@ -42,6 +42,8 @@ const LoginPage: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(true);
   const [error, setError] = useState("");
+  const [resetFeedback, setResetFeedback] = useState("");
+  const [isResetting, setIsResetting] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const isArabic = settings.language === "ar";
   const copy = isArabic
@@ -59,14 +61,17 @@ const LoginPage: React.FC = () => {
         passwordPlaceholder: "أدخل كلمة المرور",
         hidePassword: "إخفاء كلمة المرور",
         showPassword: "إظهار كلمة المرور",
-        keepSignedIn: "ابقني مسجل الدخول على هذا الجهاز",
+        keepSignedIn: "أبقني مسجل الدخول على هذا الجهاز",
+        forgotPassword: "نسيت كلمة المرور؟",
+        sendingReset: "جار إرسال رابط إعادة التعيين...",
+        resetSent: "تم إرسال رابط إعادة تعيين كلمة المرور إلى بريدك الإلكتروني.",
         signingIn: "جار تسجيل الدخول...",
         signIn: "دخول",
         useDemo: "استخدام حساب تجريبي",
         demoAccount: "الحساب التجريبي",
         demoPassword: "كلمة المرور",
         firebaseTitle: "مصادقة Firebase بالبريد وكلمة المرور",
-        firebaseCopy: "استخدم الحساب نفسه على المتصفح وAndroid.",
+        firebaseCopy: "استخدم الحساب نفسه على المتصفح و Android.",
         newHere: "جديد هنا؟",
         createAccount: "إنشاء حساب",
         invalidEmail: "أدخل بريدا إلكترونيا صحيحا.",
@@ -88,6 +93,9 @@ const LoginPage: React.FC = () => {
         hidePassword: "Hide password",
         showPassword: "Show password",
         keepSignedIn: "Keep me signed in on this device",
+        forgotPassword: "Forgot password?",
+        sendingReset: "Sending reset link...",
+        resetSent: "Password reset email sent. Check your inbox.",
         signingIn: "Signing in...",
         signIn: "Sign In",
         useDemo: "Use Demo Login",
@@ -108,11 +116,13 @@ const LoginPage: React.FC = () => {
     event.preventDefault();
 
     if (!emailPattern.test(email.trim())) {
+      setResetFeedback("");
       setError(copy.invalidEmail);
       return;
     }
 
     if (password.trim().length < 6) {
+      setResetFeedback("");
       setError(copy.shortPassword);
       return;
     }
@@ -120,16 +130,38 @@ const LoginPage: React.FC = () => {
     try {
       setIsSubmitting(true);
       setError("");
+      setResetFeedback("");
       await login({ email, password, rememberMe });
       history.replace(redirectTo);
     } catch (loginError) {
       setError(
-        loginError instanceof Error
-          ? loginError.message
-          : copy.signInError,
+        loginError instanceof Error ? loginError.message : copy.signInError,
       );
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  const handlePasswordReset = async () => {
+    if (!emailPattern.test(email.trim())) {
+      setResetFeedback("");
+      setError(copy.invalidEmail);
+      return;
+    }
+
+    try {
+      setIsResetting(true);
+      setError("");
+      setResetFeedback("");
+      await requestPasswordReset(email.trim());
+      setResetFeedback(copy.resetSent);
+    } catch (resetError) {
+      setResetFeedback("");
+      setError(
+        resetError instanceof Error ? resetError.message : copy.signInError,
+      );
+    } finally {
+      setIsResetting(false);
     }
   };
 
@@ -137,6 +169,7 @@ const LoginPage: React.FC = () => {
     setEmail(demoAccounts[0].email);
     setPassword(demoAccounts[0].password);
     setError("");
+    setResetFeedback("");
   };
 
   const continueWithCurrentSession = () => {
@@ -148,6 +181,7 @@ const LoginPage: React.FC = () => {
     setEmail("");
     setPassword("");
     setError("");
+    setResetFeedback("");
   };
 
   return (
@@ -159,10 +193,7 @@ const LoginPage: React.FC = () => {
 
           <div className="login-shell">
             <section className="login-hero">
-              <span className="spotlight-pill">
-              {/*  <IonIcon icon={sparklesOutline} /> */}
-                {copy.welcome}
-              </span>
+              <span className="spotlight-pill">{copy.welcome}</span>
 
               <div className="brand-hero brand-hero--login">
                 <BrandMark className="brand-mark--hero" />
@@ -225,7 +256,11 @@ const LoginPage: React.FC = () => {
                     placeholder={copy.emailPlaceholder}
                     type="email"
                     value={email}
-                    onChange={(event) => setEmail(event.target.value)}
+                    onChange={(event) => {
+                      setEmail(event.target.value);
+                      setError("");
+                      setResetFeedback("");
+                    }}
                   />
                 </div>
               </label>
@@ -239,12 +274,17 @@ const LoginPage: React.FC = () => {
                     placeholder={copy.passwordPlaceholder}
                     type={showPassword ? "text" : "password"}
                     value={password}
-                    onChange={(event) => setPassword(event.target.value)}
+                    onChange={(event) => {
+                      setPassword(event.target.value);
+                      setError("");
+                    }}
                   />
                   <button
                     type="button"
                     className="auth-field__toggle"
-                    aria-label={showPassword ? copy.hidePassword : copy.showPassword}
+                    aria-label={
+                      showPassword ? copy.hidePassword : copy.showPassword
+                    }
                     onClick={() => setShowPassword((currentValue) => !currentValue)}
                   >
                     <IonIcon icon={showPassword ? eyeOffOutline : eyeOutline} />
@@ -261,7 +301,23 @@ const LoginPage: React.FC = () => {
                 <span>{copy.keepSignedIn}</span>
               </label>
 
+              {authMode === "firebase" ? (
+                <div className="auth-helper-row">
+                  <button
+                    type="button"
+                    className="auth-link-button"
+                    onClick={handlePasswordReset}
+                    disabled={isResetting}
+                  >
+                    {isResetting ? copy.sendingReset : copy.forgotPassword}
+                  </button>
+                </div>
+              ) : null}
+
               {error ? <p className="auth-error">{error}</p> : null}
+              {resetFeedback ? (
+                <p className="auth-success">{resetFeedback}</p>
+              ) : null}
 
               <button
                 type="submit"

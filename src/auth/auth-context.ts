@@ -27,6 +27,7 @@ export interface AuthContextValue {
   isAuthenticated: boolean;
   isReady: boolean;
   login: (payload: LoginPayload) => Promise<AuthUser>;
+  requestPasswordReset: (email: string) => Promise<void>;
   register: (payload: RegisterPayload) => Promise<AuthUser>;
   logout: () => void;
   user: AuthUser | null;

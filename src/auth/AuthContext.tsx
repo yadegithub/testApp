@@ -15,6 +15,7 @@ import {
   loginWithFirebase,
   refreshFirebaseSession,
   registerWithFirebase,
+  sendPasswordResetEmailWithFirebase,
   shouldRefreshSession,
   type FirebaseSession,
 } from "./firebaseAuth";
@@ -306,6 +307,15 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     return nextUser;
   };
 
+  const requestPasswordReset = async (email: string) => {
+    if (authMode === "firebase") {
+      await sendPasswordResetEmailWithFirebase(email);
+      return;
+    }
+
+    throw new Error(LOCAL_MODE_NOTICE);
+  };
+
   const register = async ({
     email,
     name,
@@ -358,6 +368,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         isAuthenticated: Boolean(session?.user),
         isReady,
         login,
+        requestPasswordReset,
         register,
         logout,
         user: session?.user ?? null,

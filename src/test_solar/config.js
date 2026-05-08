@@ -195,7 +195,7 @@ const copy = {
   appTitle: "SOLAR SYSTEM",
   rotate: "Rotate",
   scale: "Scale",
-  labels: "Numbers On/Off",
+  labels: "Labels On/Off",
   statusStarting: "Starting camera...",
   statusLoading: "Loading solar model...",
   statusReady: "Camera ready",
@@ -204,7 +204,7 @@ const copy = {
   statusHoldSteady: "Hold the QR steady for a moment...",
   statusCameraError: "Camera access was denied.",
   statusModelError: "The solar model could not be loaded.",
-  focusTag: "Selected body",
+  focusTag: "Selected planet",
 };
 
 const defaultConfig = {
@@ -215,7 +215,7 @@ const defaultConfig = {
         targetSize: 1.75,
         enhanceDirectModel: false,
         animationClipName: "solar system",
-        animationTimeScale: 1,
+        animationTimeScale: 0.3,
         position: { x: 0.44, y: 0.36, z: 0.03 },
         rotation: { x: 1.5708, y: 0, z: 0 },
       },

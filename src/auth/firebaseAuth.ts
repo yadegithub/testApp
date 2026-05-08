@@ -83,10 +83,23 @@ const mapFirebaseError = (errorCode: string | undefined) => {
       return "Email/password sign-in is not enabled in Firebase yet.";
     case "API_KEY_INVALID":
       return "Firebase API key is invalid.";
+    case "MISSING_EMAIL":
+      return "Enter your email address first.";
     case "TOO_MANY_ATTEMPTS_TRY_LATER":
       return "Too many attempts. Please try again later.";
     default:
       return "Authentication failed. Please try again.";
+  }
+};
+
+const mapPasswordResetError = (errorCode: string | undefined) => {
+  switch (errorCode) {
+    case "EMAIL_NOT_FOUND":
+      return "No account was found for this email.";
+    case "MISSING_EMAIL":
+      return "Enter your email address first.";
+    default:
+      return mapFirebaseError(errorCode);
   }
 };
 
@@ -156,6 +169,31 @@ export const loginWithFirebase = async ({
   const profileName = profile.users?.[0]?.displayName;
 
   return buildSession(response, profileName);
+};
+
+export const sendPasswordResetEmailWithFirebase = async (email: string) => {
+  if (!FIREBASE_API_KEY) {
+    throw new Error(
+      "Firebase auth is not configured yet. Add VITE_FIREBASE_API_KEY to use real auth.",
+    );
+  }
+
+  const response = await fetch(getFirebaseEndpoint("accounts:sendOobCode"), {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      email: email.trim(),
+      requestType: "PASSWORD_RESET",
+    }),
+  });
+
+  const payload = (await response.json()) as FirebaseErrorResponse;
+
+  if (!response.ok) {
+    throw new Error(mapPasswordResetError(payload.error?.message));
+  }
 };
 
 export const registerWithFirebase = async ({

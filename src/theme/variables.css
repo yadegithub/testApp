@@ -654,12 +654,36 @@ ion-content.app-page::part(scroll) {
   accent-color: #2084ff;
 }
 
+.auth-helper-row {
+  display: flex;
+  justify-content: flex-end;
+  margin: -4px 0 14px;
+}
+
+.auth-link-button {
+  border: none;
+  padding: 0;
+  background: transparent;
+  color: #1c78ef;
+  font-size: 0.88rem;
+  font-weight: 700;
+}
+
 .auth-error {
   margin: 0 0 14px;
   padding: 12px 14px;
   border-radius: 16px;
   background: rgba(255, 97, 97, 0.09);
   color: #bf2e45;
+  font-size: 0.92rem;
+}
+
+.auth-success {
+  margin: 0 0 14px;
+  padding: 12px 14px;
+  border-radius: 16px;
+  background: rgba(50, 184, 126, 0.1);
+  color: #137951;
   font-size: 0.92rem;
 }
 
@@ -2817,7 +2841,12 @@ ion-tab-button ion-label {
     font-size: 0.85rem;
   }
 
+  .auth-link-button {
+    font-size: 0.82rem;
+  }
+
   .auth-error,
+  .auth-success,
   .auth-hint strong,
   .auth-hint span,
   .auth-session-card__copy span,
@@ -3128,7 +3157,12 @@ ion-tab-button ion-label {
     height: 16px;
   }
 
+  .auth-helper-row {
+    margin: -2px 0 12px;
+  }
+
   .auth-error,
+  .auth-success,
   .auth-hint strong,
   .auth-hint span,
   .auth-session-card__copy strong,
@@ -3373,9 +3407,18 @@ html[data-theme="dark"] .auth-field__toggle {
   color: #7fd8ff;
 }
 
+html[data-theme="dark"] .auth-link-button {
+  color: #7fd8ff;
+}
+
 html[data-theme="dark"] .auth-error {
   background: rgba(255, 97, 97, 0.12);
   color: #ff9dad;
+}
+
+html[data-theme="dark"] .auth-success {
+  background: rgba(56, 201, 136, 0.14);
+  color: #8df0c4;
 }
 
 html[data-theme="dark"] .app-tab-bar {

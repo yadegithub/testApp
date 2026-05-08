@@ -1,8 +1,53 @@
+window.AR_VIEWER_BOOTSTRAP = {
+    defaultModelPath: "assets/kidney.glb",
+    defaultTitle: "HUMAN KIDNEY",
+    defaultStatusLoading: "Loading human kidney model...",
+    defaultStatusTracking: "Human kidney placed",
+    defaultFocusTag: "Kidney structure",
+    defaultOverview: {
+        tag: "Kidney anatomy",
+        title: "HUMAN KIDNEY",
+        info: "Inspect the kidney in AR and tap the numbered notes to understand the main filtering structures.",
+        hint: "Use Rotate, Scale and Labels to inspect the kidney more clearly."
+    },
+    defaultConfig: {
+        assets: {
+            models: {
+                primary: {
+                    name: "Human Kidney",
+                    path: "assets/kidney.glb",
+                    scale: { x: 0.16, y: 0.16, z: 0.16 },
+                    position: { x: 0.0, y: 0.0, z: 0.0 },
+                    rotation: { x: 0.0, y: Math.PI, z: 0.0 },
+                    autoCenter: true
+                }
+            }
+        },
+        settings: {
+            arScale: 2.6,
+            tracking: {
+                markerLostGraceFrames: 3,
+                trackingLerpAlpha: 0.26,
+                trackingScaleLerpAlpha: 0.22,
+                confirmFrames: 2,
+                qrScanIntervalMs: 20,
+                qrSearchIntervalMs: 40,
+                positionDeadzone: 0.02,
+                scaleDeadzone: 0.018,
+                rotationDeadzoneRad: 0.03,
+                fastFollowDistance: 0.12,
+                fastFollowAlpha: 0.62
+            }
+        }
+    }
+};
+
 const query = new URLSearchParams(window.location.search);
 const currentTheme = query.get("theme") === "light" ? "light" : "dark";
 const currentLanguage = query.get("lang") === "ar" ? "ar" : "en";
-const DEFAULT_MODEL_PATH = "assets/digestive_system.glb";
-const DEFAULT_MODEL_ROTATION = {
+const BOOT = window.AR_VIEWER_BOOTSTRAP ?? {};
+const DEFAULT_MODEL_PATH = BOOT.defaultModelPath ?? "assets/model.glb";
+const DEFAULT_MODEL_ROTATION = BOOT.defaultModelRotation ?? {
     x: 0,
     y: Math.PI,
     z: 0
@@ -17,14 +62,12 @@ const MAX_QR_EDGE_RATIO = 2.3;
 const MAX_CENTER_JUMP_RATIO = 0.12;
 const QR_SCAN_INTERVAL_MS = 42;
 const QR_SEARCH_INTERVAL_MS = 64;
-const MAX_RENDER_PIXEL_RATIO = 1.25;
+const MAX_RENDER_PIXEL_RATIO = BOOT.maxRenderPixelRatio ?? 1;
 const CAMERA_IDEAL_WIDTH = 960;
 const CAMERA_IDEAL_HEIGHT = 540;
 const CAMERA_IDEAL_FRAME_RATE = 24;
 const CAMERA_MAX_FRAME_RATE = 30;
 const SHOW_DEBUG_CAMERA_CANVAS = false;
-const MOBILE_INFO_CARD_BREAKPOINT = 820;
-
 document.documentElement.dataset.theme = currentTheme;
 document.documentElement.lang = currentLanguage;
 document.documentElement.dir = currentLanguage === "ar" ? "rtl" : "ltr";
@@ -51,83 +94,81 @@ const UI = {
     video: document.getElementById("videoInput")
 };
 
-const defaultAnatomyParts = [
-    {
-        id: "liver",
-        label: "Liver",
-        title: "LIVER",
-        info: "The liver supports digestion by producing bile and helping the body process nutrients.",
-        hint: "This large upper organ helps chemical digestion.",
-        normalizedPosition: [-0.19, 0.24, 0.26]
-    },
-    {
-        id: "stomach",
-        label: "Stomach",
-        title: "STOMACH",
-        info: "The stomach stores food for a short time, mixes it, and starts chemical digestion.",
-        hint: "It works like a mixing chamber before food moves onward.",
-        normalizedPosition: [0.18, 0.19, 0.26]
-    },
-    {
-        id: "pancreas",
-        label: "Pancreas",
-        title: "PANCREAS",
-        info: "The pancreas helps digestion by releasing enzymes that continue breaking food down.",
-        hint: "This structure works with the stomach and intestine during digestion.",
-        normalizedPosition: [-0.08, 0.1, 0.31]
-    },
-    {
-        id: "small-intestine",
-        label: "Small Intestine",
-        title: "SMALL INTESTINE",
-        info: "Most digestion finishes in the small intestine, where nutrients are absorbed into the body.",
-        hint: "This is the main absorption zone of the digestive system.",
-        normalizedPosition: [-0.02, -0.02, 0.31]
-    },
-    {
-        id: "large-intestine",
-        label: "Large Intestine",
-        title: "LARGE INTESTINE",
-        info: "The large intestine reabsorbs water and helps prepare waste before it leaves the body.",
-        hint: "It forms the outer lower frame around the intestinal area.",
-        normalizedPosition: [0.08, -0.18, 0.22]
-    },
-    {
-        id: "lower-digestive-tract",
-        label: "Lower Digestive Tract",
-        title: "LOWER DIGESTIVE TRACT",
-        info: "This lower section completes the digestive pathway and helps the body eliminate waste.",
-        hint: "It marks the final stage of the digestive process.",
-        normalizedPosition: [0.0, -0.33, 0.18]
-    }
-].map((part, index) => ({
+const defaultAnatomyParts = Array.isArray(BOOT.defaultAnatomyParts)
+    ? BOOT.defaultAnatomyParts.map((part, index) => ({
     ...part,
     number: index + 1
-}));
+    }))
+    : [];
 
-const defaultCopy = {
+function isPlainObject(value) {
+    return Boolean(value) && typeof value === "object" && !Array.isArray(value);
+}
+
+function deepMerge(baseValue, overrideValue) {
+    if (Array.isArray(baseValue)) {
+        return Array.isArray(overrideValue) ? overrideValue : [...baseValue];
+    }
+
+    if (!isPlainObject(baseValue)) {
+        return overrideValue ?? baseValue;
+    }
+
+    const mergedValue = { ...baseValue };
+
+    if (!isPlainObject(overrideValue)) {
+        return mergedValue;
+    }
+
+    Object.keys(overrideValue).forEach((key) => {
+        const baseEntry = mergedValue[key];
+        const overrideEntry = overrideValue[key];
+
+        if (Array.isArray(overrideEntry)) {
+            mergedValue[key] = overrideEntry;
+            return;
+        }
+
+        if (isPlainObject(baseEntry) && isPlainObject(overrideEntry)) {
+            mergedValue[key] = deepMerge(baseEntry, overrideEntry);
+            return;
+        }
+
+        mergedValue[key] = overrideEntry;
+    });
+
+    return mergedValue;
+}
+
+const genericDefaultCopy = {
     appEyebrow: "AR Learn live scan",
-    appTitle: "DIGESTIVE SYSTEM",
+    appTitle: BOOT.defaultTitle ?? "MODEL EXPERIENCE",
     rotate: "Rotate",
     scale: "Scale",
     sound: "Audio",
     labels: "Numbers On/Off",
     statusStarting: "Starting camera...",
-    statusLoading: "Loading digestive system model...",
+    statusLoading: BOOT.defaultStatusLoading ?? "Loading model...",
     statusReady: "Camera ready",
-    statusTracking: "Digestive system placed",
+    statusTracking: BOOT.defaultStatusTracking ?? "Model placed",
     statusHoldSteady: "Hold steady while locking QR...",
     statusSearching: "Searching for QR code...",
     statusCameraError: "Camera access was denied.",
-    statusModelError: "The digestive system model could not be loaded.",
-    focusTag: "Digestive structure",
+    statusModelError: "The model could not be loaded.",
+    focusTag: BOOT.defaultFocusTag ?? "Selected structure",
     overview: {
-        tag: "Digestive anatomy",
-        title: "DIGESTIVE SYSTEM",
-        info: "Tap a numbered marker to read the role of each major structure in the digestive system.",
-        hint: "Use Rotate, Scale and Labels to inspect the whole system more clearly."
+        tag: BOOT.defaultOverview?.tag ?? "Model anatomy",
+        title: BOOT.defaultOverview?.title ?? (BOOT.defaultTitle ?? "MODEL EXPERIENCE"),
+        info:
+            BOOT.defaultOverview?.info ??
+            "Inspect the model in AR and tap the numbered labels to read more about each structure.",
+        hint:
+            BOOT.defaultOverview?.hint ??
+            "Use Rotate, Scale and Labels to inspect the model more clearly."
     }
 };
+
+const defaultCopy = deepMerge(genericDefaultCopy, BOOT.defaultCopy ?? {});
 
 let anatomyParts = defaultAnatomyParts.map((part) => ({ ...part }));
 let copy = {
@@ -183,51 +224,54 @@ let hasLiveMarkerDetection = false;
 let detectionStreak = 0;
 let lastDetectionCenter = null;
 let lastQrScanTime = 0;
+let preloadedModelPath = "";
+let preloadedModelPromise;
+let isModelMounted = false;
 
 const trackedMatrix = new THREE.Matrix4();
 const trackedPosition = new THREE.Vector3();
 const trackedQuaternion = new THREE.Quaternion();
 const trackedScale = new THREE.Vector3();
 
-const defaultConfig = {
+const baseDefaultConfig = {
     assets: {
         models: {
             primary: {
-                name: "Digestive System",
+                name: BOOT.defaultTitle ?? "Model Experience",
                 path: DEFAULT_MODEL_PATH,
                 position: { x: 0.5, y: 0.55, z: 0.0 },
-                scale: { x: 0.95, y: 0.95, z: 0.95 },
+                scale: { x: 1, y: 1, z: 1 },
                 rotation: DEFAULT_MODEL_ROTATION,
                 autoCenter: false
             }
         },
-        audio: "assets/heartbeat.mp3"
+        audio: BOOT.defaultAudioPath ?? ""
     },
     content: {
         defaultPart: {
             en: {
-                tag: "Digestive anatomy",
-                name: "DIGESTIVE SYSTEM",
-                info: "Inspect the full digestive system in AR and tap the numbered labels to read the role of each main structure.",
-                hint: "Use rotate, scale and labels while the model is active."
+                tag: defaultCopy.overview.tag,
+                name: defaultCopy.overview.title,
+                info: defaultCopy.overview.info,
+                hint: defaultCopy.overview.hint
             }
         },
         ui: {
             en: {
-                appEyebrow: "AR Learn live scan",
-                appTitle: "DIGESTIVE SYSTEM",
-                rotate: "Rotate",
-                scale: "Scale",
-                labels: "Numbers On/Off",
-                statusStarting: "Starting camera...",
-                statusLoading: "Loading digestive system model...",
-                statusReady: "Camera ready",
-                statusTracking: "Digestive system placed",
-                statusHoldSteady: "Hold steady while locking QR...",
-                statusSearching: "Searching for QR code...",
-                statusCameraError: "Camera access was denied.",
-                statusModelError: "The digestive system model could not be loaded.",
-                focusTag: "Digestive structure"
+                appEyebrow: defaultCopy.appEyebrow,
+                appTitle: defaultCopy.appTitle,
+                rotate: defaultCopy.rotate,
+                scale: defaultCopy.scale,
+                labels: defaultCopy.labels,
+                statusStarting: defaultCopy.statusStarting,
+                statusLoading: defaultCopy.statusLoading,
+                statusReady: defaultCopy.statusReady,
+                statusTracking: defaultCopy.statusTracking,
+                statusHoldSteady: defaultCopy.statusHoldSteady,
+                statusSearching: defaultCopy.statusSearching,
+                statusCameraError: defaultCopy.statusCameraError,
+                statusModelError: defaultCopy.statusModelError,
+                focusTag: defaultCopy.focusTag
             }
         },
         parts: defaultAnatomyParts
@@ -249,6 +293,8 @@ const defaultConfig = {
         }
     }
 };
+
+const defaultConfig = deepMerge(baseDefaultConfig, BOOT.defaultConfig ?? {});
 
 function getLocalizedString(value, fallback = "") {
     if (typeof value === "string") {
@@ -286,6 +332,26 @@ function getPrimaryModelConfig(config) {
     }
 
     return defaultConfig.assets.models.primary;
+}
+
+function getConfiguredModelPath(config) {
+    return getPrimaryModelConfig(config).path ?? DEFAULT_MODEL_PATH;
+}
+
+function startModelPreload(config) {
+    const modelPath = getConfiguredModelPath(config);
+
+    if (preloadedModelPromise && preloadedModelPath === modelPath) {
+        return preloadedModelPromise;
+    }
+
+    preloadedModelPath = modelPath;
+    preloadedModelPromise = new Promise((resolve, reject) => {
+        const loader = new THREE.GLTFLoader();
+        loader.load(modelPath, resolve, undefined, reject);
+    });
+
+    return preloadedModelPromise;
 }
 
 function resolvePartPosition(part, modelSize) {
@@ -481,16 +547,6 @@ function positionInfoCard() {
         return;
     }
 
-    if (window.innerWidth <= MOBILE_INFO_CARD_BREAKPOINT) {
-        UI.card.classList.remove("info-card--floating");
-        UI.card.style.left = "50%";
-        UI.card.style.top = "";
-        UI.card.style.right = "";
-        UI.card.style.bottom = "12px";
-        UI.card.style.transform = "translateX(-50%)";
-        return;
-    }
-
     const selectedEntry =
         focusedPartIndex >= 0 ? anatomyLabels[focusedPartIndex] : null;
 
@@ -505,21 +561,75 @@ function positionInfoCard() {
     }
 
     const markerRect = selectedEntry.label.element.getBoundingClientRect();
-    const cardWidth = UI.card.offsetWidth || 300;
+    const isCompactViewport = window.innerWidth <= 600;
+    const viewportMargin = isCompactViewport ? 10 : 16;
+    const gap = isCompactViewport ? 10 : 18;
+    const cardWidth = UI.card.offsetWidth || (isCompactViewport ? 220 : 300);
     const cardHeight = UI.card.offsetHeight || 170;
+    const markerCenterX = markerRect.left + markerRect.width / 2;
+    const markerCenterY = markerRect.top + markerRect.height / 2;
 
-    let left = markerRect.right + 18;
-    if (left + cardWidth > window.innerWidth - 16) {
-        left = markerRect.left - cardWidth - 18;
-    }
+    const placementCandidates = isCompactViewport
+        ? [
+              {
+                  left: markerCenterX - cardWidth / 2,
+                  top: markerRect.top - cardHeight - gap
+              },
+              {
+                  left: markerCenterX - cardWidth / 2,
+                  top: markerRect.bottom + gap
+              },
+              {
+                  left: markerRect.right + gap,
+                  top: markerCenterY - cardHeight / 2
+              },
+              {
+                  left: markerRect.left - cardWidth - gap,
+                  top: markerCenterY - cardHeight / 2
+              }
+          ]
+        : [
+              {
+                  left: markerRect.right + gap,
+                  top: markerCenterY - cardHeight / 2
+              },
+              {
+                  left: markerRect.left - cardWidth - gap,
+                  top: markerCenterY - cardHeight / 2
+              },
+              {
+                  left: markerCenterX - cardWidth / 2,
+                  top: markerRect.top - cardHeight - gap
+              },
+              {
+                  left: markerCenterX - cardWidth / 2,
+                  top: markerRect.bottom + gap
+              }
+          ];
 
-    let top = markerRect.top + markerRect.height / 2 - cardHeight / 2;
-    left = Math.max(16, Math.min(window.innerWidth - cardWidth - 16, left));
-    top = Math.max(16, Math.min(window.innerHeight - cardHeight - 16, top));
+    const placementFitsViewport = ({ left, top }) =>
+        left >= viewportMargin &&
+        top >= viewportMargin &&
+        left + cardWidth <= window.innerWidth - viewportMargin &&
+        top + cardHeight <= window.innerHeight - viewportMargin;
+
+    const clampPlacementToViewport = ({ left, top }) => ({
+        left: Math.max(
+            viewportMargin,
+            Math.min(window.innerWidth - cardWidth - viewportMargin, left)
+        ),
+        top: Math.max(
+            viewportMargin,
+            Math.min(window.innerHeight - cardHeight - viewportMargin, top)
+        )
+    });
+
+    const chosenPlacement = placementCandidates.find(placementFitsViewport)
+        ?? clampPlacementToViewport(placementCandidates[0]);
 
     UI.card.classList.add("info-card--floating");
-    UI.card.style.left = `${left}px`;
-    UI.card.style.top = `${top}px`;
+    UI.card.style.left = `${chosenPlacement.left}px`;
+    UI.card.style.top = `${chosenPlacement.top}px`;
     UI.card.style.right = "auto";
     UI.card.style.bottom = "auto";
     UI.card.style.transform = "none";
@@ -564,6 +674,7 @@ async function loadConfig() {
     hydrateRuntimeContent(config);
     applyTrackingSettings(config);
     applyCopy();
+    startModelPreload(config);
 
     try {
         await startCamera(config);
@@ -656,7 +767,8 @@ function initThree(config) {
     renderer = new THREE.WebGLRenderer({
         canvas: UI.canvasThree,
         alpha: true,
-        antialias: true
+        antialias: false,
+        powerPreference: "high-performance"
     });
     renderer.setSize(UI.video.width, UI.video.height, false);
     renderer.setPixelRatio(
@@ -695,54 +807,75 @@ function initThree(config) {
     accentLight.position.set(-4, 3, 4);
     scene.add(accentLight);
 
-    const loader = new THREE.GLTFLoader();
     const modelConfig = getPrimaryModelConfig(config);
     const defaultModelConfig = defaultConfig.assets.models.primary;
-    const modelPath = modelConfig.path ?? DEFAULT_MODEL_PATH;
     const modelPosition = modelConfig.position ?? defaultModelConfig.position;
     const modelScale = modelConfig.scale ?? defaultModelConfig.scale;
     const modelRotation =
         modelConfig.rotation ?? defaultModelConfig.rotation;
     const autoCenter = modelConfig.autoCenter ?? defaultModelConfig.autoCenter;
+    const alignBaseY =
+        modelConfig.alignBaseY ?? defaultModelConfig.alignBaseY ?? false;
 
     arScale = config.settings?.arScale ?? defaultConfig.settings.arScale;
-    heartSound = new Audio(config.assets?.audio ?? defaultConfig.assets.audio);
-    heartSound.loop = true;
 
     setStatus(copy.statusLoading);
+    mountPrimaryModel(config, {
+        modelPosition,
+        modelScale,
+        modelRotation,
+        autoCenter,
+        alignBaseY
+    });
+}
 
-    loader.load(
-        modelPath,
-        (gltf) => {
+function mountPrimaryModel(config, runtimeModelConfig) {
+    startModelPreload(config)
+        .then((gltf) => {
+            if (!arGroup || isModelMounted) {
+                return;
+            }
+
             heartModel = gltf.scene;
+
+            if (heartModel.parent) {
+                heartModel.parent.remove(heartModel);
+            }
+
             const localBounds = new THREE.Box3().setFromObject(heartModel);
             const modelCenter = localBounds.getCenter(new THREE.Vector3());
             const modelSize = localBounds.getSize(new THREE.Vector3());
             const modelAnchor = new THREE.Group();
             modelAnchor.position.set(
-                modelPosition.x ?? 0.5,
-                modelPosition.y ?? 0.55,
-                modelPosition.z ?? 0
+                runtimeModelConfig.modelPosition.x ?? 0.5,
+                runtimeModelConfig.modelPosition.y ?? 0.55,
+                runtimeModelConfig.modelPosition.z ?? 0
             );
             arGroup.add(modelAnchor);
 
             const modelRig = new THREE.Group();
             modelRig.scale.set(
-                modelScale.x ?? 0.95,
-                modelScale.y ?? 0.95,
-                modelScale.z ?? 0.95
+                runtimeModelConfig.modelScale.x ?? 1,
+                runtimeModelConfig.modelScale.y ?? 1,
+                runtimeModelConfig.modelScale.z ?? 1
             );
             modelRig.rotation.set(
-                modelRotation.x ?? DEFAULT_MODEL_ROTATION.x,
-                modelRotation.y ?? DEFAULT_MODEL_ROTATION.y,
-                modelRotation.z ?? DEFAULT_MODEL_ROTATION.z
+                runtimeModelConfig.modelRotation.x ?? DEFAULT_MODEL_ROTATION.x,
+                runtimeModelConfig.modelRotation.y ?? DEFAULT_MODEL_ROTATION.y,
+                runtimeModelConfig.modelRotation.z ?? DEFAULT_MODEL_ROTATION.z
             );
             modelAnchor.add(modelRig);
 
+            const modelOffsetY = runtimeModelConfig.alignBaseY
+                ? -localBounds.min.y
+                : runtimeModelConfig.autoCenter
+                    ? -modelCenter.y
+                    : 0;
+
             heartModel.position.set(
-                autoCenter ? -modelCenter.x : 0,
-                autoCenter ? -modelCenter.y : 0,
-                autoCenter ? -modelCenter.z : 0
+                runtimeModelConfig.autoCenter ? -modelCenter.x : 0,
+                modelOffsetY,
+                runtimeModelConfig.autoCenter ? -modelCenter.z : 0
             );
             modelRig.add(heartModel);
 
@@ -750,17 +883,16 @@ function initThree(config) {
                 addAnatomyLabel(part, index, modelSize, modelRig);
             });
 
+            isModelMounted = true;
             setupInteraction();
             updateInfoCard();
             syncLabels();
             positionInfoCard();
-            setStatus(copy.statusReady);
-        },
-        undefined,
-        () => {
+            setStatus(hasLiveMarkerDetection ? copy.statusTracking : copy.statusReady);
+        })
+        .catch(() => {
             setStatus(copy.statusModelError);
-        }
-    );
+        });
 }
 
 function addAnatomyLabel(part, index, modelSize, parentGroup) {
@@ -1294,6 +1426,7 @@ function cleanup() {
     lostMarkerFrames = 0;
     hasTrackingPose = false;
     hasLiveMarkerDetection = false;
+    isModelMounted = false;
     resetDetectionConfidence();
     lastQrScanTime = 0;
 
@@ -1341,3 +1474,4 @@ window.addEventListener("pagehide", cleanup);
 window.addEventListener("beforeunload", cleanup);
 
 loadConfig();
+
