@@ -52,8 +52,8 @@
 
 .landing-phone-device {
   position: relative;
-  width: min(100%, 365px);
-  height: 740px;
+  width: min(100%, 340px);
+  height: 660px;
   padding: 14px;
   border-radius: 44px;
   border: 1px solid rgba(148, 163, 184, 0.26);
@@ -215,4 +215,16 @@ ion-content.landing-page {
 
 ion-content.landing-page::part(scroll) {
   padding-bottom: 0;
+}
+
+.landing-page-shell {
+  font-family: "Aptos", "Segoe UI Variable Text", "Segoe UI", sans-serif;
+}
+
+.landing-page-shell h1,
+.landing-page-shell h2,
+.landing-page-shell h3,
+.landing-page-shell .landing-brand {
+  font-family: "Aptos Display", "Aptos", "Segoe UI Variable Display", "Segoe UI", sans-serif;
+  letter-spacing: -0.03em;
 }

@@ -8,23 +8,6 @@
     <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/build/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/examples/js/loaders/GLTFLoader.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/examples/js/renderers/CSS2DRenderer.js"></script>
-    <script>
-        (function () {
-            const existingModule = window.Module || {};
-            window.__solarOpenCvRuntimeReady = false;
-            window.__solarWasmBootAt = performance.now();
-            window.Module = Object.assign({}, existingModule, {
-                onRuntimeInitialized: function () {
-                    window.__solarOpenCvRuntimeReady = true;
-                    window.__solarOpenCvRuntimeReadyAt = performance.now();
-                    if (typeof existingModule.onRuntimeInitialized === "function") {
-                        existingModule.onRuntimeInitialized();
-                    }
-                    window.dispatchEvent(new CustomEvent("solar-opencv-ready"));
-                }
-            });
-        })();
-    </script>
     <script async src="https://docs.opencv.org/4.5.4/opencv.js"></script>
 </head>
 <body>

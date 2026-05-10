@@ -25,11 +25,6 @@ body {
     font-family: "Avenir Next", "Segoe UI", sans-serif;
 }
 
-html[data-scanner="mlkit"],
-html[data-scanner="mlkit"] body {
-    background: transparent;
-}
-
 body {
     position: relative;
     color: var(--text-main);

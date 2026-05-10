@@ -1,9 +1,12 @@
 import { IonContent, IonPage } from "@ionic/react";
-import { type MouseEvent, useEffect } from "react";
+import { type MouseEvent, useEffect, useRef } from "react";
 import { Link, useLocation } from "react-router-dom";
 import DashboardPhonePreview from "../components/DashboardPhonePreview";
 
 const HEADER_OFFSET = 104;
+const DEMO_VIDEO_URL = "/site-demo/demo-video.mp4";
+const DEMO_QR_CODE_URL = "/site-demo/demo-qr.png";
+const DEMO_URL = "https://4c69zz.csb.app/";
 
 const features = [
   {
@@ -97,16 +100,43 @@ const subjects = [
 
 const LandingPage: React.FC = () => {
   const location = useLocation();
+  const contentRef = useRef<HTMLIonContentElement | null>(null);
   const sectionHref = (sectionId: string) => `${location.pathname}#${sectionId}`;
+  const getSectionOffsetTop = (section: HTMLElement) => {
+    let offsetTop = section.offsetTop;
+    let currentParent = section.offsetParent as HTMLElement | null;
 
-  const scrollToSection = (sectionId: string) => {
+    while (currentParent) {
+      offsetTop += currentParent.offsetTop;
+      currentParent = currentParent.offsetParent as HTMLElement | null;
+    }
+
+    return offsetTop;
+  };
+
+  const scrollToSection = async (
+    sectionId: string,
+    options?: { updateHash?: boolean }
+  ) => {
     const section = document.getElementById(sectionId);
 
     if (!section) {
       return;
     }
 
-    window.history.replaceState({}, "", `${location.pathname}#${sectionId}`);
+    if (options?.updateHash !== false) {
+      window.history.replaceState({}, "", `${location.pathname}#${sectionId}`);
+    }
+
+    const scrollElement = await contentRef.current?.getScrollElement();
+
+    if (scrollElement && contentRef.current) {
+      const sectionTop = getSectionOffsetTop(section) - HEADER_OFFSET;
+
+      await contentRef.current.scrollToPoint(0, Math.max(0, sectionTop), 500);
+      return;
+    }
+
     const sectionTop =
       section.getBoundingClientRect().top + window.scrollY - HEADER_OFFSET;
 
@@ -121,7 +151,7 @@ const LandingPage: React.FC = () => {
     sectionId: string
   ) => {
     event.preventDefault();
-    scrollToSection(sectionId);
+    void scrollToSection(sectionId);
   };
 
   useEffect(() => {
@@ -137,13 +167,7 @@ const LandingPage: React.FC = () => {
     }
 
     const frameId = window.requestAnimationFrame(() => {
-      const sectionTop =
-        section.getBoundingClientRect().top + window.scrollY - HEADER_OFFSET;
-
-      window.scrollTo({
-        top: Math.max(0, sectionTop),
-        behavior: "smooth",
-      });
+      void scrollToSection(sectionId, { updateHash: false });
     });
 
     return () => window.cancelAnimationFrame(frameId);
@@ -151,18 +175,15 @@ const LandingPage: React.FC = () => {
 
   return (
     <IonPage>
-      <IonContent fullscreen className="landing-page">
-        <div className="relative min-h-screen overflow-hidden bg-slate-50 text-slate-900">
-          <div className="pointer-events-none absolute left-0 top-24 h-56 w-56 rounded-full bg-blue-200/40 blur-3xl animate-float-soft" />
-          <div className="pointer-events-none absolute right-0 top-72 h-64 w-64 rounded-full bg-emerald-200/40 blur-3xl animate-float-soft" />
-
-          <header className="fixed inset-x-0 top-0 z-50 border-b border-slate-200/80 bg-slate-50/88 backdrop-blur animate-fade-in">
+      <IonContent ref={contentRef} fullscreen className="landing-page">
+        <div className="landing-page-shell relative min-h-screen overflow-hidden bg-white text-slate-900">
+          <header className="fixed inset-x-0 top-0 z-50 border-b border-slate-200 bg-white/95 backdrop-blur animate-fade-in">
             <div className="mx-auto max-w-6xl px-6 lg:px-8">
               <nav className="flex min-h-16 items-center justify-between gap-4 py-4">
                 <a
                   href={sectionHref("top")}
                   onClick={(event) => handleSectionLinkClick(event, "top")}
-                  className="text-lg font-semibold tracking-tight text-slate-950 transition hover:text-slate-700"
+                  className="landing-brand text-lg font-semibold tracking-tight text-slate-950 transition hover:text-slate-700"
                 >
                   AR Learn
                 </a>
@@ -215,9 +236,9 @@ const LandingPage: React.FC = () => {
             </div>
           </header>
 
-          <div className="mx-auto max-w-6xl px-6 pt-24 lg:px-8 lg:pt-28">
-            <main id="top" className="pb-16">
-              <section className="grid gap-14 pb-12 pt-6 md:pb-16 md:pt-10 lg:min-h-[calc(100vh-7rem)] lg:grid-cols-[1.15fr_0.85fr] lg:items-center">
+          <div className="mx-auto max-w-6xl px-6 pt-20 lg:px-8 lg:pt-24">
+            <main id="top" className="pb-12">
+              <section className="grid gap-10 pb-8 pt-2 md:pb-10 md:pt-4 lg:grid-cols-[1.15fr_0.85fr] lg:items-start">
                 <div className="max-w-2xl animate-fade-up">
                   <span className="inline-flex rounded-full border border-slate-200 bg-white px-3 py-1 text-sm font-medium text-slate-600 shadow-sm">
                     Plateforme educative en realite augmentee
@@ -344,64 +365,37 @@ const LandingPage: React.FC = () => {
                   </div>
                 </div>
 
-                <div className="mt-6 grid gap-4 lg:grid-cols-[1.05fr_0.95fr]">
-                  <article className="rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm animate-fade-up hover-lift md:p-8">
-                    <span className="inline-flex rounded-full bg-slate-100 px-3 py-1 text-sm font-medium text-slate-700">
-                      Apprentissage par l'histoire
-                    </span>
-                    <h3 className="mt-4 text-2xl font-semibold tracking-tight text-slate-950">
-                      Les eleves apprennent a travers une histoire, pas seulement un ecran.
-                    </h3>
-                    <p className="mt-4 max-w-2xl text-sm leading-7 text-slate-600 sm:text-base">
-                      Au lieu d'entrer directement dans un modele, l'eleve avance dans une
-                      histoire, decouvre des indices, interagit avec les scenes et construit
-                      sa comprehension etape par etape. A la fin, il realise un exercice pour
-                      explorer ce qu'il a retenu de l'histoire.
-                    </p>
+                <div className="mt-6 max-w-3xl">
+                  <p className="text-sm leading-7 text-slate-600 sm:text-base">
+                    Les eleves suivent une petite histoire, interagissent avec les scenes
+                    et terminent par un exercice simple pour verifier ce qu'ils ont compris.
+                  </p>
+                </div>
 
-                    <div className="mt-6 grid gap-3 sm:grid-cols-3">
-                      <div className="rounded-2xl bg-slate-50 p-4">
-                        <p className="text-sm font-medium text-slate-500">Histoires</p>
-                        <p className="mt-2 text-sm leading-6 text-slate-700">
-                          Des chapitres guides avec contexte et progression.
-                        </p>
-                      </div>
-                      <div className="rounded-2xl bg-slate-50 p-4">
-                        <p className="text-sm font-medium text-slate-500">Interaction</p>
-                        <p className="mt-2 text-sm leading-6 text-slate-700">
-                          Des actions, reponses et decouvertes dans chaque lecon.
-                        </p>
-                      </div>
-                      <div className="rounded-2xl bg-slate-50 p-4">
-                        <p className="text-sm font-medium text-slate-500">Exercice</p>
-                        <p className="mt-2 text-sm leading-6 text-slate-700">
-                          Une activite finale pour approfondir ce qui a ete compris.
-                        </p>
-                      </div>
-                    </div>
-                  </article>
-
-                  <div className="grid gap-4">
+                <div className="mt-6 rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm animate-fade-up">
+                  <div className="grid gap-6 md:grid-cols-3">
                     {storyLearningSteps.map((step, index) => (
-                      <article
+                      <div
                         key={step.number}
-                        className="rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm animate-fade-up hover-lift"
-                        style={{ animationDelay: `${index * 100 + 120}ms` }}
+                        className={[
+                          "flex gap-4",
+                          index > 0
+                            ? "border-t border-slate-200 pt-6 md:border-l md:border-t-0 md:pl-6 md:pt-0"
+                            : "",
+                        ].join(" ")}
                       >
-                        <div className="flex items-start gap-4">
-                          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-slate-100 text-sm font-semibold text-slate-700">
-                            {step.number}
-                          </div>
-                          <div>
-                            <h3 className="text-lg font-semibold tracking-tight text-slate-950">
-                              {step.title}
-                            </h3>
-                            <p className="mt-3 text-sm leading-6 text-slate-600">
-                              {step.description}
-                            </p>
-                          </div>
+                        <div className="text-sm font-semibold text-slate-400">
+                          {step.number}
                         </div>
-                      </article>
+                        <div>
+                          <h3 className="text-lg font-semibold tracking-tight text-slate-950">
+                            {step.title}
+                          </h3>
+                          <p className="mt-2 text-sm leading-6 text-slate-600">
+                            {step.description}
+                          </p>
+                        </div>
+                      </div>
                     ))}
                   </div>
                 </div>
@@ -455,14 +449,23 @@ const LandingPage: React.FC = () => {
                       Apercu video
                     </h3>
                     <p className="mt-3 text-sm leading-6 text-slate-600">
-                      Utilisez cet espace pour presenter une courte video de demonstration de l'experience RA.
+                      Regardez un court apercu pour voir comment l'experience RA se lance et se presente sur mobile.
                     </p>
-                    <div className="mt-6 flex h-64 items-center justify-center rounded-[2rem] border border-dashed border-slate-300 bg-slate-50 text-sm font-medium text-slate-500 sm:h-72">
-                      Emplacement video
+                    <div className="mt-6 flex justify-center">
+                      <video
+                        className="w-full max-w-[18rem] rounded-[2rem] border border-slate-200 bg-slate-950 shadow-inner sm:max-w-[20rem]"
+                        controls
+                        playsInline
+                        preload="metadata"
+                        style={{ aspectRatio: "5 / 9" }}
+                      >
+                        <source src={DEMO_VIDEO_URL} type="video/mp4" />
+                        Votre navigateur ne prend pas en charge la lecture video.
+                      </video>
                     </div>
                   </article>
 
-                  <article className="rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm animate-fade-up hover-lift" style={{ animationDelay: "100ms" }}>
+                  <article className="flex flex-col rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm animate-fade-up hover-lift" style={{ animationDelay: "100ms" }}>
                     <h3 className="text-lg font-semibold tracking-tight text-slate-950">
                       Scanner le QR de demo
                     </h3>
@@ -470,18 +473,22 @@ const LandingPage: React.FC = () => {
                       Ajoutez ici un QR code pour ouvrir rapidement la demonstration sur mobile.
                     </p>
 
-                    <div className="mt-6 flex justify-center">
-                      <div className="flex h-48 w-48 items-center justify-center rounded-[2rem] border border-dashed border-slate-300 bg-slate-50 text-sm font-medium text-slate-500">
-                        Emplacement QR
-                      </div>
+                    <div className="flex flex-1 items-center justify-center py-8">
+                      <img
+                        src={DEMO_QR_CODE_URL}
+                        alt="QR code de demonstration AR Learn"
+                        className="mx-auto h-60 w-60 rounded-[2rem] border border-slate-200 bg-white object-contain p-5 shadow-inner sm:h-64 sm:w-64"
+                      />
                     </div>
 
-                    <Link
+                    <a
                       className="mt-6 inline-flex w-full items-center justify-center rounded-full bg-slate-950 px-5 py-3 text-sm font-medium text-white transition hover:-translate-y-0.5 hover:bg-slate-800"
-                      to="/login"
+                      href={DEMO_URL}
+                      rel="noreferrer"
+                      target="_blank"
                     >
                       Essayer la demo
-                    </Link>
+                    </a>
                   </article>
                 </div>
               </section>
