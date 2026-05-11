@@ -71,7 +71,7 @@ function updateInfoCard() {
 
 function syncLabels() {
   const shouldShowLabels =
-    labelsVisible && Boolean(arGroup?.visible) && hasLiveMarkerDetection;
+    labelsVisible && Boolean(arGroup?.visible);
 
   labels.forEach((entry) => {
     const isActive = entry.index === focusedPartIndex;
@@ -893,7 +893,7 @@ function processFrame(timestamp) {
     setStatus(copy.statusSearching);
   }
 
-  if (!hasLiveMarkerDetection && focusedPartIndex !== -1) {
+  if (!arGroup?.visible && focusedPartIndex !== -1) {
     setFocusedPart(-1);
   } else {
     syncLabels();
