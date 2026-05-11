@@ -126,15 +126,87 @@ const experienceCopy: Record<
       duration: "9 min lesson",
     },
     ar: {
-      title: "Ø§Ù„Ø¬Ù‡Ø§Ø² Ø§Ù„Ù‡Ø¶Ù…ÙŠ",
+      title: "الجهاز الهضمي",
       shortDescription:
-        "Ø§Ù…Ø³Ø­ Ø±Ù…Ø² QR Ù„Ø¹Ø±Ø¶ Ø§Ù„Ø¬Ù‡Ø§Ø² Ø§Ù„Ù‡Ø¶Ù…ÙŠ ÙÙŠ Ø§Ù„ÙˆØ§Ù‚Ø¹ Ø§Ù„Ù…Ø¹Ø²Ø² ÙˆØ§Ø³ØªÙƒØ´Ù Ø§Ù„Ø£Ø¹Ø¶Ø§Ø¡ Ø¨Ù…Ù„Ø§Ø­Ø¸Ø§Øª Ø¥Ø±Ø´Ø§Ø¯ÙŠØ©.",
+        "امسح رمز QR لعرض الجهاز الهضمي في الواقع المعزز واستكشف الأعضاء بملاحظات إرشادية.",
       teaser:
-        "ØªØªØ¨Ø¹ Ù…Ø³Ø§Ø± Ø§Ù„Ù‡Ø¶Ù… ÙÙŠ Ø§Ù„ÙˆØ§Ù‚Ø¹ Ø§Ù„Ù…Ø¹Ø²Ø² ÙˆØ§Ø¶ØºØ· Ø¹Ù„Ù‰ Ø§Ù„Ø£Ø±Ù‚Ø§Ù… Ù„ÙÙ‡Ù… ÙƒÙ„ Ø¹Ø¶Ùˆ.",
-      focusTitle: "Ø§Ù„Ø£Ù…Ø¹Ø§Ø¡ Ø§Ù„Ø¯Ù‚ÙŠÙ‚Ø©",
+        "تتبع مسار الهضم في الواقع المعزز واضغط على الأرقام لفهم كل عضو.",
+      focusTitle: "الأمعاء الدقيقة",
       focusCopy:
-        "ÙŠØ­Ø¯Ø« Ù…Ø¹Ø¸Ù… Ø§Ù…ØªØµØ§Øµ Ø§Ù„Ù…ØºØ°ÙŠØ§Øª ÙÙŠ Ø§Ù„Ø£Ù…Ø¹Ø§Ø¡ Ø§Ù„Ø¯Ù‚ÙŠÙ‚Ø© Ø¨Ø¹Ø¯ Ø£Ù† ÙŠÙÙƒÙƒ Ø§Ù„Ù…Ø¹Ø¯Ø© Ø§Ù„Ø·Ø¹Ø§Ù….",
-      duration: "Ø¯Ø±Ø³ 9 Ø¯Ù‚Ø§Ø¦Ù‚",
+        "يحدث معظم امتصاص المغذيات في الأمعاء الدقيقة بعد أن يفكك المعدة الطعام.",
+      duration: "درس 9 دقائق",
+    },
+  },
+  "human-skin": {
+    en: {
+      title: "Human Skin",
+      shortDescription:
+        "Explore the layers of the skin and the structures that protect, sense and regulate the body.",
+      teaser:
+        "Zoom into a skin cross-section in AR and tap each numbered label to inspect its anatomy.",
+      focusTitle: "Dermis",
+      focusCopy:
+        "The dermis supports the outer surface of the skin and contains follicles, glands, vessels and sensory structures.",
+      duration: "8 min lesson",
+    },
+    ar: {
+      title: "جلد الإنسان",
+      shortDescription:
+        "استكشف طبقات الجلد والبنى التي تحمي الجسم وتساعده على الإحساس وتنظيم الحرارة.",
+      teaser:
+        "كبّر مقطعًا عرضيًا للجلد في الواقع المعزز واضغط على كل تسمية لفحص التشريح.",
+      focusTitle: "الأدمة",
+      focusCopy:
+        "تدعم الأدمة الطبقة الخارجية للجلد وتحتوي على الجريبات والغدد والأوعية والبنى الحسية.",
+      duration: "درس 8 دقائق",
+    },
+  },
+  "female-reproductive-system": {
+    en: {
+      title: "Female Reproductive System",
+      shortDescription:
+        "Place a cross-section of the female reproductive system and explore the main organs with guided notes.",
+      teaser:
+        "Study the uterus, ovaries and connecting pathways in a clear AR cross-section.",
+      focusTitle: "Uterus",
+      focusCopy:
+        "The uterus is the central muscular organ of the reproductive system and supports pregnancy when a fertilized egg implants.",
+      duration: "9 min lesson",
+    },
+    ar: {
+      title: "الجهاز التناسلي الأنثوي",
+      shortDescription:
+        "ضع مقطعًا للجهاز التناسلي الأنثوي واستكشف الأعضاء الرئيسية مع ملاحظات إرشادية.",
+      teaser:
+        "ادرس الرحم والمبايض والمسارات المتصلة من خلال مقطع واضح في الواقع المعزز.",
+      focusTitle: "الرحم",
+      focusCopy:
+        "الرحم هو العضو العضلي المركزي في الجهاز التناسلي ويدعم الحمل عند انغراس البويضة المخصبة.",
+      duration: "درس 9 دقائق",
+    },
+  },
+  "human-kidney": {
+    en: {
+      title: "Human Kidney",
+      shortDescription:
+        "Inspect the kidney layers and vessels that filter blood and guide urine out of the organ.",
+      teaser:
+        "Tap through the cortex, medulla and ureter in a detailed AR kidney model.",
+      focusTitle: "Renal Cortex",
+      focusCopy:
+        "The renal cortex is the outer region where filtration begins before fluid continues deeper into the kidney.",
+      duration: "8 min lesson",
+    },
+    ar: {
+      title: "كلية الإنسان",
+      shortDescription:
+        "افحص طبقات الكلية والأوعية التي ترشح الدم وتوجه البول إلى خارج العضو.",
+      teaser:
+        "تنقل بين القشرة واللب والحالب داخل نموذج كلية مفصل في الواقع المعزز.",
+      focusTitle: "القشرة الكلوية",
+      focusCopy:
+        "القشرة الكلوية هي المنطقة الخارجية التي تبدأ فيها عملية الترشيح قبل أن يتجه السائل إلى عمق الكلية.",
+      duration: "درس 8 دقائق",
     },
   },
   "solar-system-model": {
@@ -171,14 +243,14 @@ const experienceCopy: Record<
       duration: "6 min lesson",
     },
     ar: {
-      title: "Electric Circuit",
+      title: "الدائرة الكهربائية",
       shortDescription:
-        "Explore a battery, wires, switch and bulb in a simple closed circuit.",
-      teaser: "Place a classroom circuit on your desk and follow the current path.",
-      focusTitle: "Closed Circuit",
+        "استكشف بطارية وأسلاكًا ومفتاحًا ومصباحًا داخل دائرة كهربائية مغلقة بسيطة.",
+      teaser: "ضع دائرة كهربائية مدرسية على مكتبك وتابع مسار التيار.",
+      focusTitle: "دائرة مغلقة",
       focusCopy:
-        "See how current flows only when every component is connected in one complete loop.",
-      duration: "6 min lesson",
+        "لاحظ كيف يمر التيار فقط عندما تكون كل المكونات متصلة في حلقة كاملة.",
+      duration: "درس 6 دقائق",
     },
   },
   "magnetic-fields": {

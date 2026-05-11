@@ -4,9 +4,21 @@
       "digestive": {
         "name": "Digestive System",
         "path": "assets/digestive_system.glb",
-        "scale": { "x": 0.78, "y": 0.78, "z": 0.78 },
-        "position": { "x": 0.0, "y": 0.0, "z": 0.0 },
-        "rotation": { "x": 0.0, "y": -0.15, "z": 0.0 },
+        "scale": {
+          "x": 0.78,
+          "y": 0.78,
+          "z": 0.78
+        },
+        "position": {
+          "x": 0,
+          "y": 0,
+          "z": 0
+        },
+        "rotation": {
+          "x": 0,
+          "y": -0.15,
+          "z": 0
+        },
         "autoCenter": true
       }
     },
@@ -20,58 +32,179 @@
         "name": "DIGESTIVE SYSTEM",
         "info": "Inspect the full digestive system in AR and tap the numbered labels to read the role of each main structure.",
         "hint": "Use rotate, scale and labels while the model is active."
+      },
+      "ar": {
+        "tag": "تشريح الجهاز الهضمي",
+        "name": "الجهاز الهضمي",
+        "info": "استكشف الجهاز الهضمي كاملا في الواقع المعزز واضغط على التسميات المرقمة لمعرفة دور كل بنية رئيسية.",
+        "hint": "استخدم التدوير والتحجيم والتسميات أثناء عرض النموذج."
       }
     },
     "parts": [
       {
         "id": "liver",
-        "label": "Liver",
-        "title": "LIVER",
-        "info": "The liver supports digestion by producing bile and helping the body process nutrients.",
-        "hint": "This large upper organ helps chemical digestion.",
-        "normalizedPosition": [-0.19, 0.24, 0.26]
+        "label": {
+          "en": "Liver",
+          "ar": "الكبد"
+        },
+        "title": {
+          "en": "LIVER",
+          "ar": "الكبد"
+        },
+        "info": {
+          "en": "The liver supports digestion by producing bile and helping the body process nutrients.",
+          "ar": "يساعد الكبد في عملية الهضم بإنتاج الصفراء ومساعدة الجسم على معالجة المغذيات."
+        },
+        "hint": {
+          "en": "This large upper organ helps chemical digestion.",
+          "ar": "هذا العضو الكبير في الأعلى يساهم في الهضم الكيميائي."
+        },
+        "normalizedPosition": [
+          -0.19,
+          0.24,
+          0.26
+        ]
       },
       {
         "id": "stomach",
-        "label": "Stomach",
-        "title": "STOMACH",
-        "info": "The stomach stores food for a short time, mixes it, and starts chemical digestion.",
-        "hint": "It works like a mixing chamber before food moves onward.",
-        "normalizedPosition": [0.18, 0.19, 0.26]
+        "label": {
+          "en": "Stomach",
+          "ar": "المعدة"
+        },
+        "title": {
+          "en": "STOMACH",
+          "ar": "المعدة"
+        },
+        "info": {
+          "en": "The stomach stores food for a short time, mixes it, and starts chemical digestion.",
+          "ar": "تخزن المعدة الطعام لفترة قصيرة وتمزجه وتبدأ الهضم الكيميائي."
+        },
+        "hint": {
+          "en": "It works like a mixing chamber before food moves onward.",
+          "ar": "تعمل مثل غرفة خلط قبل انتقال الطعام إلى الأمعاء."
+        },
+        "normalizedPosition": [
+          0.18,
+          0.19,
+          0.26
+        ]
       },
       {
         "id": "pancreas",
-        "label": "Pancreas",
-        "title": "PANCREAS",
-        "info": "The pancreas helps digestion by releasing enzymes that continue breaking food down.",
-        "hint": "This structure works with the stomach and intestine during digestion.",
-        "normalizedPosition": [-0.08, 0.1, 0.31]
+        "label": {
+          "en": "Pancreas",
+          "ar": "البنكرياس"
+        },
+        "title": {
+          "en": "PANCREAS",
+          "ar": "البنكرياس"
+        },
+        "info": {
+          "en": "The pancreas helps digestion by releasing enzymes that continue breaking food down.",
+          "ar": "يساعد البنكرياس في الهضم بإفراز إنزيمات تواصل تفكيك الطعام."
+        },
+        "hint": {
+          "en": "This structure works with the stomach and intestine during digestion.",
+          "ar": "تعمل هذه البنية مع المعدة والأمعاء أثناء الهضم."
+        },
+        "normalizedPosition": [
+          -0.08,
+          0.1,
+          0.31
+        ]
       },
       {
         "id": "small-intestine",
-        "label": "Small Intestine",
-        "title": "SMALL INTESTINE",
-        "info": "Most digestion finishes in the small intestine, where nutrients are absorbed into the body.",
-        "hint": "This is the main absorption zone of the digestive system.",
-        "normalizedPosition": [-0.02, -0.02, 0.31]
+        "label": {
+          "en": "Small Intestine",
+          "ar": "الأمعاء الدقيقة"
+        },
+        "title": {
+          "en": "SMALL INTESTINE",
+          "ar": "الأمعاء الدقيقة"
+        },
+        "info": {
+          "en": "Most digestion finishes in the small intestine, where nutrients are absorbed into the body.",
+          "ar": "ينتهي معظم الهضم في الأمعاء الدقيقة حيث يتم امتصاص المغذيات في الجسم."
+        },
+        "hint": {
+          "en": "This is the main absorption zone of the digestive system.",
+          "ar": "هذه هي منطقة الامتصاص الرئيسية في الجهاز الهضمي."
+        },
+        "normalizedPosition": [
+          -0.02,
+          -0.02,
+          0.31
+        ]
       },
       {
         "id": "large-intestine",
-        "label": "Large Intestine",
-        "title": "LARGE INTESTINE",
-        "info": "The large intestine reabsorbs water and helps prepare waste before it leaves the body.",
-        "hint": "It forms the outer lower frame around the intestinal area.",
-        "normalizedPosition": [0.08, -0.18, 0.22]
+        "label": {
+          "en": "Large Intestine",
+          "ar": "الأمعاء الغليظة"
+        },
+        "title": {
+          "en": "LARGE INTESTINE",
+          "ar": "الأمعاء الغليظة"
+        },
+        "info": {
+          "en": "The large intestine reabsorbs water and helps prepare waste before it leaves the body.",
+          "ar": "تعيد الأمعاء الغليظة امتصاص الماء وتساعد على تجهيز الفضلات قبل خروجها من الجسم."
+        },
+        "hint": {
+          "en": "It forms the outer lower frame around the intestinal area.",
+          "ar": "تشكل الإطار السفلي الخارجي حول منطقة الأمعاء."
+        },
+        "normalizedPosition": [
+          0.08,
+          -0.18,
+          0.22
+        ]
       },
       {
         "id": "lower-digestive-tract",
-        "label": "Lower Digestive Tract",
-        "title": "LOWER DIGESTIVE TRACT",
-        "info": "This lower section completes the digestive pathway and helps the body eliminate waste.",
-        "hint": "It marks the final stage of the digestive process.",
-        "normalizedPosition": [0.0, -0.33, 0.18]
+        "label": {
+          "en": "Lower Digestive Tract",
+          "ar": "القناة الهضمية السفلية"
+        },
+        "title": {
+          "en": "LOWER DIGESTIVE TRACT",
+          "ar": "القناة الهضمية السفلية"
+        },
+        "info": {
+          "en": "This lower section completes the digestive pathway and helps the body eliminate waste.",
+          "ar": "يكمل هذا الجزء السفلي مسار الهضم ويساعد الجسم على التخلص من الفضلات."
+        },
+        "hint": {
+          "en": "It marks the final stage of the digestive process.",
+          "ar": "يمثل المرحلة الأخيرة من عملية الهضم."
+        },
+        "normalizedPosition": [
+          0,
+          -0.33,
+          0.18
+        ]
       }
-    ]
+    ],
+    "ui": {
+      "ar": {
+        "appEyebrow": "مسح مباشر",
+        "appTitle": "الجهاز الهضمي",
+        "rotate": "تدوير",
+        "scale": "تحجيم",
+        "sound": "صوت",
+        "labels": "الأرقام تشغيل/إيقاف",
+        "statusStarting": "جار تشغيل الكاميرا...",
+        "statusLoading": "جار تحميل نموذج الجهاز الهضمي...",
+        "statusReady": "الكاميرا جاهزة",
+        "statusTracking": "تم وضع الجهاز الهضمي",
+        "statusHoldSteady": "ثبّت الجهاز أثناء التقاط رمز QR...",
+        "statusSearching": "جار البحث عن رمز QR...",
+        "statusCameraError": "تم رفض الوصول إلى الكاميرا.",
+        "statusModelError": "تعذر تحميل النموذج.",
+        "focusTag": "بنية هضمية"
+      }
+    }
   },
   "settings": {
     "arScale": 2.35,

@@ -4,9 +4,21 @@
       "civilisationCastle": {
         "name": "Castle of Consuegra",
         "path": "assets/castle_of_consuegra_toledo_spain.glb",
-        "scale": { "x": 0.9, "y": 0.9, "z": 0.9 },
-        "position": { "x": 0.0, "y": 0.18, "z": 0.0 },
-        "rotation": { "x": 0.0, "y": 3.141592653589793, "z": 0.0 },
+        "scale": {
+          "x": 0.9,
+          "y": 0.9,
+          "z": 0.9
+        },
+        "position": {
+          "x": 0,
+          "y": 0.18,
+          "z": 0
+        },
+        "rotation": {
+          "x": 0,
+          "y": 3.141592653589793,
+          "z": 0
+        },
         "autoCenter": true
       }
     },
@@ -21,10 +33,10 @@
         "hint": "Use rotate, scale and labels while the model is active."
       },
       "ar": {
-        "tag": "History model",
-        "name": "CASTLE OF CONSUEGRA",
-        "info": "Explore a historic Spanish castle in AR and tap the numbered labels to learn how medieval fortifications worked.",
-        "hint": "Use rotate, scale and labels while the model is active."
+        "tag": "نموذج تاريخي",
+        "name": "قلعة كونسويغرا",
+        "info": "استكشف قلعة إسبانية تاريخية في الواقع المعزز واضغط على التسميات المرقمة لمعرفة كيف عملت التحصينات في العصور الوسطى.",
+        "hint": "استخدم التدوير والتحجيم والتسميات أثناء عرض النموذج."
       }
     },
     "ui": {
@@ -47,94 +59,145 @@
         "focusTag": "Castle feature"
       },
       "ar": {
-        "appEyebrow": "AR Learn live scan",
-        "appTitle": "CASTLE OF CONSUEGRA",
-        "rotate": "Rotate",
-        "scale": "Scale",
-        "launchCollision": "Launch",
-        "pauseCollision": "Pause",
-        "labels": "Numbers On/Off",
-        "statusStarting": "Starting camera...",
-        "statusLoading": "Loading castle model...",
-        "statusReady": "Camera ready",
-        "statusTracking": "Castle placed",
-        "statusHoldSteady": "Hold steady while locking QR...",
-        "statusSearching": "Searching for QR code...",
-        "statusCameraError": "Camera access was denied.",
-        "statusModelError": "The castle model could not be loaded.",
-        "focusTag": "Castle feature"
+        "appEyebrow": "مسح مباشر",
+        "appTitle": "قلعة كونسويغرا",
+        "rotate": "تدوير",
+        "scale": "تحجيم",
+        "sound": "صوت",
+        "labels": "الأرقام تشغيل/إيقاف",
+        "statusStarting": "جار تشغيل الكاميرا...",
+        "statusLoading": "جار تحميل نموذج القلعة...",
+        "statusReady": "الكاميرا جاهزة",
+        "statusTracking": "تم وضع القلعة",
+        "statusHoldSteady": "ثبّت الجهاز أثناء التقاط رمز QR...",
+        "statusSearching": "جار البحث عن رمز QR...",
+        "statusCameraError": "تم رفض الوصول إلى الكاميرا.",
+        "statusModelError": "تعذر تحميل النموذج.",
+        "focusTag": "ميزة في القلعة",
+        "launchCollision": "ابدأ",
+        "pauseCollision": "إيقاف"
       }
     },
     "parts": [
       {
         "id": "main-keep",
-        "label": { "en": "Main Keep", "ar": "Main Keep" },
-        "title": { "en": "MAIN KEEP", "ar": "MAIN KEEP" },
+        "label": {
+          "en": "Main Keep",
+          "ar": "البرج الرئيسي"
+        },
+        "title": {
+          "en": "MAIN KEEP",
+          "ar": "البرج الرئيسي"
+        },
         "info": {
           "en": "The keep was the strongest central structure, used for defense, command and shelter during attacks.",
-          "ar": "The keep was the strongest central structure, used for defense, command and shelter during attacks."
+          "ar": "كان البرج الرئيسي أقوى بنية مركزية، واستُخدم للدفاع والقيادة والاحتماء أثناء الهجمات."
         },
         "hint": {
           "en": "Look for the highest fortified mass of the castle.",
-          "ar": "Look for the highest fortified mass of the castle."
+          "ar": "ابحث عن أعلى كتلة محصنة في القلعة."
         },
-        "normalizedPosition": [0.0, 0.28, 0.18]
+        "normalizedPosition": [
+          0,
+          0.28,
+          0.18
+        ]
       },
       {
         "id": "defensive-walls",
-        "label": { "en": "Defensive Walls", "ar": "Defensive Walls" },
-        "title": { "en": "DEFENSIVE WALLS", "ar": "DEFENSIVE WALLS" },
+        "label": {
+          "en": "Defensive Walls",
+          "ar": "الجدران الدفاعية"
+        },
+        "title": {
+          "en": "DEFENSIVE WALLS",
+          "ar": "الجدران الدفاعية"
+        },
         "info": {
           "en": "Thick walls protected the interior spaces and slowed attackers before they could reach the main courtyard.",
-          "ar": "Thick walls protected the interior spaces and slowed attackers before they could reach the main courtyard."
+          "ar": "حمت الجدران السميكة المساحات الداخلية وأبطأت المهاجمين قبل وصولهم إلى الفناء الرئيسي."
         },
         "hint": {
           "en": "Rotate the model to follow the wall line around the fortress.",
-          "ar": "Rotate the model to follow the wall line around the fortress."
+          "ar": "دوّر النموذج لتتبع خط الجدار حول الحصن."
         },
-        "normalizedPosition": [-0.34, 0.02, 0.18]
+        "normalizedPosition": [
+          -0.34,
+          0.02,
+          0.18
+        ]
       },
       {
         "id": "watchtower",
-        "label": { "en": "Watchtower", "ar": "Watchtower" },
-        "title": { "en": "WATCHTOWER", "ar": "WATCHTOWER" },
+        "label": {
+          "en": "Watchtower",
+          "ar": "برج المراقبة"
+        },
+        "title": {
+          "en": "WATCHTOWER",
+          "ar": "برج المراقبة"
+        },
         "info": {
           "en": "Watchtowers gave guards a higher view of the surrounding plains and roads.",
-          "ar": "Watchtowers gave guards a higher view of the surrounding plains and roads."
+          "ar": "منحت أبراج المراقبة الحراس رؤية أعلى للسهول والطرق المحيطة."
         },
         "hint": {
           "en": "These raised points helped spot danger before it reached the castle.",
-          "ar": "These raised points helped spot danger before it reached the castle."
+          "ar": "ساعدت هذه النقاط المرتفعة على رصد الخطر قبل وصوله إلى القلعة."
         },
-        "normalizedPosition": [0.32, 0.2, 0.2]
+        "normalizedPosition": [
+          0.32,
+          0.2,
+          0.2
+        ]
       },
       {
         "id": "entrance-gate",
-        "label": { "en": "Entrance Gate", "ar": "Entrance Gate" },
-        "title": { "en": "ENTRANCE GATE", "ar": "ENTRANCE GATE" },
+        "label": {
+          "en": "Entrance Gate",
+          "ar": "بوابة الدخول"
+        },
+        "title": {
+          "en": "ENTRANCE GATE",
+          "ar": "بوابة الدخول"
+        },
         "info": {
           "en": "The gate controlled access and was usually one of the most protected parts of a medieval castle.",
-          "ar": "The gate controlled access and was usually one of the most protected parts of a medieval castle."
+          "ar": "كانت البوابة تتحكم في الدخول وغالبا من أكثر أجزاء القلعة حماية."
         },
         "hint": {
           "en": "Gateways often combined narrow passages, strong doors and defensive angles.",
-          "ar": "Gateways often combined narrow passages, strong doors and defensive angles."
+          "ar": "جمعت البوابات غالبا بين ممرات ضيقة وأبواب قوية وزوايا دفاعية."
         },
-        "normalizedPosition": [0.08, -0.2, 0.16]
+        "normalizedPosition": [
+          0.08,
+          -0.2,
+          0.16
+        ]
       },
       {
         "id": "courtyard",
-        "label": { "en": "Courtyard", "ar": "Courtyard" },
-        "title": { "en": "COURTYARD", "ar": "COURTYARD" },
+        "label": {
+          "en": "Courtyard",
+          "ar": "الفناء"
+        },
+        "title": {
+          "en": "COURTYARD",
+          "ar": "الفناء"
+        },
         "info": {
           "en": "The courtyard was the working heart of the fortress, connecting storage, movement and daily activity.",
-          "ar": "The courtyard was the working heart of the fortress, connecting storage, movement and daily activity."
+          "ar": "كان الفناء قلب الحصن العملي، يربط التخزين والحركة والنشاط اليومي."
         },
         "hint": {
           "en": "This open area helped organize life inside the walls.",
-          "ar": "This open area helped organize life inside the walls."
+          "ar": "ساعدت هذه المساحة المفتوحة على تنظيم الحياة داخل الجدران."
         },
-        "normalizedPosition": [0.0, -0.04, 0.28]
+        "normalizedPosition": [
+          0,
+          -0.04,
+          0.28
+        ]
       }
     ]
   },

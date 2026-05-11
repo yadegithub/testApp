@@ -8,8 +8,16 @@
         "enhanceDirectModel": false,
         "animationClipName": "solar system",
         "animationTimeScale": 0.3,
-        "position": { "x": 0.43, "y": 0.31, "z": 0.03 },
-        "rotation": { "x": 1.5708, "y": 0.0, "z": 0.0 }
+        "position": {
+          "x": 0.43,
+          "y": 0.31,
+          "z": 0.03
+        },
+        "rotation": {
+          "x": 1.5708,
+          "y": 0,
+          "z": 0
+        }
       }
     }
   },

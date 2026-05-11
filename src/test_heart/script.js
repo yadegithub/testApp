@@ -37,6 +37,9 @@ const UI = {
     cardTag: document.getElementById("card-tag"),
     labelToggle: document.getElementById("label-toggle"),
     labelsLabel: document.getElementById("labels-label"),
+    modelTitle: document.getElementById("model-title-pill"),
+    overviewTitle: document.getElementById("overview-title"),
+    overviewText: document.getElementById("overview-text"),
     partInfo: document.getElementById("part-info"),
     partName: document.getElementById("part-name"),
     rotateBtn: document.getElementById("btn-rotate"),
@@ -103,7 +106,60 @@ const anatomyParts = [
     number: index + 1
 }));
 
-const copy = {
+const heartPartCopy = {
+    aorta: {
+        label: "الشريان الأبهر",
+        title: "الشريان الأبهر",
+        info: "ينقل الشريان الأبهر الدم الغني بالأكسجين من البطين الأيسر إلى باقي الجسم.",
+        hint: "هذا هو الشريان الرئيسي الخارج من القلب."
+    },
+    "pulmonary-artery": {
+        label: "الشريان الرئوي",
+        title: "الشريان الرئوي",
+        info: "ينقل الشريان الرئوي الدم الفقير بالأكسجين من القلب إلى الرئتين.",
+        hint: "يبدأ هنا مسار الدورة الدموية الرئوية."
+    },
+    "left-atrium": {
+        label: "الأذين الأيسر",
+        title: "الأذين الأيسر",
+        info: "يستقبل الأذين الأيسر الدم الغني بالأكسجين العائد من الرئتين.",
+        hint: "يمرر الدم المؤكسج إلى البطين الأيسر."
+    },
+    "left-ventricle": {
+        label: "البطين الأيسر",
+        title: "البطين الأيسر",
+        info: "يضخ البطين الأيسر الدم الغني بالأكسجين إلى خارج القلب عبر الشريان الأبهر.",
+        hint: "هذه الحجرة لها الجدار الأكثر سماكة."
+    },
+    "right-atrium": {
+        label: "الأذين الأيمن",
+        title: "الأذين الأيمن",
+        info: "يستقبل الأذين الأيمن الدم الفقير بالأكسجين العائد من الجسم.",
+        hint: "يرسل الدم إلى الأسفل نحو البطين الأيمن."
+    },
+    "right-ventricle": {
+        label: "البطين الأيمن",
+        title: "البطين الأيمن",
+        info: "يضخ البطين الأيمن الدم الفقير بالأكسجين نحو الرئتين.",
+        hint: "يبدأ رحلة الدم نحو الرئتين للحصول على الأكسجين."
+    }
+};
+
+if (currentLanguage === "ar") {
+    anatomyParts.forEach((part) => {
+        const localizedPart = heartPartCopy[part.id];
+        if (!localizedPart) {
+            return;
+        }
+
+        part.label = localizedPart.label;
+        part.title = localizedPart.title;
+        part.info = localizedPart.info;
+        part.hint = localizedPart.hint;
+    });
+}
+
+const copyEn = {
     appEyebrow: "AR Learn live scan",
     appTitle: "HUMAN HEART",
     rotate: "Rotate",
@@ -119,6 +175,9 @@ const copy = {
     statusCameraError: "Camera access was denied.",
     statusModelError: "The heart model could not be loaded.",
     focusTag: "Selected part",
+    modelTitle: "CARDIOVASCULAR SYSTEM",
+    overviewTitle: "Human Heart",
+    overviewText: "An interactive anatomy model that shows the chambers, vessels and blood flow pathways.",
     overview: {
         tag: "Open-heart view",
         title: "OPEN HEART",
@@ -126,6 +185,35 @@ const copy = {
         hint: "Rotate the model until the cutaway side faces you, or use Scale to zoom closer."
     }
 };
+
+const copyAr = {
+    appEyebrow: "مسح مباشر",
+    appTitle: "قلب الإنسان",
+    rotate: "تدوير",
+    scale: "تحجيم",
+    sound: "صوت",
+    labels: "الأرقام تشغيل/إيقاف",
+    statusStarting: "جار تشغيل الكاميرا...",
+    statusLoading: "جار تحميل نموذج القلب...",
+    statusReady: "الكاميرا جاهزة",
+    statusTracking: "تم وضع القلب",
+    statusHoldSteady: "ثبّت الجهاز أثناء التقاط رمز QR...",
+    statusSearching: "جار البحث عن رمز QR...",
+    statusCameraError: "تم رفض الوصول إلى الكاميرا.",
+    statusModelError: "تعذر تحميل نموذج القلب.",
+    focusTag: "الجزء المحدد",
+    modelTitle: "الجهاز القلبي الوعائي",
+    overviewTitle: "قلب الإنسان",
+    overviewText: "نموذج تشريحي تفاعلي يوضح حجرات القلب والأوعية ومسارات تدفق الدم.",
+    overview: {
+        tag: "عرض القلب المفتوح",
+        title: "القلب المفتوح",
+        info: "اضغط على علامة مرقمة لقراءة تعريف كل بنية داخل القلب.",
+        hint: "دوّر النموذج حتى تظهر جهة المقطع، أو استخدم التحجيم للاقتراب أكثر."
+    }
+};
+
+const copy = currentLanguage === "ar" ? copyAr : copyEn;
 
 let src;
 let cap;
@@ -175,7 +263,7 @@ const defaultConfig = {
         models: {
             heart: {
                 path: HEART_MODEL_PATH,
-                position: { x: 0.5, y: 0.55, z: 0.0 },
+                position: { x: 0.0, y: 0.0, z: 0.0 },
                 scale: { x: 0.8, y: 0.8, z: 0.8 },
                 rotation: DEFAULT_HEART_ROTATION
             }
@@ -291,6 +379,16 @@ function applyCopy() {
     UI.scaleLabel.textContent = copy.scale;
     UI.soundLabel.textContent = copy.sound;
     UI.labelsLabel.textContent = copy.labels;
+    if (UI.modelTitle) {
+        UI.modelTitle.textContent = copy.modelTitle;
+    }
+    if (UI.overviewTitle) {
+        UI.overviewTitle.textContent = copy.overviewTitle;
+    }
+    if (UI.overviewText) {
+        UI.overviewText.textContent = copy.overviewText;
+    }
+    document.title = `AR Learn - ${copy.appTitle}`;
     updateInfoCard();
     positionInfoCard();
     setStatus(copy.statusStarting);
@@ -363,6 +461,7 @@ async function startCamera(config) {
         });
 
         fitToScreen();
+        document.body.classList.add("camera-ready");
         checkOpenCV(config ?? defaultConfig);
     } catch (error) {
         setStatus(copy.statusCameraError);
@@ -463,8 +562,8 @@ function initThree(config) {
         (gltf) => {
             heartModel = gltf.scene;
             heartModel.position.set(
-                modelPosition.x ?? 0.5,
-                modelPosition.y ?? 0.55,
+                modelPosition.x ?? 0,
+                modelPosition.y ?? 0,
                 modelPosition.z ?? 0
             );
             heartModel.scale.set(
@@ -654,10 +753,10 @@ function initCV() {
     ]);
     distCoeffs = new cv.Mat.zeros(5, 1, cv.CV_64FC1);
     objectPoints = cv.matFromArray(4, 3, cv.CV_64FC1, [
-        0, 0, 0,
-        1, 0, 0,
-        1, 1, 0,
-        0, 1, 0
+        -0.5, -0.5, 0,
+        0.5, -0.5, 0,
+        0.5, 0.5, 0,
+        -0.5, 0.5, 0
     ]);
     rvec = new cv.Mat();
     tvec = new cv.Mat();
@@ -971,6 +1070,7 @@ function cleanup() {
         UI.video.pause();
         UI.video.srcObject = null;
     }
+    document.body.classList.remove("camera-ready");
 
     if (heartSound) {
         heartSound.pause();

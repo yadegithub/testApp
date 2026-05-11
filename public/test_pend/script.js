@@ -60,6 +60,21 @@ const CLICK_MOVE_THRESHOLD = 8;
 const DEFAULT_SWING_ANGLE = 0.95;
 const SWING_DAMPING = 0.72;
 const MIN_SWING_ANGLE = 0.18;
+const COPY = currentLanguage === "ar"
+    ? {
+        ready: "جاهز: امسح رمز QR",
+        stable: "تم تثبيت النموذج",
+        rotate: "تدوير",
+        scale: "تحجيم",
+        launch: "تشغيل"
+    }
+    : {
+        ready: "Ready: scan the QR code",
+        stable: "Model stabilized",
+        rotate: "Rotate",
+        scale: "Scale",
+        launch: "Launch"
+    };
 
 window.addEventListener("resize", fitToScreen);
 
@@ -230,7 +245,7 @@ function setupThreeJS(modelPath) {
         arGroup.add(mainModel);
         setupPendulumBalls();
 
-        setStatus("Pret : Scannez le QR Code");
+        setStatus(COPY.ready);
         setupInteraction();
     }, undefined, (err) => {
         console.error("Model error:", err);
@@ -406,7 +421,7 @@ function updatePendulumAnimation(now) {
         pendulumPhases = [];
         pendulumPhaseIndex = 0;
         setLaunchButtonActive(false);
-        setStatus("Pret : Scannez le QR Code");
+        setStatus(COPY.ready);
     }
 }
 
@@ -415,6 +430,9 @@ function setupControls() {
     const btnScale = document.getElementById("btn-scale");
     const btnLaunch = document.getElementById("btn-launch");
     launchButton = btnLaunch;
+    document.querySelector("#btn-rotate .label").innerText = COPY.rotate;
+    document.querySelector("#btn-scale .label").innerText = COPY.scale;
+    document.querySelector("#btn-launch .label").innerText = COPY.launch;
     btnRotate.onclick = () => {
         currentMode = "rotate";
         btnRotate.classList.add("active");
@@ -634,7 +652,7 @@ function updateTrackingStatus(markerFound, shouldHoldSteady) {
     }
 
     if (markerFound) {
-        setStatus("Modele stabilise");
+        setStatus(COPY.stable);
         return;
     }
 
@@ -643,7 +661,7 @@ function updateTrackingStatus(markerFound, shouldHoldSteady) {
         return;
     }
 
-    setStatus("Pret : Scannez le QR Code");
+    setStatus(COPY.ready);
 }
 
 function processFrame() {

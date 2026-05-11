@@ -42,11 +42,6 @@ const LoginPage: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(true);
   const [error, setError] = useState("");
-  const [resetFeedback, setResetFeedback] = useState(
-    searchParams.get("reset") === "success"
-      ? "Password updated. Sign in with your new password."
-      : "",
-  );
   const [isSubmitting, setIsSubmitting] = useState(false);
   const isArabic = settings.language === "ar";
   const copy = isArabic
@@ -80,6 +75,8 @@ const LoginPage: React.FC = () => {
         invalidEmail: "أدخل بريدا إلكترونيا صحيحا.",
         shortPassword: "يجب أن تحتوي كلمة المرور على 6 أحرف على الأقل.",
         signInError: "تعذر تسجيل الدخول الآن.",
+        passwordUpdated:
+          "تم تحديث كلمة المرور. سجل الدخول بكلمة المرور الجديدة.",
       }
     : {
         welcome: "Welcome back",
@@ -111,7 +108,11 @@ const LoginPage: React.FC = () => {
         invalidEmail: "Enter a valid email address.",
         shortPassword: "Password must be at least 6 characters.",
         signInError: "Unable to sign in right now.",
+        passwordUpdated: "Password updated. Sign in with your new password.",
       };
+  const [resetFeedback, setResetFeedback] = useState(
+    searchParams.get("reset") === "success" ? copy.passwordUpdated : "",
+  );
 
   const redirectTo = location.state?.from?.pathname ?? "/tabs/dashboard";
 

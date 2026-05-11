@@ -1,5 +1,6 @@
 import type { CSSProperties } from "react";
 import type { ExperienceArtworkId } from "../data/arData";
+import { useAppSettings, type AppLanguage } from "../settings/AppSettingsContext";
 
 interface Hotspot {
   label: string;
@@ -54,7 +55,40 @@ const hotspotMap: Record<ExperienceArtworkId, Hotspot[]> = {
   ],
 };
 
-const SceneArtwork: React.FC<SceneArtworkProps> = ({ variant, showLabels }) => (
+const hotspotLabelCopy: Record<string, Record<AppLanguage, string>> = {
+  Aorta: { en: "Aorta", ar: "الشريان الأبهر" },
+  Ventricle: { en: "Ventricle", ar: "البطين" },
+  Atrium: { en: "Atrium", ar: "الأذين" },
+  Trachea: { en: "Trachea", ar: "القصبة الهوائية" },
+  "Left lung": { en: "Left lung", ar: "الرئة اليسرى" },
+  Bronchi: { en: "Bronchi", ar: "الشعب الهوائية" },
+  Sun: { en: "Sun", ar: "الشمس" },
+  "Inner orbit": { en: "Inner orbit", ar: "المدار الداخلي" },
+  "Gas giant": { en: "Gas giant", ar: "عملاق غازي" },
+  Battery: { en: "Battery", ar: "البطارية" },
+  Switch: { en: "Switch", ar: "المفتاح" },
+  Bulb: { en: "Bulb", ar: "المصباح" },
+  "North pole": { en: "North pole", ar: "القطب الشمالي" },
+  "Field arc": { en: "Field arc", ar: "قوس المجال" },
+  "South pole": { en: "South pole", ar: "القطب الجنوبي" },
+  Pivot: { en: "Pivot", ar: "نقطة التعليق" },
+  "Swing path": { en: "Swing path", ar: "مسار التأرجح" },
+  Bob: { en: "Bob", ar: "الثقل" },
+  "Temple roof": { en: "Temple roof", ar: "سقف المعبد" },
+  "Column hall": { en: "Column hall", ar: "قاعة الأعمدة" },
+  Artifact: { en: "Artifact", ar: "قطعة أثرية" },
+  "Plate edge": { en: "Plate edge", ar: "حافة الصفيحة" },
+  "Mantle flow": { en: "Mantle flow", ar: "تدفق الوشاح" },
+  Subduction: { en: "Subduction", ar: "الاندساس" },
+};
+
+const getHotspotLabel = (label: string, language: AppLanguage) =>
+  hotspotLabelCopy[label]?.[language] ?? label;
+
+const SceneArtwork: React.FC<SceneArtworkProps> = ({ variant, showLabels }) => {
+  const { settings } = useAppSettings();
+
+  return (
   <div className={`scene-art scene-art--${variant}`}>
     <div className="scene-art__platform" />
 
@@ -290,10 +324,13 @@ const SceneArtwork: React.FC<SceneArtworkProps> = ({ variant, showLabels }) => (
           style={hotspot.style}
         >
           <span className="scene-hotspot__dot" />
-          <span className="scene-hotspot__label">{hotspot.label}</span>
+          <span className="scene-hotspot__label">
+            {getHotspotLabel(hotspot.label, settings.language)}
+          </span>
         </div>
       ))}
   </div>
-);
+  );
+};
 
 export default SceneArtwork;

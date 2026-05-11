@@ -11,6 +11,7 @@ import { useEffect, useState } from "react";
 import { useHistory, useLocation } from "react-router-dom";
 import { useAuth } from "../auth/useAuth";
 import BrandMark from "../components/BrandMark";
+import { useAppSettings } from "../settings/AppSettingsContext";
 
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -28,6 +29,7 @@ const ResetPasswordPage: React.FC = () => {
     requestPasswordReset,
     verifyPasswordResetCode,
   } = useAuth();
+  const { settings } = useAppSettings();
 
   const [email, setEmail] = useState(initialEmail);
   const [resolvedEmail, setResolvedEmail] = useState(initialEmail);
@@ -39,6 +41,82 @@ const ResetPasswordPage: React.FC = () => {
   const [info, setInfo] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isCheckingCode, setIsCheckingCode] = useState(isCodeMode);
+  const isArabic = settings.language === "ar";
+  const copy = isArabic
+    ? {
+        chooseNewPassword: "اختر كلمة مرور جديدة",
+        resetPassword: "إعادة تعيين كلمة المرور",
+        codeSubtitle:
+          "أنشئ كلمة مرور جديدة، ثم سجل الدخول مرة أخرى بحسابك المحدّث.",
+        requestSubtitle:
+          "أدخل بريدك الإلكتروني لتصلك رسالة إعادة التعيين وتكمل على أي جهاز.",
+        newPasswordHeading: "كلمة مرور جديدة",
+        forgotPasswordHeading: "نسيت كلمة المرور",
+        checkingLink: "جار التحقق من رابط إعادة التعيين...",
+        email: "البريد الإلكتروني",
+        emailPlaceholder: "you@example.com",
+        account: "الحساب",
+        checkingAccount: "جار التحقق من الحساب...",
+        newPassword: "كلمة المرور الجديدة",
+        newPasswordPlaceholder: "أنشئ كلمة مرور جديدة",
+        confirmPassword: "تأكيد كلمة المرور",
+        confirmPasswordPlaceholder: "أعد إدخال كلمة المرور الجديدة",
+        hidePassword: "إخفاء كلمة المرور",
+        showPassword: "إظهار كلمة المرور",
+        hideConfirmPassword: "إخفاء تأكيد كلمة المرور",
+        showConfirmPassword: "إظهار تأكيد كلمة المرور",
+        updatingPassword: "جار تحديث كلمة المرور...",
+        sendingResetLink: "جار إرسال رابط إعادة التعيين...",
+        saveNewPassword: "حفظ كلمة المرور الجديدة",
+        sendResetLink: "إرسال رابط إعادة التعيين",
+        rememberedPassword: "تذكرت كلمة المرور؟",
+        backToLogin: "العودة إلى تسجيل الدخول",
+        invalidEmail: "أدخل بريدًا إلكترونيًا صحيحًا.",
+        resetLinkSent:
+          "تم إرسال رابط إعادة التعيين. افتح رابط البريد لاختيار كلمة مرور جديدة في هذه الصفحة.",
+        resetLinkError: "تعذر إرسال رابط إعادة التعيين الآن.",
+        verifyLinkError: "تعذر التحقق من رابط إعادة التعيين.",
+        shortPassword: "يجب أن تحتوي كلمة المرور على 6 أحرف على الأقل.",
+        mismatchPassword: "كلمتا المرور غير متطابقتين.",
+        resetError: "تعذر إعادة تعيين كلمة المرور الآن.",
+      }
+    : {
+        chooseNewPassword: "Choose New Password",
+        resetPassword: "Reset Password",
+        codeSubtitle:
+          "Create a new password, then sign in again with your updated account.",
+        requestSubtitle:
+          "Enter your email to receive a reset link and continue on any device.",
+        newPasswordHeading: "New password",
+        forgotPasswordHeading: "Forgot password",
+        checkingLink: "Checking your reset link...",
+        email: "Email",
+        emailPlaceholder: "you@example.com",
+        account: "Account",
+        checkingAccount: "Checking account...",
+        newPassword: "New Password",
+        newPasswordPlaceholder: "Create a new password",
+        confirmPassword: "Confirm Password",
+        confirmPasswordPlaceholder: "Repeat the new password",
+        hidePassword: "Hide password",
+        showPassword: "Show password",
+        hideConfirmPassword: "Hide confirm password",
+        showConfirmPassword: "Show confirm password",
+        updatingPassword: "Updating password...",
+        sendingResetLink: "Sending reset link...",
+        saveNewPassword: "Save New Password",
+        sendResetLink: "Send Reset Link",
+        rememberedPassword: "Remembered your password?",
+        backToLogin: "Back to Login",
+        invalidEmail: "Enter a valid email address.",
+        resetLinkSent:
+          "Reset link sent. Open the email link to choose your new password on this page.",
+        resetLinkError: "Unable to send the reset link right now.",
+        verifyLinkError: "Unable to verify this reset link.",
+        shortPassword: "Password must be at least 6 characters.",
+        mismatchPassword: "Passwords do not match.",
+        resetError: "Unable to reset your password right now.",
+      };
 
   useEffect(() => {
     if (!isCodeMode || authMode !== "firebase") {
@@ -66,7 +144,7 @@ const ResetPasswordPage: React.FC = () => {
         setError(
           verificationError instanceof Error
             ? verificationError.message
-            : "Unable to verify this reset link.",
+            : copy.verifyLinkError,
         );
       })
       .finally(() => {
@@ -78,7 +156,13 @@ const ResetPasswordPage: React.FC = () => {
     return () => {
       isMounted = false;
     };
-  }, [authMode, isCodeMode, resetCode, verifyPasswordResetCode]);
+  }, [
+    authMode,
+    copy.verifyLinkError,
+    isCodeMode,
+    resetCode,
+    verifyPasswordResetCode,
+  ]);
 
   const goToLogin = () => {
     const nextEmail = resolvedEmail || email;
@@ -95,7 +179,7 @@ const ResetPasswordPage: React.FC = () => {
 
     if (!emailPattern.test(email.trim())) {
       setInfo("");
-      setError("Enter a valid email address.");
+      setError(copy.invalidEmail);
       return;
     }
 
@@ -104,15 +188,13 @@ const ResetPasswordPage: React.FC = () => {
       setError("");
       setInfo("");
       await requestPasswordReset(email.trim());
-      setInfo(
-        "Reset link sent. Open the email link to choose your new password on this page.",
-      );
+      setInfo(copy.resetLinkSent);
     } catch (requestError) {
       setInfo("");
       setError(
         requestError instanceof Error
           ? requestError.message
-          : "Unable to send the reset link right now.",
+          : copy.resetLinkError,
       );
     } finally {
       setIsSubmitting(false);
@@ -126,13 +208,13 @@ const ResetPasswordPage: React.FC = () => {
 
     if (newPassword.trim().length < 6) {
       setInfo("");
-      setError("Password must be at least 6 characters.");
+      setError(copy.shortPassword);
       return;
     }
 
     if (newPassword !== confirmPassword) {
       setInfo("");
-      setError("Passwords do not match.");
+      setError(copy.mismatchPassword);
       return;
     }
 
@@ -150,7 +232,7 @@ const ResetPasswordPage: React.FC = () => {
       setError(
         resetError instanceof Error
           ? resetError.message
-          : "Unable to reset your password right now.",
+          : copy.resetError,
       );
     } finally {
       setIsSubmitting(false);
@@ -160,14 +242,14 @@ const ResetPasswordPage: React.FC = () => {
   return (
     <IonPage>
       <IonContent fullscreen className="app-page">
-        <div className="screen screen--login">
+        <div className="screen screen--login" dir={isArabic ? "rtl" : "ltr"}>
           <div className="screen__ambient screen__ambient--login-left" />
           <div className="screen__ambient screen__ambient--login-right" />
 
           <div className="login-shell">
             <section className="login-hero">
               <span className="spotlight-pill">
-                {isCodeMode ? "Choose New Password" : "Reset Password"}
+                {isCodeMode ? copy.chooseNewPassword : copy.resetPassword}
               </span>
 
               <div className="brand-hero brand-hero--login">
@@ -176,8 +258,8 @@ const ResetPasswordPage: React.FC = () => {
                   <strong>AR Learn</strong>
                   <p>
                     {isCodeMode
-                      ? "Create a new password, then sign in again with your updated account."
-                      : "Enter your email to receive a reset link and continue on any device."}
+                      ? copy.codeSubtitle
+                      : copy.requestSubtitle}
                   </p>
                 </div>
               </div>
@@ -188,7 +270,11 @@ const ResetPasswordPage: React.FC = () => {
               onSubmit={isCodeMode ? handleConfirmReset : handleSendResetLink}
             >
               <div className="section-head section-head--compact">
-                <h2>{isCodeMode ? "New password" : "Forgot password"}</h2>
+                <h2>
+                  {isCodeMode
+                    ? copy.newPasswordHeading
+                    : copy.forgotPasswordHeading}
+                </h2>
               </div>
 
               {authMode !== "firebase" ? (
@@ -197,19 +283,19 @@ const ResetPasswordPage: React.FC = () => {
 
               {isCheckingCode ? (
                 <p className="auth-hint auth-hint--status">
-                  Checking your reset link...
+                  {copy.checkingLink}
                 </p>
               ) : null}
 
               {!isCodeMode ? (
                 <label className="auth-field">
-                  <span>Email</span>
+                  <span>{copy.email}</span>
                   <div className="auth-field__control">
                     <IonIcon icon={mailOutline} />
                     <input
                       autoComplete="email"
                       inputMode="email"
-                      placeholder="you@example.com"
+                      placeholder={copy.emailPlaceholder}
                       type="email"
                       value={email}
                       onChange={(event) => {
@@ -223,17 +309,17 @@ const ResetPasswordPage: React.FC = () => {
               ) : (
                 <>
                   <div className="auth-hint">
-                    <strong>Account</strong>
-                    <span>{resolvedEmail || email || "Checking account..."}</span>
+                    <strong>{copy.account}</strong>
+                    <span>{resolvedEmail || email || copy.checkingAccount}</span>
                   </div>
 
                   <label className="auth-field">
-                    <span>New Password</span>
+                    <span>{copy.newPassword}</span>
                     <div className="auth-field__control">
                       <IonIcon icon={lockClosedOutline} />
                       <input
                         autoComplete="new-password"
-                        placeholder="Create a new password"
+                        placeholder={copy.newPasswordPlaceholder}
                         type={showNewPassword ? "text" : "password"}
                         value={newPassword}
                         onChange={(event) => {
@@ -246,7 +332,7 @@ const ResetPasswordPage: React.FC = () => {
                         type="button"
                         className="auth-field__toggle"
                         aria-label={
-                          showNewPassword ? "Hide password" : "Show password"
+                          showNewPassword ? copy.hidePassword : copy.showPassword
                         }
                         onClick={() =>
                           setShowNewPassword((currentValue) => !currentValue)
@@ -260,12 +346,12 @@ const ResetPasswordPage: React.FC = () => {
                   </label>
 
                   <label className="auth-field">
-                    <span>Confirm Password</span>
+                    <span>{copy.confirmPassword}</span>
                     <div className="auth-field__control">
                       <IonIcon icon={keyOutline} />
                       <input
                         autoComplete="new-password"
-                        placeholder="Repeat the new password"
+                        placeholder={copy.confirmPasswordPlaceholder}
                         type={showConfirmPassword ? "text" : "password"}
                         value={confirmPassword}
                         onChange={(event) => {
@@ -279,8 +365,8 @@ const ResetPasswordPage: React.FC = () => {
                         className="auth-field__toggle"
                         aria-label={
                           showConfirmPassword
-                            ? "Hide confirm password"
-                            : "Show confirm password"
+                            ? copy.hideConfirmPassword
+                            : copy.showConfirmPassword
                         }
                         onClick={() =>
                           setShowConfirmPassword(
@@ -310,22 +396,22 @@ const ResetPasswordPage: React.FC = () => {
                 />
                 {isSubmitting
                   ? isCodeMode
-                    ? "Updating password..."
-                    : "Sending reset link..."
+                    ? copy.updatingPassword
+                    : copy.sendingResetLink
                   : isCodeMode
-                    ? "Save New Password"
-                    : "Send Reset Link"}
+                    ? copy.saveNewPassword
+                    : copy.sendResetLink}
               </button>
 
               <div className="auth-switch">
-                <span>Remembered your password?</span>
+                <span>{copy.rememberedPassword}</span>
                 <button
                   type="button"
                   className="ghost-button"
                   onClick={goToLogin}
                 >
                   <IonIcon icon={arrowBackOutline} />
-                  Back to Login
+                  {copy.backToLogin}
                 </button>
               </div>
             </form>

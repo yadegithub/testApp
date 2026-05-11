@@ -6,7 +6,6 @@ import {
   mailOutline,
   personOutline,
   personSharp,
-  sparklesOutline,
 } from "ionicons/icons";
 import { useState } from "react";
 import { Redirect, useHistory } from "react-router-dom";
@@ -148,8 +147,6 @@ const RegisterPage: React.FC = () => {
           <div className="login-shell">
             <section className="login-hero">
               <span className="spotlight-pill">
-                {/*  <IonIcon icon={sparklesOutline} /> */}
-                
                 {copy.createAccount}
               </span>
 

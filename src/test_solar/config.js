@@ -166,6 +166,29 @@ const solarBodies = [
   },
 }));
 
+const solarBodyCopy = {
+  sun: ["الشمس", "الشمس", "الشمس نجم يقع في مركز النظام الشمسي ويوفر الضوء والحرارة لكل الكواكب.", "تحتوي على معظم كتلة النظام الشمسي."],
+  mercury: ["عطارد", "عطارد", "عطارد أصغر الكواكب وأقربها إلى الشمس.", "يدور حول الشمس بسرعة كبيرة."],
+  venus: ["الزهرة", "الزهرة", "الزهرة قريب من حجم الأرض لكنه يملك غلافا جويا كثيفا يحبس الحرارة.", "غالبا ما يكون ألمع كوكب في السماء."],
+  earth: ["الأرض", "الأرض", "الأرض كوكبنا والجرم الوحيد المعروف بوجود ماء سائل وفير على سطحه.", "تكمل دورة واحدة حول الشمس كل عام."],
+  mars: ["المريخ", "المريخ", "يسمى المريخ الكوكب الأحمر لأن الغبار الغني بالحديد يمنح سطحه لونا محمرا.", "يدرس العلماء المريخ بحثا عن آثار ماء قديم."],
+  jupiter: ["المشتري", "المشتري", "المشتري أكبر كواكب النظام الشمسي ويشتهر بعاصفته المعروفة بالبقعة الحمراء العظيمة.", "هو عملاق غازي له أقمار كثيرة."],
+  saturn: ["زحل", "زحل", "زحل عملاق غازي تحيط به حلقات واسعة لامعة من الجليد والصخور.", "نظام حلقاته هو الأشهر في النظام الشمسي."],
+  uranus: ["أورانوس", "أورانوس", "أورانوس عملاق جليدي يدور بميلان شديد جدا.", "يبدو كأنه يتدحرج حول الشمس."],
+  neptune: ["نبتون", "نبتون", "نبتون أبعد كوكب رئيسي عن الشمس ويعرف برياحه القوية.", "هو عملاق جليدي أزرق عميق."]
+};
+
+if (currentLanguage === "ar") {
+  solarBodies.forEach((body) => {
+    const localizedBody = solarBodyCopy[body.id];
+    if (!localizedBody) {
+      return;
+    }
+
+    [body.label, body.title, body.info, body.hint] = localizedBody;
+  });
+}
+
 const BODY_FALLBACK_COLORS = {
   sun: 0xffb347,
   mercury: 0xb8a89d,
@@ -190,7 +213,7 @@ const DIRECT_PLANET_SCALE_FACTORS = {
   neptune: 1.3,
 };
 
-const copy = {
+const copyEn = {
   appEyebrow: "AR Learn live scan",
   appTitle: "SOLAR SYSTEM",
   rotate: "Rotate",
@@ -206,6 +229,25 @@ const copy = {
   statusModelError: "The solar model could not be loaded.",
   focusTag: "Selected planet",
 };
+
+const copyAr = {
+  appEyebrow: "مسح مباشر",
+  appTitle: "النظام الشمسي",
+  rotate: "تدوير",
+  scale: "تحجيم",
+  labels: "التسميات تشغيل/إيقاف",
+  statusStarting: "جار تشغيل الكاميرا...",
+  statusLoading: "جار تحميل نموذج النظام الشمسي...",
+  statusReady: "الكاميرا جاهزة",
+  statusTracking: "تم تثبيت النظام الشمسي",
+  statusSearching: "وجّه الكاميرا نحو رمز QR",
+  statusHoldSteady: "ثبّت رمز QR للحظة...",
+  statusCameraError: "تم رفض الوصول إلى الكاميرا.",
+  statusModelError: "تعذر تحميل نموذج النظام الشمسي.",
+  focusTag: "الكوكب المحدد",
+};
+
+const copy = currentLanguage === "ar" ? copyAr : copyEn;
 
 const defaultConfig = {
   assets: {

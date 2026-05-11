@@ -4,9 +4,21 @@
       "primary": {
         "name": "Human Skin",
         "path": "assets/human_anatomy_skin.glb",
-        "scale": { "x": 0.46, "y": 0.46, "z": 0.46 },
-        "position": { "x": 0.0, "y": 0.0, "z": 0.0 },
-        "rotation": { "x": 0.0, "y": 3.141592653589793, "z": 0.0 },
+        "scale": {
+          "x": 0.46,
+          "y": 0.46,
+          "z": 0.46
+        },
+        "position": {
+          "x": 0,
+          "y": 0,
+          "z": 0
+        },
+        "rotation": {
+          "x": 0,
+          "y": 3.141592653589793,
+          "z": 0
+        },
         "autoCenter": true
       }
     },
@@ -20,6 +32,12 @@
         "name": "HUMAN SKIN",
         "info": "Inspect the layers of the skin in AR and tap the numbered labels to understand each protective and sensory structure.",
         "hint": "Use rotate, scale and labels while the skin model is active."
+      },
+      "ar": {
+        "tag": "تشريح الجلد",
+        "name": "جلد الإنسان",
+        "info": "استكشف طبقات الجلد في الواقع المعزز واضغط على التسميات المرقمة لفهم كل بنية واقية وحسية.",
+        "hint": "استخدم التدوير والتحجيم والتسميات أثناء عرض نموذج الجلد."
       }
     },
     "ui": {
@@ -29,56 +47,169 @@
         "statusLoading": "Loading human skin model...",
         "statusTracking": "Human skin placed",
         "focusTag": "Skin structure"
+      },
+      "ar": {
+        "appEyebrow": "مسح مباشر",
+        "appTitle": "جلد الإنسان",
+        "rotate": "تدوير",
+        "scale": "تحجيم",
+        "sound": "صوت",
+        "labels": "الأرقام تشغيل/إيقاف",
+        "statusStarting": "جار تشغيل الكاميرا...",
+        "statusLoading": "جار تحميل نموذج جلد الإنسان...",
+        "statusReady": "الكاميرا جاهزة",
+        "statusTracking": "تم وضع جلد الإنسان",
+        "statusHoldSteady": "ثبّت الجهاز أثناء التقاط رمز QR...",
+        "statusSearching": "جار البحث عن رمز QR...",
+        "statusCameraError": "تم رفض الوصول إلى الكاميرا.",
+        "statusModelError": "تعذر تحميل النموذج.",
+        "focusTag": "بنية جلدية"
       }
     },
     "parts": [
       {
         "id": "epidermis",
-        "label": "Epidermis",
-        "title": "EPIDERMIS",
-        "info": "The epidermis is the thin outer layer that protects the body from the environment.",
-        "hint": "This surface layer forms the skin's first protective barrier.",
-        "normalizedPosition": [0.02, 0.43, 0.18]
+        "label": {
+          "en": "Epidermis",
+          "ar": "البشرة"
+        },
+        "title": {
+          "en": "EPIDERMIS",
+          "ar": "البشرة"
+        },
+        "info": {
+          "en": "The epidermis is the thin outer layer that protects the body from the environment.",
+          "ar": "البشرة هي الطبقة الخارجية الرقيقة التي تحمي الجسم من البيئة المحيطة."
+        },
+        "hint": {
+          "en": "This surface layer forms the skin's first protective barrier.",
+          "ar": "تشكل هذه الطبقة السطحية الحاجز الواقي الأول للجلد."
+        },
+        "normalizedPosition": [
+          0.02,
+          0.43,
+          0.18
+        ]
       },
       {
         "id": "dermis",
-        "label": "Dermis",
-        "title": "DERMIS",
-        "info": "The dermis supports the epidermis and contains vessels, nerves, follicles and glands.",
-        "hint": "This middle layer gives the skin strength and sensation.",
-        "normalizedPosition": [-0.12, 0.22, 0.16]
+        "label": {
+          "en": "Dermis",
+          "ar": "الأدمة"
+        },
+        "title": {
+          "en": "DERMIS",
+          "ar": "الأدمة"
+        },
+        "info": {
+          "en": "The dermis supports the epidermis and contains vessels, nerves, follicles and glands.",
+          "ar": "تدعم الأدمة البشرة وتحتوي على أوعية وأعصاب وجريبات وغدد."
+        },
+        "hint": {
+          "en": "This middle layer gives the skin strength and sensation.",
+          "ar": "تعطي هذه الطبقة الوسطى الجلد القوة والإحساس."
+        },
+        "normalizedPosition": [
+          -0.12,
+          0.22,
+          0.16
+        ]
       },
       {
         "id": "hair-follicle",
-        "label": "Hair Follicle",
-        "title": "HAIR FOLLICLE",
-        "info": "The hair follicle anchors a hair strand and supports its growth beneath the surface.",
-        "hint": "Look for the tube-like structure surrounding the hair root.",
-        "normalizedPosition": [0.28, 0.12, 0.22]
+        "label": {
+          "en": "Hair Follicle",
+          "ar": "جريب الشعرة"
+        },
+        "title": {
+          "en": "HAIR FOLLICLE",
+          "ar": "جريب الشعرة"
+        },
+        "info": {
+          "en": "The hair follicle anchors a hair strand and supports its growth beneath the surface.",
+          "ar": "يثبت جريب الشعرة الشعرة ويدعم نموها تحت السطح."
+        },
+        "hint": {
+          "en": "Look for the tube-like structure surrounding the hair root.",
+          "ar": "ابحث عن البنية الأنبوبية المحيطة بجذر الشعرة."
+        },
+        "normalizedPosition": [
+          0.28,
+          0.12,
+          0.22
+        ]
       },
       {
         "id": "sebaceous-gland",
-        "label": "Sebaceous Gland",
-        "title": "SEBACEOUS GLAND",
-        "info": "The sebaceous gland releases oil that helps keep the skin and hair from drying out.",
-        "hint": "This gland connects closely to the hair follicle.",
-        "normalizedPosition": [0.34, -0.01, 0.18]
+        "label": {
+          "en": "Sebaceous Gland",
+          "ar": "الغدة الدهنية"
+        },
+        "title": {
+          "en": "SEBACEOUS GLAND",
+          "ar": "الغدة الدهنية"
+        },
+        "info": {
+          "en": "The sebaceous gland releases oil that helps keep the skin and hair from drying out.",
+          "ar": "تفرز الغدة الدهنية زيتا يساعد على منع جفاف الجلد والشعر."
+        },
+        "hint": {
+          "en": "This gland connects closely to the hair follicle.",
+          "ar": "ترتبط هذه الغدة بشكل وثيق بجريب الشعرة."
+        },
+        "normalizedPosition": [
+          0.34,
+          -0.01,
+          0.18
+        ]
       },
       {
         "id": "sweat-gland",
-        "label": "Sweat Gland",
-        "title": "SWEAT GLAND",
-        "info": "The sweat gland produces sweat to help regulate body temperature.",
-        "hint": "Its coiled shape sits deeper in the skin layers.",
-        "normalizedPosition": [-0.05, -0.16, 0.24]
+        "label": {
+          "en": "Sweat Gland",
+          "ar": "الغدة العرقية"
+        },
+        "title": {
+          "en": "SWEAT GLAND",
+          "ar": "الغدة العرقية"
+        },
+        "info": {
+          "en": "The sweat gland produces sweat to help regulate body temperature.",
+          "ar": "تنتج الغدة العرقية العرق للمساعدة على تنظيم حرارة الجسم."
+        },
+        "hint": {
+          "en": "Its coiled shape sits deeper in the skin layers.",
+          "ar": "يقع شكلها الملفوف في طبقات أعمق من الجلد."
+        },
+        "normalizedPosition": [
+          -0.05,
+          -0.16,
+          0.24
+        ]
       },
       {
         "id": "hypodermis",
-        "label": "Hypodermis",
-        "title": "HYPODERMIS",
-        "info": "The hypodermis is the deeper fatty layer that cushions the body and helps store energy.",
-        "hint": "This bottom layer helps anchor the skin to the tissues below.",
-        "normalizedPosition": [-0.18, -0.33, 0.12]
+        "label": {
+          "en": "Hypodermis",
+          "ar": "تحت الجلد"
+        },
+        "title": {
+          "en": "HYPODERMIS",
+          "ar": "تحت الجلد"
+        },
+        "info": {
+          "en": "The hypodermis is the deeper fatty layer that cushions the body and helps store energy.",
+          "ar": "تحت الجلد طبقة دهنية أعمق تعمل كوسادة للجسم وتساعد على تخزين الطاقة."
+        },
+        "hint": {
+          "en": "This bottom layer helps anchor the skin to the tissues below.",
+          "ar": "تساعد هذه الطبقة السفلية على تثبيت الجلد بالأنسجة الموجودة تحته."
+        },
+        "normalizedPosition": [
+          -0.18,
+          -0.33,
+          0.12
+        ]
       }
     ]
   },

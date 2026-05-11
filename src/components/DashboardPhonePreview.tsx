@@ -25,16 +25,16 @@ const DashboardPhonePreview: React.FC = () => {
   const isArabic = settings.language === "ar";
   const copy = isArabic
     ? {
-        eyebrow: "ÙØµÙ„ Ø¯Ø±Ø§Ø³ÙŠ ØºØ§Ù…Ø±",
-        profile: "Ø§Ù„Ù…Ù„Ù Ø§Ù„Ø´Ø®ØµÙŠ",
-        title: "ØªØ¹Ù„Ù‘Ù… Ù…Ø¹ Ù…Ø´Ø§Ù‡Ø¯ Ø«Ù„Ø§Ø«ÙŠØ© Ø§Ù„Ø£Ø¨Ø¹Ø§Ø¯ Ù…ØµÙ…Ù…Ø© Ù„Ù„ÙˆØ§Ù‚Ø¹ Ø§Ù„Ù…Ù…Ø¹Ø²Ø².",
-        subtitle: "Ø§Ø¨Ø¯Ø£ Ø¨Ø§Ù„Ø¹Ù„ÙˆÙ… Ø«Ù… Ø§ÙØªØ­ Ø§Ù„ØªØ§Ø±ÙŠØ® ÙˆØ§Ù„Ø¬ØºØ±Ø§ÙÙŠØ§.",
-        openDemo: "Ø§ÙØªØ­ Ø§Ù„Ø¹Ø±Ø¶",
-        explore: "Ø§Ø³ØªÙƒØ´Ù",
-        subjects: "Ø§Ù„Ù…ÙˆØ§Ø¯",
-        viewAll: "Ø¹Ø±Ø¶ Ø§Ù„ÙƒÙ„",
-        featured: "Ù…Ù…ÙŠØ²",
-        featuredTitle: "ØªØ¬Ø§Ø±Ø¨ AR Ø§Ù„Ù…Ù…ÙŠØ²Ø©",
+        eyebrow: "فصل دراسي غامر",
+        profile: "الملف الشخصي",
+        title: "تعلّم مع مشاهد ثلاثية الأبعاد مصممة للواقع الممعزز.",
+        subtitle: "ابدأ بالعلوم ثم افتح التاريخ والجغرافيا.",
+        openDemo: "افتح العرض",
+        explore: "استكشف",
+        subjects: "المواد",
+        viewAll: "عرض الكل",
+        featured: "مميز",
+        featuredTitle: "تجارب AR المميزة",
       }
     : {
         eyebrow: "Immersive classroom",

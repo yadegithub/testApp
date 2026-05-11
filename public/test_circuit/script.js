@@ -20,9 +20,21 @@ const UI = {
     partHint: document.getElementById("part-hint")
 };
 
-const STATUS_READY = "Pret : Scannez le QR Code";
-const STATUS_STABLE = "Modele stabilise";
-const STATUS_BREATHING = "Circuit allume...";
+const STATUS_COPY = {
+    en: {
+        ready: "Ready: scan the QR code",
+        stable: "Model stabilized",
+        active: "Circuit powered..."
+    },
+    ar: {
+        ready: "جاهز: امسح رمز QR",
+        stable: "تم تثبيت النموذج",
+        active: "الدائرة مشغلة..."
+    }
+};
+const STATUS_READY = STATUS_COPY[currentLanguage]?.ready ?? STATUS_COPY.en.ready;
+const STATUS_STABLE = STATUS_COPY[currentLanguage]?.stable ?? STATUS_COPY.en.stable;
+const STATUS_BREATHING = STATUS_COPY[currentLanguage]?.active ?? STATUS_COPY.en.active;
 
 const INFO_COPY = {
     fr: {
@@ -36,9 +48,9 @@ const INFO_COPY = {
         hint: "Use Rotate, Scale and Power to explore the model."
     },
     ar: {
-        name: "Electric Circuit",
-        info: "Observe a battery, wires, a bulb and a switch in a simple electric circuit.",
-        hint: "Use Rotate, Scale and Power to explore the model."
+        name: "الدائرة الكهربائية",
+        info: "شاهد بطارية وأسلاكا ومصباحا ومفتاحا داخل دائرة كهربائية بسيطة.",
+        hint: "استخدم التدوير والتحجيم والتشغيل لاستكشاف النموذج."
     }
 };
 
@@ -72,6 +84,35 @@ const ORGAN_PARTS = [
         screenOffset: { x: 0, y: -0.22 }
     }
 ];
+
+const ORGAN_PARTS_AR = {
+    battery: {
+        label: "البطارية",
+        info: "توفر البطارية الطاقة الكهربائية للدائرة.",
+        hint: "تخلق فرقا في الجهد بين قطبيها."
+    },
+    bulb: {
+        label: "المصباح",
+        info: "يحول المصباح الطاقة الكهربائية إلى ضوء.",
+        hint: "يضيء عندما تكون الدائرة مغلقة."
+    },
+    wires: {
+        label: "الأسلاك",
+        info: "تسمح الأسلاك الموصلة بمرور التيار بين المكونات.",
+        hint: "تربط البطارية والمفتاح والمصباح."
+    },
+    switch: {
+        label: "المفتاح",
+        info: "يفتح المفتاح الدائرة أو يغلقها.",
+        hint: "الدائرة المغلقة تسمح بمرور التيار، أما المفتوحة فتوقفه."
+    }
+};
+
+if (currentLanguage === "ar") {
+    ORGAN_PARTS.forEach((part) => {
+        Object.assign(part, ORGAN_PARTS_AR[part.id] ?? {});
+    });
+}
 
 let src;
 let cap;
@@ -158,9 +199,35 @@ function getCopy() {
 
 function applyInfoCard() {
     const copy = getCopy();
+    const menuCopy = currentLanguage === "ar"
+        ? {
+            eyebrow: "مسح مباشر",
+            appTitle: "الدائرة الكهربائية",
+            rotate: "تدوير",
+            scale: "تحجيم",
+            launch: "تشغيل",
+            labels: "التسميات تشغيل/إيقاف",
+            modelTag: "نموذج فيزيائي"
+        }
+        : {
+            eyebrow: "AR Learn live scan",
+            appTitle: "ELECTRIC CIRCUIT",
+            rotate: "Rotate",
+            scale: "Scale",
+            launch: "Power",
+            labels: "Labels On/Off",
+            modelTag: "PHYSICS MODEL"
+        };
+
+    document.getElementById("app-eyebrow").innerText = menuCopy.eyebrow;
+    document.getElementById("app-title").innerText = menuCopy.appTitle;
+    document.querySelector("#btn-rotate .label").innerText = menuCopy.rotate;
+    document.querySelector("#btn-scale .label").innerText = menuCopy.scale;
+    document.querySelector("#btn-launch .label").innerText = menuCopy.launch;
+    document.querySelector(".toggle-box .label").innerText = menuCopy.labels;
 
     if (UI.cardTag) {
-        UI.cardTag.innerText = "MODELE PHYSIQUE";
+        UI.cardTag.innerText = menuCopy.modelTag;
     }
 
     if (UI.partName) {
@@ -191,7 +258,8 @@ function setOrganInfo(index) {
     const part = ORGAN_PARTS[activeOrganIndex];
 
     if (UI.cardTag) {
-        UI.cardTag.innerText = "COMPOSANT SELECTIONNE";
+        UI.cardTag.innerText =
+            currentLanguage === "ar" ? "المكوّن المحدد" : "SELECTED COMPONENT";
     }
 
     if (UI.partName) {
@@ -540,7 +608,11 @@ function setupThreeJS(modelPath) {
         arGroup.add(mainModel);
         createOrganLabels();
         setupInteraction();
-        setStatus("Modele local absent, circuit simple charge");
+        setStatus(
+            currentLanguage === "ar"
+                ? "النموذج المحلي غير موجود، تم تحميل دائرة بسيطة"
+                : "Local model missing, simple circuit loaded"
+        );
     });
 }
 
@@ -669,7 +741,7 @@ function prepareModel(model) {
 function startBreathingAnimation() {
     if (!mainModel) {
         setLaunchButtonActive(false);
-        setStatus("Modele non charge");
+        setStatus(currentLanguage === "ar" ? "النموذج غير محمّل" : "Model not loaded");
         return;
     }
 

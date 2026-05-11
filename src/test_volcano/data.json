@@ -4,9 +4,21 @@
       "volcano": {
         "name": "Volcano",
         "path": "assets/free__volcano_low_poly.glb",
-        "scale": { "x": 0.95, "y": 0.95, "z": 0.95 },
-        "position": { "x": 0.0, "y": 0.12, "z": 0.0 },
-        "rotation": { "x": 0.0, "y": 3.141592653589793, "z": 0.0 },
+        "scale": {
+          "x": 0.95,
+          "y": 0.95,
+          "z": 0.95
+        },
+        "position": {
+          "x": 0,
+          "y": 0.12,
+          "z": 0
+        },
+        "rotation": {
+          "x": 0,
+          "y": 3.141592653589793,
+          "z": 0
+        },
         "autoCenter": true
       }
     },
@@ -65,8 +77,14 @@
     "parts": [
       {
         "id": "crater",
-        "label": { "en": "Crater", "ar": "الفوهة" },
-        "title": { "en": "CRATER", "ar": "الفوهة" },
+        "label": {
+          "en": "Crater",
+          "ar": "الفوهة"
+        },
+        "title": {
+          "en": "CRATER",
+          "ar": "الفوهة"
+        },
         "info": {
           "en": "The crater is the opening at the top of a volcano where gases, ash and lava can escape.",
           "ar": "الفوهة هي الفتحة أعلى البركان التي تخرج منها الغازات والرماد والحمم."
@@ -75,12 +93,22 @@
           "en": "Look at the summit to find the main eruption opening.",
           "ar": "انظر إلى قمة البركان لتحديد فتحة الثوران الرئيسية."
         },
-        "normalizedPosition": [0.0, 0.34, 0.24]
+        "normalizedPosition": [
+          0,
+          0.34,
+          0.24
+        ]
       },
       {
         "id": "main-vent",
-        "label": { "en": "Main Vent", "ar": "القناة الرئيسية" },
-        "title": { "en": "MAIN VENT", "ar": "القناة الرئيسية" },
+        "label": {
+          "en": "Main Vent",
+          "ar": "القناة الرئيسية"
+        },
+        "title": {
+          "en": "MAIN VENT",
+          "ar": "القناة الرئيسية"
+        },
         "info": {
           "en": "The main vent is the passage that carries magma from deep underground toward the crater.",
           "ar": "القناة الرئيسية هي الممر الذي ينقل الصهارة من الأعماق نحو الفوهة."
@@ -89,12 +117,22 @@
           "en": "This pathway connects the magma source to the surface.",
           "ar": "يربط هذا الممر مصدر الصهارة بسطح الأرض."
         },
-        "normalizedPosition": [0.04, 0.1, 0.32]
+        "normalizedPosition": [
+          0.04,
+          0.1,
+          0.32
+        ]
       },
       {
         "id": "magma-chamber",
-        "label": { "en": "Magma Chamber", "ar": "غرفة الصهارة" },
-        "title": { "en": "MAGMA CHAMBER", "ar": "غرفة الصهارة" },
+        "label": {
+          "en": "Magma Chamber",
+          "ar": "غرفة الصهارة"
+        },
+        "title": {
+          "en": "MAGMA CHAMBER",
+          "ar": "غرفة الصهارة"
+        },
         "info": {
           "en": "A magma chamber stores molten rock beneath the volcano before an eruption.",
           "ar": "تخزن غرفة الصهارة الصخور المنصهرة تحت البركان قبل حدوث الثوران."
@@ -103,12 +141,22 @@
           "en": "Pressure builds here before magma rises through the vent.",
           "ar": "يتراكم الضغط هنا قبل صعود الصهارة عبر القناة."
         },
-        "normalizedPosition": [0.0, -0.28, 0.28]
+        "normalizedPosition": [
+          0,
+          -0.28,
+          0.28
+        ]
       },
       {
         "id": "lava-flow",
-        "label": { "en": "Lava Flow", "ar": "تدفق الحمم" },
-        "title": { "en": "LAVA FLOW", "ar": "تدفق الحمم" },
+        "label": {
+          "en": "Lava Flow",
+          "ar": "تدفق الحمم"
+        },
+        "title": {
+          "en": "LAVA FLOW",
+          "ar": "تدفق الحمم"
+        },
         "info": {
           "en": "Lava flow is molten rock that reaches the surface and moves down the volcano's slopes.",
           "ar": "تدفق الحمم هو صخور منصهرة تصل إلى السطح وتنحدر على جوانب البركان."
@@ -117,12 +165,22 @@
           "en": "Lava cools into new rock and can build fresh layers on the cone.",
           "ar": "تبرد الحمم لتصبح صخورا جديدة وتبني طبقات على المخروط."
         },
-        "normalizedPosition": [0.26, -0.02, 0.24]
+        "normalizedPosition": [
+          0.26,
+          -0.02,
+          0.24
+        ]
       },
       {
         "id": "volcanic-cone",
-        "label": { "en": "Volcanic Cone", "ar": "المخروط البركاني" },
-        "title": { "en": "VOLCANIC CONE", "ar": "المخروط البركاني" },
+        "label": {
+          "en": "Volcanic Cone",
+          "ar": "المخروط البركاني"
+        },
+        "title": {
+          "en": "VOLCANIC CONE",
+          "ar": "المخروط البركاني"
+        },
         "info": {
           "en": "The volcanic cone forms as layers of lava, ash and rock fragments pile up over time.",
           "ar": "يتشكل المخروط البركاني عندما تتراكم طبقات الحمم والرماد وقطع الصخور بمرور الوقت."
@@ -131,12 +189,22 @@
           "en": "The cone records repeated eruptions like layers in a stack.",
           "ar": "يسجل المخروط الثورانات المتكررة على شكل طبقات متراكمة."
         },
-        "normalizedPosition": [-0.24, 0.02, 0.2]
+        "normalizedPosition": [
+          -0.24,
+          0.02,
+          0.2
+        ]
       },
       {
         "id": "ash-cloud",
-        "label": { "en": "Ash Cloud", "ar": "سحابة الرماد" },
-        "title": { "en": "ASH CLOUD", "ar": "سحابة الرماد" },
+        "label": {
+          "en": "Ash Cloud",
+          "ar": "سحابة الرماد"
+        },
+        "title": {
+          "en": "ASH CLOUD",
+          "ar": "سحابة الرماد"
+        },
         "info": {
           "en": "An ash cloud can rise during explosive eruptions and spread fine volcanic particles through the air.",
           "ar": "قد ترتفع سحابة الرماد أثناء الثورانات العنيفة وتنشر جسيمات بركانية دقيقة في الهواء."
@@ -145,7 +213,11 @@
           "en": "Ash can travel far from the volcano depending on wind and eruption strength.",
           "ar": "يمكن أن ينتقل الرماد بعيدا حسب الرياح وقوة الثوران."
         },
-        "normalizedPosition": [0.0, 0.48, 0.18]
+        "normalizedPosition": [
+          0,
+          0.48,
+          0.18
+        ]
       }
     ]
   },

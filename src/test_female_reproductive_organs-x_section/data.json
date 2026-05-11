@@ -4,9 +4,21 @@
       "primary": {
         "name": "Female Reproductive System",
         "path": "assets/female_reproductive_organs.glb",
-        "scale": { "x": 0.3, "y": 0.3, "z": 0.3 },
-        "position": { "x": 0.0, "y": 0.0, "z": 0.0 },
-        "rotation": { "x": 0.0, "y": 3.141592653589793, "z": 0.0 },
+        "scale": {
+          "x": 0.3,
+          "y": 0.3,
+          "z": 0.3
+        },
+        "position": {
+          "x": 0,
+          "y": 0,
+          "z": 0
+        },
+        "rotation": {
+          "x": 0,
+          "y": 3.141592653589793,
+          "z": 0
+        },
         "autoCenter": true
       }
     },
@@ -20,6 +32,12 @@
         "name": "FEMALE REPRODUCTIVE SYSTEM",
         "info": "Inspect the main organs of the female reproductive system in AR and tap each note to read its role.",
         "hint": "Use rotate, scale and labels while the model is active."
+      },
+      "ar": {
+        "tag": "تشريح الجهاز التناسلي",
+        "name": "الجهاز التناسلي الأنثوي",
+        "info": "استكشف الأعضاء الرئيسية للجهاز التناسلي الأنثوي في الواقع المعزز واضغط على كل ملاحظة لقراءة دورها.",
+        "hint": "استخدم التدوير والتحجيم والتسميات أثناء عرض النموذج."
       }
     },
     "ui": {
@@ -29,56 +47,169 @@
         "statusLoading": "Loading reproductive system model...",
         "statusTracking": "Reproductive system placed",
         "focusTag": "Reproductive structure"
+      },
+      "ar": {
+        "appEyebrow": "مسح مباشر",
+        "appTitle": "الجهاز التناسلي الأنثوي",
+        "rotate": "تدوير",
+        "scale": "تحجيم",
+        "sound": "صوت",
+        "labels": "الأرقام تشغيل/إيقاف",
+        "statusStarting": "جار تشغيل الكاميرا...",
+        "statusLoading": "جار تحميل نموذج الجهاز التناسلي...",
+        "statusReady": "الكاميرا جاهزة",
+        "statusTracking": "تم وضع الجهاز التناسلي",
+        "statusHoldSteady": "ثبّت الجهاز أثناء التقاط رمز QR...",
+        "statusSearching": "جار البحث عن رمز QR...",
+        "statusCameraError": "تم رفض الوصول إلى الكاميرا.",
+        "statusModelError": "تعذر تحميل النموذج.",
+        "focusTag": "بنية تناسلية"
       }
     },
     "parts": [
       {
         "id": "ovary",
-        "label": "Ovary",
-        "title": "OVARY",
-        "info": "The ovary stores egg cells and also produces hormones such as estrogen and progesterone.",
-        "hint": "This small rounded structure sits near the end of the reproductive pathway.",
-        "normalizedPosition": [-0.42, 0.18, 0.14]
+        "label": {
+          "en": "Ovary",
+          "ar": "المبيض"
+        },
+        "title": {
+          "en": "OVARY",
+          "ar": "المبيض"
+        },
+        "info": {
+          "en": "The ovary stores egg cells and also produces hormones such as estrogen and progesterone.",
+          "ar": "يخزن المبيض الخلايا البيضية وينتج هرمونات مثل الإستروجين والبروجسترون."
+        },
+        "hint": {
+          "en": "This small rounded structure sits near the end of the reproductive pathway.",
+          "ar": "هذه البنية الصغيرة المستديرة تقع قرب نهاية المسار التناسلي."
+        },
+        "normalizedPosition": [
+          -0.42,
+          0.18,
+          0.14
+        ]
       },
       {
         "id": "fallopian-tube",
-        "label": "Fallopian Tube",
-        "title": "FALLOPIAN TUBE",
-        "info": "The fallopian tube carries the egg from the ovary toward the uterus.",
-        "hint": "This curved passage links the ovary to the uterus.",
-        "normalizedPosition": [-0.2, 0.34, 0.12]
+        "label": {
+          "en": "Fallopian Tube",
+          "ar": "قناة فالوب"
+        },
+        "title": {
+          "en": "FALLOPIAN TUBE",
+          "ar": "قناة فالوب"
+        },
+        "info": {
+          "en": "The fallopian tube carries the egg from the ovary toward the uterus.",
+          "ar": "تنقل قناة فالوب البويضة من المبيض نحو الرحم."
+        },
+        "hint": {
+          "en": "This curved passage links the ovary to the uterus.",
+          "ar": "هذا الممر المنحني يربط المبيض بالرحم."
+        },
+        "normalizedPosition": [
+          -0.2,
+          0.34,
+          0.12
+        ]
       },
       {
         "id": "uterus",
-        "label": "Uterus",
-        "title": "UTERUS",
-        "info": "The uterus is the central muscular organ where a fertilized egg can develop during pregnancy.",
-        "hint": "This is the main chamber at the center of the model.",
-        "normalizedPosition": [0.02, 0.12, 0.16]
+        "label": {
+          "en": "Uterus",
+          "ar": "الرحم"
+        },
+        "title": {
+          "en": "UTERUS",
+          "ar": "الرحم"
+        },
+        "info": {
+          "en": "The uterus is the central muscular organ where a fertilized egg can develop during pregnancy.",
+          "ar": "الرحم عضو عضلي مركزي يمكن أن ينمو داخله الجنين أثناء الحمل."
+        },
+        "hint": {
+          "en": "This is the main chamber at the center of the model.",
+          "ar": "هذه هي الحجرة الرئيسية في مركز النموذج."
+        },
+        "normalizedPosition": [
+          0.02,
+          0.12,
+          0.16
+        ]
       },
       {
         "id": "endometrium",
-        "label": "Endometrium",
-        "title": "ENDOMETRIUM",
-        "info": "The endometrium is the inner lining of the uterus that thickens and sheds during the menstrual cycle.",
-        "hint": "This inner tissue layer appears inside the uterus cross-section.",
-        "normalizedPosition": [0.12, 0.08, 0.22]
+        "label": {
+          "en": "Endometrium",
+          "ar": "بطانة الرحم"
+        },
+        "title": {
+          "en": "ENDOMETRIUM",
+          "ar": "بطانة الرحم"
+        },
+        "info": {
+          "en": "The endometrium is the inner lining of the uterus that thickens and sheds during the menstrual cycle.",
+          "ar": "بطانة الرحم هي الطبقة الداخلية التي تزداد سماكتها ثم تنسلخ أثناء الدورة الشهرية."
+        },
+        "hint": {
+          "en": "This inner tissue layer appears inside the uterus cross-section.",
+          "ar": "تظهر هذه الطبقة النسيجية داخل مقطع الرحم."
+        },
+        "normalizedPosition": [
+          0.12,
+          0.08,
+          0.22
+        ]
       },
       {
         "id": "cervix",
-        "label": "Cervix",
-        "title": "CERVIX",
-        "info": "The cervix is the lower narrow portion of the uterus that opens into the vaginal canal.",
-        "hint": "It forms the transition between the uterus and the lower tract.",
-        "normalizedPosition": [0.08, -0.18, 0.16]
+        "label": {
+          "en": "Cervix",
+          "ar": "عنق الرحم"
+        },
+        "title": {
+          "en": "CERVIX",
+          "ar": "عنق الرحم"
+        },
+        "info": {
+          "en": "The cervix is the lower narrow portion of the uterus that opens into the vaginal canal.",
+          "ar": "عنق الرحم هو الجزء السفلي الضيق من الرحم ويفتح على القناة المهبلية."
+        },
+        "hint": {
+          "en": "It forms the transition between the uterus and the lower tract.",
+          "ar": "يشكل منطقة الانتقال بين الرحم والمسار السفلي."
+        },
+        "normalizedPosition": [
+          0.08,
+          -0.18,
+          0.16
+        ]
       },
       {
         "id": "vagina",
-        "label": "Vagina",
-        "title": "VAGINA",
-        "info": "The vagina is the muscular canal that connects the cervix to the outside of the body.",
-        "hint": "This lower passage continues downward from the cervix.",
-        "normalizedPosition": [0.08, -0.42, 0.14]
+        "label": {
+          "en": "Vagina",
+          "ar": "المهبل"
+        },
+        "title": {
+          "en": "VAGINA",
+          "ar": "المهبل"
+        },
+        "info": {
+          "en": "The vagina is the muscular canal that connects the cervix to the outside of the body.",
+          "ar": "المهبل قناة عضلية تصل عنق الرحم بخارج الجسم."
+        },
+        "hint": {
+          "en": "This lower passage continues downward from the cervix.",
+          "ar": "يمتد هذا الممر السفلي إلى الأسفل من عنق الرحم."
+        },
+        "normalizedPosition": [
+          0.08,
+          -0.42,
+          0.14
+        ]
       }
     ]
   },

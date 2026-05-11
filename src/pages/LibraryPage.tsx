@@ -21,13 +21,13 @@ const LibraryPage: React.FC = () => {
   const isArabic = settings.language === "ar";
   const copy = isArabic
     ? {
-        title: "Ù…ÙƒØªØ¨Ø© Ø§Ù„ÙˆØ§Ù‚Ø¹ Ø§Ù„Ù…Ø¹Ø²Ø²",
-        back: "Ø§Ù„Ø¹ÙˆØ¯Ø©",
-        searchPlaceholder: "Ø§Ø¨Ø­Ø« Ø¹Ù† Ø¯Ø±Ø³ Ø£Ùˆ Ù…ÙˆØ¶ÙˆØ¹",
-        browseSubjects: "ØªØµÙØ­ Ø§Ù„Ù…ÙˆØ§Ø¯",
-        all: "Ø§Ù„ÙƒÙ„",
-        modulesReady: "ÙˆØ­Ø¯Ø§Øª Ø¬Ø§Ù‡Ø²Ø©",
-        launch: "Ø§ÙØªØ­ AR",
+        title: "مكتبة الواقع المعزز",
+        back: "العودة",
+        searchPlaceholder: "ابحث عن درس أو موضوع",
+        browseSubjects: "تصفح المواد",
+        all: "الكل",
+        modulesReady: "وحدات جاهزة",
+        launch: "افتح AR",
       }
     : {
         title: "AR Library",

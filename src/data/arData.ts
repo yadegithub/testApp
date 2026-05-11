@@ -8,7 +8,6 @@ import lungImage from "../assets/images/human lung.jpg";
 import skinImage from "../assets/images/human skin.jpg";
 import magneticImage from "../assets/images/Magnetic Fields.png";
 import pendulumImage from "../assets/images/Simple Pendulum.png";
-import physicsImage from "../assets/images/physics.jpg";
 import solarImage from "../assets/images/Solar System Model.jpg";
 import tectonicsImage from "../assets/images/Tectonic Plates.jpg";
 import volcanoImage from "../assets/images/volcano.png";

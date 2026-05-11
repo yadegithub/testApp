@@ -4,9 +4,21 @@
       "primary": {
         "name": "Human Kidney",
         "path": "assets/kidney_with_labels.glb",
-        "scale": { "x": 0.16, "y": 0.16, "z": 0.16 },
-        "position": { "x": 0.0, "y": 0.0, "z": 0.0 },
-        "rotation": { "x": 0.0, "y": 3.141592653589793, "z": 0.0 },
+        "scale": {
+          "x": 0.16,
+          "y": 0.16,
+          "z": 0.16
+        },
+        "position": {
+          "x": 0,
+          "y": 0,
+          "z": 0
+        },
+        "rotation": {
+          "x": 0,
+          "y": 3.141592653589793,
+          "z": 0
+        },
         "autoCenter": true
       }
     },
@@ -20,6 +32,12 @@
         "name": "HUMAN KIDNEY",
         "info": "Inspect the kidney in AR and tap the numbered notes to understand the main filtering structures.",
         "hint": "Use rotate, scale and labels while the kidney model is active."
+      },
+      "ar": {
+        "tag": "تشريح الكلية",
+        "name": "كلية الإنسان",
+        "info": "افحص الكلية في الواقع المعزز واضغط على الملاحظات المرقمة لفهم بنى الترشيح الرئيسية.",
+        "hint": "استخدم التدوير والتحجيم والتسميات أثناء عرض نموذج الكلية."
       }
     },
     "ui": {
@@ -29,56 +47,169 @@
         "statusLoading": "Loading human kidney model...",
         "statusTracking": "Human kidney placed",
         "focusTag": "Kidney structure"
+      },
+      "ar": {
+        "appEyebrow": "مسح مباشر",
+        "appTitle": "كلية الإنسان",
+        "rotate": "تدوير",
+        "scale": "تحجيم",
+        "sound": "صوت",
+        "labels": "الأرقام تشغيل/إيقاف",
+        "statusStarting": "جار تشغيل الكاميرا...",
+        "statusLoading": "جار تحميل نموذج كلية الإنسان...",
+        "statusReady": "الكاميرا جاهزة",
+        "statusTracking": "تم وضع كلية الإنسان",
+        "statusHoldSteady": "ثبّت الجهاز أثناء التقاط رمز QR...",
+        "statusSearching": "جار البحث عن رمز QR...",
+        "statusCameraError": "تم رفض الوصول إلى الكاميرا.",
+        "statusModelError": "تعذر تحميل النموذج.",
+        "focusTag": "بنية كلوية"
       }
     },
     "parts": [
       {
         "id": "capsule",
-        "label": "Capsule",
-        "title": "CAPSULE",
-        "info": "The capsule is the thin outer covering that helps protect the kidney.",
-        "hint": "This outer layer wraps around the kidney surface.",
-        "normalizedPosition": [-0.34, 0.25, 0.18]
+        "label": {
+          "en": "Capsule",
+          "ar": "المحفظة"
+        },
+        "title": {
+          "en": "CAPSULE",
+          "ar": "المحفظة"
+        },
+        "info": {
+          "en": "The capsule is the thin outer covering that helps protect the kidney.",
+          "ar": "المحفظة غلاف خارجي رقيق يساعد على حماية الكلية."
+        },
+        "hint": {
+          "en": "This outer layer wraps around the kidney surface.",
+          "ar": "هذه الطبقة الخارجية تلتف حول سطح الكلية."
+        },
+        "normalizedPosition": [
+          -0.34,
+          0.25,
+          0.18
+        ]
       },
       {
         "id": "cortex",
-        "label": "Cortex",
-        "title": "CORTEX",
-        "info": "The cortex is the outer region where blood filtration begins inside the kidney.",
-        "hint": "This layer sits just beneath the capsule.",
-        "normalizedPosition": [0.16, 0.21, 0.18]
+        "label": {
+          "en": "Cortex",
+          "ar": "القشرة"
+        },
+        "title": {
+          "en": "CORTEX",
+          "ar": "القشرة"
+        },
+        "info": {
+          "en": "The cortex is the outer region where blood filtration begins inside the kidney.",
+          "ar": "القشرة هي المنطقة الخارجية التي تبدأ فيها تصفية الدم داخل الكلية."
+        },
+        "hint": {
+          "en": "This layer sits just beneath the capsule.",
+          "ar": "تقع هذه الطبقة مباشرة تحت المحفظة."
+        },
+        "normalizedPosition": [
+          0.16,
+          0.21,
+          0.18
+        ]
       },
       {
         "id": "renal-medulla",
-        "label": "Renal Medulla",
-        "title": "RENAL MEDULLA",
-        "info": "The renal medulla contains the pyramids that help concentrate urine as it moves inward.",
-        "hint": "This deeper region lies toward the center of the kidney.",
-        "normalizedPosition": [0.0, 0.02, 0.22]
+        "label": {
+          "en": "Renal Medulla",
+          "ar": "اللب الكلوي"
+        },
+        "title": {
+          "en": "RENAL MEDULLA",
+          "ar": "اللب الكلوي"
+        },
+        "info": {
+          "en": "The renal medulla contains the pyramids that help concentrate urine as it moves inward.",
+          "ar": "يحتوي اللب الكلوي على الأهرامات التي تساعد على تركيز البول أثناء انتقاله نحو الداخل."
+        },
+        "hint": {
+          "en": "This deeper region lies toward the center of the kidney.",
+          "ar": "هذه المنطقة الأعمق تقع باتجاه مركز الكلية."
+        },
+        "normalizedPosition": [
+          0,
+          0.02,
+          0.22
+        ]
       },
       {
         "id": "renal-artery",
-        "label": "Renal Artery",
-        "title": "RENAL ARTERY",
-        "info": "The renal artery brings oxygen-rich blood into the kidney for filtration.",
-        "hint": "This red vessel feeds blood into the kidney.",
-        "normalizedPosition": [-0.14, -0.06, 0.26]
+        "label": {
+          "en": "Renal Artery",
+          "ar": "الشريان الكلوي"
+        },
+        "title": {
+          "en": "RENAL ARTERY",
+          "ar": "الشريان الكلوي"
+        },
+        "info": {
+          "en": "The renal artery brings oxygen-rich blood into the kidney for filtration.",
+          "ar": "يجلب الشريان الكلوي الدم الغني بالأكسجين إلى الكلية من أجل الترشيح."
+        },
+        "hint": {
+          "en": "This red vessel feeds blood into the kidney.",
+          "ar": "هذا الوعاء الأحمر يغذي الكلية بالدم."
+        },
+        "normalizedPosition": [
+          -0.14,
+          -0.06,
+          0.26
+        ]
       },
       {
         "id": "renal-vein",
-        "label": "Renal Vein",
-        "title": "RENAL VEIN",
-        "info": "The renal vein carries filtered blood away from the kidney and back toward circulation.",
-        "hint": "This blue vessel exits the kidney after filtration.",
-        "normalizedPosition": [0.18, -0.02, 0.24]
+        "label": {
+          "en": "Renal Vein",
+          "ar": "الوريد الكلوي"
+        },
+        "title": {
+          "en": "RENAL VEIN",
+          "ar": "الوريد الكلوي"
+        },
+        "info": {
+          "en": "The renal vein carries filtered blood away from the kidney and back toward circulation.",
+          "ar": "ينقل الوريد الكلوي الدم المصفى بعيدا عن الكلية عائدا إلى الدورة الدموية."
+        },
+        "hint": {
+          "en": "This blue vessel exits the kidney after filtration.",
+          "ar": "هذا الوعاء الأزرق يخرج من الكلية بعد الترشيح."
+        },
+        "normalizedPosition": [
+          0.18,
+          -0.02,
+          0.24
+        ]
       },
       {
         "id": "ureter",
-        "label": "Ureter",
-        "title": "URETER",
-        "info": "The ureter transports urine from the kidney down toward the bladder.",
-        "hint": "This narrow tube leaves the lower side of the kidney.",
-        "normalizedPosition": [0.14, -0.34, 0.12]
+        "label": {
+          "en": "Ureter",
+          "ar": "الحالب"
+        },
+        "title": {
+          "en": "URETER",
+          "ar": "الحالب"
+        },
+        "info": {
+          "en": "The ureter transports urine from the kidney down toward the bladder.",
+          "ar": "ينقل الحالب البول من الكلية إلى المثانة."
+        },
+        "hint": {
+          "en": "This narrow tube leaves the lower side of the kidney.",
+          "ar": "هذا الأنبوب الضيق يغادر الجهة السفلية من الكلية."
+        },
+        "normalizedPosition": [
+          0.14,
+          -0.34,
+          0.12
+        ]
       }
     ]
   },

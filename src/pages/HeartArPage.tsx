@@ -6,6 +6,7 @@ import {
   timeOutline,
 } from "ionicons/icons";
 import { useEffect, useMemo, useState } from "react";
+import heartIcon from "../test_heart/assets/heart-icon.jpeg";
 import "./HeartArPage.css";
 
 const QUIZ_DELAY_SECONDS = 180;
@@ -61,6 +62,9 @@ const HeartArPage: React.FC<HeartArPageProps> = ({
             quizResult: "\u0623\u062d\u0631\u0632\u062a {score} \u0645\u0646 {total}.",
             quizTimer: "\u0627\u0644\u0627\u062e\u062a\u0628\u0627\u0631 \u0628\u0639\u062f",
             quizTitle: "\u0627\u0633\u062a\u0628\u064a\u0627\u0646 \u0627\u0644\u0642\u0644\u0628 \u0627\u0644\u0628\u0634\u0631\u064a",
+            hintTitle: "\u0642\u0644\u0628 \u0627\u0644\u0625\u0646\u0633\u0627\u0646",
+            hintDescription:
+              "\u0627\u0645\u0633\u062d \u0631\u0645\u0632 QR \u0648\u0636\u0639 \u0627\u0644\u0642\u0644\u0628 \u062b\u0645 \u0627\u0641\u062d\u0635 \u0627\u0644\u0623\u0630\u064a\u0646\u064a\u0646 \u0648\u0627\u0644\u0628\u0637\u064a\u0646\u064a\u0646 \u0648\u0627\u0644\u0623\u0648\u0639\u064a\u0629 \u0627\u0644\u0631\u0626\u064a\u0633\u064a\u0629.",
             submitQuiz: "\u0625\u0631\u0633\u0627\u0644 \u0627\u0644\u0625\u062c\u0627\u0628\u0627\u062a",
           }
         : {
@@ -76,6 +80,9 @@ const HeartArPage: React.FC<HeartArPageProps> = ({
             quizResult: "You scored {score} out of {total}.",
             quizTimer: "Quiz in",
             quizTitle: "Human Heart Questionnaire",
+            hintTitle: "Human Heart",
+            hintDescription:
+              "Scan the QR code, place the heart, then inspect the atria, ventricles and major vessels.",
             submitQuiz: "Submit answers",
           },
     [resolvedLanguage],
@@ -328,6 +335,14 @@ const HeartArPage: React.FC<HeartArPageProps> = ({
               <div className="heart-ar-title-pill">{experienceTitle}</div>
 
               <span className="heart-ar-topbar__spacer" aria-hidden="true" />
+            </div>
+
+            <div className="heart-ar-hint-strip" aria-hidden="true">
+              <img src={heartIcon} alt={copy.hintTitle} />
+              <div>
+                <strong>{copy.hintTitle}</strong>
+                <span>{copy.hintDescription}</span>
+              </div>
             </div>
 
             <div className="heart-ar-quiz-pill-wrap">

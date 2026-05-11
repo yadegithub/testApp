@@ -25,9 +25,26 @@ const UI = {
     partHint: document.getElementById("card-hint")
 };
 
-const STATUS_READY = "Pret : Scannez le QR Code";
-const STATUS_STABLE = "Modele stabilise";
-const STATUS_BREATHING = "Respiration en cours...";
+const STATUS_COPY = {
+    fr: {
+        ready: "Pret : Scannez le QR Code",
+        stable: "Modele stabilise",
+        breathing: "Respiration en cours..."
+    },
+    en: {
+        ready: "Ready: scan the QR code",
+        stable: "Model stabilized",
+        breathing: "Breathing in progress..."
+    },
+    ar: {
+        ready: "جاهز: امسح رمز QR",
+        stable: "تم تثبيت النموذج",
+        breathing: "التنفس قيد التشغيل..."
+    }
+};
+const STATUS_READY = STATUS_COPY[currentLanguage]?.ready ?? STATUS_COPY.en.ready;
+const STATUS_STABLE = STATUS_COPY[currentLanguage]?.stable ?? STATUS_COPY.en.stable;
+const STATUS_BREATHING = STATUS_COPY[currentLanguage]?.breathing ?? STATUS_COPY.en.breathing;
 
 const INFO_COPY = {
     fr: {
@@ -41,9 +58,9 @@ const INFO_COPY = {
         hint: "Use Rotate, Scale and Breathe to explore the model."
     },
     ar: {
-        name: "Ø§Ù„Ø±Ø¦ØªØ§Ù†",
-        info: "Ø´Ø§Ù‡Ø¯ Ø§Ù„Ù‚ØµØ¨Ø© Ø§Ù„Ù‡ÙˆØ§Ø¦ÙŠØ© ÙˆØ§Ù„Ø´Ø¹Ø¨ Ø§Ù„Ù‡ÙˆØ§Ø¦ÙŠØ© ÙˆØ­Ø¬Ù… Ø§Ù„Ø±Ø¦ØªÙŠÙ† Ø¯Ø§Ø®Ù„ Ù†Ù…ÙˆØ°Ø¬ Ø«Ù„Ø§Ø«ÙŠ Ø§Ù„Ø£Ø¨Ø¹Ø§Ø¯ Ù…Ø«Ø¨Øª ÙÙˆÙ‚ Ø±Ù…Ø² QR.",
-        hint: "Ø§Ø³ØªØ®Ø¯Ù… Rotate Ùˆ Scale Ùˆ Respire Ù„Ø§Ø³ØªÙƒØ´Ø§Ù Ø§Ù„Ù†Ù…ÙˆØ°Ø¬."
+        name: "الرئتان",
+        info: "شاهد القصبة الهوائية والشعب الهوائية وحجم الرئتين داخل نموذج ثلاثي الأبعاد مثبت فوق رمز QR.",
+        hint: "استخدم التدوير والتحجيم والتنفس لاستكشاف النموذج."
     }
 };
 
@@ -62,10 +79,10 @@ Object.assign(INFO_COPY.en, {
 });
 
 Object.assign(INFO_COPY.ar, {
-    title: "RESPIRATORY SYSTEM",
-    overviewTitle: "Human Lungs",
-    overviewText: "An interactive model that shows the main respiratory organs with guided notes for each structure.",
-    focusTag: "RESPIRATORY STRUCTURE"
+    title: "الجهاز التنفسي",
+    overviewTitle: "رئتا الإنسان",
+    overviewText: "نموذج تفاعلي يوضح أهم أعضاء الجهاز التنفسي مع ملاحظات إرشادية لكل بنية.",
+    focusTag: "بنية تنفسية"
 });
 
 const ORGAN_PARTS = [
@@ -98,6 +115,35 @@ const ORGAN_PARTS = [
         screenOffset: { x: 0, y: -0.22 }
     }
 ];
+
+const ORGAN_PARTS_AR = {
+    "right-lung": {
+        label: "الرئة اليمنى",
+        info: "تستقبل الرئة اليمنى الهواء الغني بالأكسجين وتساعد الجسم على التخلص من ثاني أكسيد الكربون.",
+        hint: "هي أكبر قليلا من الرئة اليسرى وتتكون من ثلاثة فصوص."
+    },
+    "left-lung": {
+        label: "الرئة اليسرى",
+        info: "تشارك الرئة اليسرى في تبادل الغازات مثل الرئة اليمنى.",
+        hint: "هي أصغر لأنها تترك مساحة للقلب."
+    },
+    trachea: {
+        label: "القصبة الهوائية",
+        info: "القصبة الهوائية أنبوب ينقل الهواء من الأنف والفم إلى الصدر.",
+        hint: "في أسفلها تنقسم إلى شعبتين تدخلان إلى الرئتين."
+    },
+    bronchi: {
+        label: "الشعب الهوائية",
+        info: "الشعب الهوائية قنوات تتفرع داخل الرئتين لتوزيع الهواء.",
+        hint: "تصبح أصغر فأصغر داخل الرئتين."
+    }
+};
+
+if (currentLanguage === "ar") {
+    ORGAN_PARTS.forEach((part) => {
+        Object.assign(part, ORGAN_PARTS_AR[part.id] ?? {});
+    });
+}
 
 let src;
 let cap;
@@ -184,6 +230,39 @@ function getCopy() {
 
 function applyInfoCard() {
     const copy = getCopy();
+    const menuCopy = {
+        fr: {
+            eyebrow: "Scan AR en direct",
+            appTitle: "POUMONS HUMAINS",
+            rotate: "Rotation",
+            scale: "Taille",
+            launch: "Respire",
+            labels: "Labels On/Off"
+        },
+        en: {
+            eyebrow: "AR Learn live scan",
+            appTitle: "HUMAN LUNGS",
+            rotate: "Rotate",
+            scale: "Scale",
+            launch: "Breathe",
+            labels: "Labels On/Off"
+        },
+        ar: {
+            eyebrow: "مسح مباشر",
+            appTitle: "رئتا الإنسان",
+            rotate: "تدوير",
+            scale: "تحجيم",
+            launch: "تنفس",
+            labels: "التسميات تشغيل/إيقاف"
+        }
+    }[currentLanguage] || menuCopy.en;
+
+    document.getElementById("app-eyebrow").innerText = menuCopy.eyebrow;
+    document.getElementById("app-title").innerText = menuCopy.appTitle;
+    document.querySelector("#btn-rotate .label").innerText = menuCopy.rotate;
+    document.querySelector("#btn-scale .label").innerText = menuCopy.scale;
+    document.querySelector("#btn-launch .label").innerText = menuCopy.launch;
+    document.getElementById("labels-label").innerText = menuCopy.labels;
 
     if (UI.modelTitle) {
         UI.modelTitle.innerText = copy.title;
@@ -662,7 +741,7 @@ function prepareModel(model) {
 function startBreathingAnimation() {
     if (!mainModel) {
         setLaunchButtonActive(false);
-        setStatus("Modele non charge");
+        setStatus(currentLanguage === "ar" ? "النموذج غير محمّل" : "Model not loaded");
         return;
     }
 
