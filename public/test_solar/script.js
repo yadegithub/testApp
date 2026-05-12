@@ -71,7 +71,11 @@ function updateInfoCard() {
 
 function syncLabels() {
   const shouldShowLabels =
+
     labelsVisible && Boolean(arGroup?.visible) && (hasLiveMarkerDetection || hasTrackingPose);
+
+    labelsVisible && Boolean(arGroup?.visible);
+
 
   labels.forEach((entry) => {
     const isActive = entry.index === focusedPartIndex;
@@ -895,7 +899,15 @@ function processFrame(timestamp) {
     setStatus(copy.statusSearching);
   }
 
+<<<<<<< HEAD
   syncLabels();
+=======
+  if (!arGroup?.visible && focusedPartIndex !== -1) {
+    setFocusedPart(-1);
+  } else {
+    syncLabels();
+  }
+>>>>>>> 3d83a33be87afefb237d7c9cb5b948afea5a7de7
 
   renderer.render(scene, camera);
   labelRenderer.render(scene, camera);
