@@ -7,7 +7,7 @@
     "dev": "vite",
     "build": "tsc && vite build",
     "android:sync": "npm run build && npx cap sync android",
-    "android:phone": "npm run build && npx cap sync android && cd android && gradlew.bat assembleDebug && cd .. && C:\\Users\\Antar\\AppData\\Local\\Android\\Sdk\\platform-tools\\adb.exe -s 1868ff967d78 install -r android\\app\\build\\outputs\\apk\\debug\\app-debug.apk && C:\\Users\\Antar\\AppData\\Local\\Android\\Sdk\\platform-tools\\adb.exe -s 1868ff967d78 shell monkey -p io.ionic.starter -c android.intent.category.LAUNCHER 1",
+    "android:phone": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/android-phone.ps1",
     "android:devices": "C:\\Users\\Antar\\AppData\\Local\\Android\\Sdk\\platform-tools\\adb.exe devices",
     "preview": "vite preview",
     "test.e2e": "cypress run",

@@ -28,9 +28,9 @@ const CivilisationArPage: React.FC<CivilisationArPageProps> = ({
           "Explore a medieval Spanish castle in AR and tap numbered labels to study its defensive features.",
       },
       ar: {
-        title: "Castle of Consuegra",
+        title: "قلعة كونسويغرا",
         description:
-          "Explore a medieval Spanish castle in AR and tap numbered labels to study its defensive features.",
+          "استكشف قلعة إسبانية من العصور الوسطى في الواقع المعزز واضغط على الأرقام لدراسة عناصرها الدفاعية.",
       },
     }}
   />

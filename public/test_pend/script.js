@@ -10,7 +10,13 @@ const UI = {
     video: document.getElementById("videoInput"),
     status: document.getElementById("status"),
     canvasOutput: document.getElementById("canvasOutput"),
-    canvasThree: document.getElementById("canvasThree")
+    canvasThree: document.getElementById("canvasThree"),
+    appEyebrow: document.getElementById("app-eyebrow"),
+    appTitle: document.getElementById("app-title"),
+    cardHint: document.getElementById("card-hint"),
+    cardTag: document.getElementById("card-tag"),
+    partInfo: document.getElementById("part-info"),
+    partName: document.getElementById("part-name")
 };
 
 let src, cap, qrDetector, camMatrix, distCoeffs, rvec, tvec, rotMatr, objectPoints;
@@ -62,20 +68,45 @@ const SWING_DAMPING = 0.72;
 const MIN_SWING_ANGLE = 0.18;
 const COPY = currentLanguage === "ar"
     ? {
+        appEyebrow: "مسح مباشر",
+        appTitle: "بندول نيوتن",
+        cardHint: "المس كرة جانبية أو استعمل زر التشغيل لبدء الحركة.",
+        cardInfo: "يوضح هذا النموذج حفظ كمية الحركة والطاقة. عندما تصطدم كرة، تنتقل الدفعة عبر الكرات الساكنة وتخرج من الجهة الأخرى.",
+        cardName: "بندول نيوتن",
+        cardTag: "نموذج فيزيائي",
+        cameraRequest: "جار طلب الوصول إلى الكاميرا...",
+        clickOuterBall: "المس كرة جانبية",
+        collision: "الحركة جارية...",
+        loading: "جار تحميل البندول...",
+        modelError: "تعذر تحميل النموذج",
+        noBall: "لا توجد كرة متاحة",
         ready: "جاهز: امسح رمز QR",
         stable: "تم تثبيت النموذج",
+        steady: "تم اكتشاف QR، أبقه ثابتا...",
         rotate: "تدوير",
         scale: "تحجيم",
         launch: "تشغيل"
     }
     : {
+        appEyebrow: "AR Learn live scan",
+        appTitle: "SIMPLE PENDULUM",
+        cardHint: "Touch a side ball or use Launch to start the motion.",
+        cardInfo: "This model illustrates conservation of momentum and energy. When one ball collides, the impulse travels through the still balls and exits on the other side.",
+        cardName: "Newton's Cradle",
+        cardTag: "PHYSICS MODEL",
+        cameraRequest: "Requesting camera access...",
+        clickOuterBall: "Click a side ball",
+        collision: "Collision in progress...",
+        loading: "Loading pendulum...",
+        modelError: "Model loading error",
+        noBall: "No ball available",
         ready: "Ready: scan the QR code",
         stable: "Model stabilized",
+        steady: "QR detected, keep it steady...",
         rotate: "Rotate",
         scale: "Scale",
         launch: "Launch"
     };
-
 window.addEventListener("resize", fitToScreen);
 
 function setStatus(message) {
@@ -144,7 +175,8 @@ function setLaunchButtonActive(isActive) {
 }
 
 async function initProject() {
-    setStatus("Chargement du pendule...");
+    applyLocalizedCopy();
+    setStatus(COPY.loading);
     try {
         const response = await fetch(withCacheBuster("./data.json"));
         if (!response.ok) {
@@ -166,7 +198,7 @@ function startAR(modelPath) {
     UI.video.muted = true;
     UI.video.autoplay = true;
     UI.video.playsInline = true;
-    setStatus("Demande d'acces a la camera...");
+    setStatus(COPY.cameraRequest);
 
     navigator.mediaDevices.getUserMedia({
         video: {
@@ -206,7 +238,7 @@ function startAR(modelPath) {
         };
     }).catch(err => {
         console.error("Camera error:", err);
-        setStatus(`Erreur camera: ${err.name || "Acces refuse"}`);
+        setStatus(`Camera error: ${err.name || "Access denied"}`);
     });
 }
 
@@ -249,7 +281,7 @@ function setupThreeJS(modelPath) {
         setupInteraction();
     }, undefined, (err) => {
         console.error("Model error:", err);
-        setStatus("Erreur chargement modele");
+        setStatus(COPY.modelError);
     });
 }
 
@@ -343,13 +375,13 @@ function getLaunchBall() {
 function startPendulumAnimation(ball) {
     if (!ball) {
         setLaunchButtonActive(false);
-        setStatus("Aucune bille disponible");
+        setStatus(COPY.noBall);
         return;
     }
 
     if (!ball.isOuter) {
         setLaunchButtonActive(false);
-        setStatus("Cliquez sur une bille laterale");
+        setStatus(COPY.clickOuterBall);
         return;
     }
 
@@ -396,7 +428,7 @@ function startPendulumAnimation(ball) {
     }
 
     pendulumPhaseStartedAt = performance.now();
-    setStatus("Collision en cours...");
+    setStatus(COPY.collision);
 }
 
 function updatePendulumAnimation(now) {
@@ -451,6 +483,16 @@ function setupControls() {
             startPendulumAnimation(ball);
         };
     }
+}
+
+function applyLocalizedCopy() {
+    UI.appEyebrow.textContent = COPY.appEyebrow;
+    UI.appTitle.textContent = COPY.appTitle;
+    UI.cardHint.textContent = COPY.cardHint;
+    UI.cardTag.textContent = COPY.cardTag;
+    UI.partInfo.textContent = COPY.cardInfo;
+    UI.partName.textContent = COPY.cardName;
+    document.title = `AR Learn - ${COPY.appTitle}`;
 }
 
 function setupInteraction() {
@@ -647,7 +689,7 @@ function isPendulumAnimating() {
 
 function updateTrackingStatus(markerFound, shouldHoldSteady) {
     if (markerFound && isPendulumAnimating()) {
-        setStatus("Collision en cours...");
+        setStatus(COPY.collision);
         return;
     }
 
@@ -657,7 +699,7 @@ function updateTrackingStatus(markerFound, shouldHoldSteady) {
     }
 
     if (shouldHoldSteady && detectionStreak > 0) {
-        setStatus("QR detecte, gardez-le stable...");
+        setStatus(COPY.steady);
         return;
     }
 
@@ -767,3 +809,4 @@ function fitToScreen() {
 }
 
 initProject();
+

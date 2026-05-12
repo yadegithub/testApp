@@ -1,4 +1,4 @@
-:root {
+﻿:root {
     --accent: #29d5ff;
     --accent-strong: #1b8fff;
     --panel-bg: rgba(9, 16, 28, 0.44);
@@ -332,6 +332,8 @@ input:checked + .slider::before {
     line-height: 1;
     cursor: pointer;
     pointer-events: auto;
+    direction: ltr;
+    unicode-bidi: isolate;
     box-shadow: 0 12px 24px rgba(0, 0, 0, 0.22);
     transition:
         background-color 180ms ease,
@@ -430,7 +432,7 @@ html[dir="rtl"] .overview-card__copy {
     }
 
     .hotspot-label {
-        width: 30px;
+          width: 30px;
         height: 30px;
         font-size: 0.86rem;
     }

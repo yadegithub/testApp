@@ -71,7 +71,7 @@ function updateInfoCard() {
 
 function syncLabels() {
   const shouldShowLabels =
-    labelsVisible && Boolean(arGroup?.visible) && hasLiveMarkerDetection;
+    labelsVisible && Boolean(arGroup?.visible) && (hasLiveMarkerDetection || hasTrackingPose);
 
   labels.forEach((entry) => {
     const isActive = entry.index === focusedPartIndex;
@@ -293,6 +293,8 @@ function initThree(config) {
   labelRenderer.domElement.style.top = "0";
   labelRenderer.domElement.style.left = "0";
   labelRenderer.domElement.style.pointerEvents = "none";
+    labelRenderer.domElement.dir = "ltr";
+    labelRenderer.domElement.style.direction = "ltr";
   labelRenderer.domElement.style.zIndex = "25";
   document.body.appendChild(labelRenderer.domElement);
 
@@ -893,11 +895,7 @@ function processFrame(timestamp) {
     setStatus(copy.statusSearching);
   }
 
-  if (!hasLiveMarkerDetection && focusedPartIndex !== -1) {
-    setFocusedPart(-1);
-  } else {
-    syncLabels();
-  }
+  syncLabels();
 
   renderer.render(scene, camera);
   labelRenderer.render(scene, camera);

@@ -1,4 +1,4 @@
-:root {
+﻿:root {
     --accent: #29d5ff;
     --accent-strong: #1b8fff;
     --panel-bg: rgba(9, 16, 28, 0.44);
@@ -255,19 +255,21 @@ input:checked + .slider::before {
     position: relative;
     display: grid;
     place-items: center;
-    width: 22px;
-    height: 22px;
+    width: 34px;
+    height: 34px;
     padding: 0;
-    border: 1px solid rgba(255, 255, 255, 0.14);
+    border: 2px solid rgba(255, 255, 255, 0.14);
     border-radius: 999px;
     background: rgba(20, 27, 40, 0.92);
     color: #f6fbff;
-    font-size: 0.62rem;
+    font-size: 0.95rem;
     font-weight: 800;
     line-height: 1;
     cursor: pointer;
     pointer-events: auto;
-    box-shadow: 0 6px 14px rgba(0, 0, 0, 0.18);
+    direction: ltr;
+    unicode-bidi: isolate;
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.22);
     transition:
         background-color 180ms ease,
         border-color 180ms ease,
@@ -280,7 +282,7 @@ input:checked + .slider::before {
 .hotspot-label--active {
     border-color: rgba(125, 233, 255, 0.85);
     background: linear-gradient(135deg, #1f3c5a 0%, #10253a 100%);
-    box-shadow: 0 0 0 2px rgba(41, 213, 255, 0.14), 0 8px 18px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 0 0 4px rgba(41, 213, 255, 0.18), 0 12px 28px rgba(0, 0, 0, 0.28);
     transform: scale(1.02);
 }
 
@@ -349,8 +351,8 @@ html[dir="rtl"] #side-menu {
     }
 
     .hotspot-label {
-        width: 18px;
-        height: 18px;
-        font-size: 0.54rem;
+        width: 30px;
+        height: 30px;
+        font-size: 0.86rem;
     }
 }

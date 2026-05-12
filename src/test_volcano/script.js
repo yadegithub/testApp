@@ -465,7 +465,7 @@ function updateInfoCard() {
 
 function syncLabels() {
     const shouldShowLabels =
-        labelsVisible && Boolean(arGroup?.visible) && hasLiveMarkerDetection;
+        labelsVisible && Boolean(arGroup?.visible) && (hasLiveMarkerDetection || hasTrackingPose);
 
     anatomyLabels.forEach((entry) => {
         const isActive = entry.index === focusedPartIndex;
@@ -665,6 +665,8 @@ function initThree(config) {
     labelRenderer.domElement.style.top = "0";
     labelRenderer.domElement.style.left = "0";
     labelRenderer.domElement.style.pointerEvents = "none";
+    labelRenderer.domElement.dir = "ltr";
+    labelRenderer.domElement.style.direction = "ltr";
     labelRenderer.domElement.style.zIndex = "18";
     document.body.appendChild(labelRenderer.domElement);
 
@@ -788,6 +790,8 @@ function addAnatomyLabel(part, index, modelSize, parentGroup) {
 
     const button = document.createElement("button");
     button.className = "hotspot-label";
+    button.dir = "ltr";
+    button.style.direction = "ltr";
     button.type = "button";
     button.textContent = String(part.number);
     button.setAttribute("aria-label", part.label);
@@ -1230,11 +1234,7 @@ function processFrame(timestamp) {
         setStatus(copy.statusSearching);
     }
 
-    if (!hasLiveMarkerDetection && focusedPartIndex !== -1) {
-        setFocusedPart(-1);
-    } else {
-        syncLabels();
-    }
+    syncLabels();
 
     if (animationMixer && isCollisionPlaying && animationClock) {
         animationMixer.update(animationClock.getDelta());
