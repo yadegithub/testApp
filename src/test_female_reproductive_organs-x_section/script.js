@@ -17,14 +17,14 @@ window.AR_VIEWER_BOOTSTRAP = {
                     name: "Female Reproductive System",
                     path: "assets/female_reproductive_organs.glb",
                     scale: { x: 0.3, y: 0.3, z: 0.3 },
-                    position: { x: 0.0, y: 0.0, z: 0.0 },
+                    position: { x: 0.02, y: 0.02, z: 0.03 },
                     rotation: { x: 0.0, y: Math.PI, z: 0.0 },
                     autoCenter: true
                 }
             }
         },
         settings: {
-            arScale: 2.6,
+            arScale: 1.45,
             tracking: {
                 markerLostGraceFrames: 6,
                 trackingLerpAlpha: 0.24,
@@ -234,7 +234,7 @@ const baseDefaultConfig = {
             primary: {
                 name: BOOT.defaultTitle ?? "Model Experience",
                 path: DEFAULT_MODEL_PATH,
-                position: { x: 0.5, y: 0.55, z: 0.0 },
+                position: { x: 0.02, y: 0.02, z: 0.03 },
                 scale: { x: 1, y: 1, z: 1 },
                 rotation: DEFAULT_MODEL_ROTATION,
                 autoCenter: false
@@ -272,7 +272,7 @@ const baseDefaultConfig = {
         parts: defaultAnatomyParts
     },
     settings: {
-        arScale: 2.6,
+        arScale: 1.45,
         tracking: {
             markerLostGraceFrames: MARKER_LOST_GRACE_FRAMES,
             trackingLerpAlpha: TRACKING_LERP_ALPHA,

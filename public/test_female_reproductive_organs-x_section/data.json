@@ -10,9 +10,9 @@
           "z": 0.3
         },
         "position": {
-          "x": 0,
-          "y": 0,
-          "z": 0
+          "x": 0.02,
+          "y": 0.02,
+          "z": 0.03
         },
         "rotation": {
           "x": 0,
@@ -214,7 +214,7 @@
     ]
   },
   "settings": {
-    "arScale": 2.6,
+    "arScale": 1.45,
     "tracking": {
       "markerLostGraceFrames": 6,
       "trackingLerpAlpha": 0.24,

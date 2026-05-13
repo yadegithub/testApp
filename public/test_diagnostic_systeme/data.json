@@ -10,9 +10,9 @@
           "z": 0.78
         },
         "position": {
-          "x": 0,
-          "y": 0,
-          "z": 0
+          "x": 0.05,
+          "y": 0.22,
+          "z": 0.03
         },
         "rotation": {
           "x": 0,
@@ -207,14 +207,14 @@
     }
   },
   "settings": {
-    "arScale": 2.35,
+    "arScale": 2.2,
     "tracking": {
-      "markerLostGraceFrames": 3,
+      "markerLostGraceFrames": 30,
       "trackingLerpAlpha": 0.28,
       "trackingScaleLerpAlpha": 0.22,
       "confirmFrames": 2,
-      "qrScanIntervalMs": 20,
-      "qrSearchIntervalMs": 36,
+      "qrScanIntervalMs": 60,
+      "qrSearchIntervalMs": 100,
       "positionDeadzone": 0.01,
       "scaleDeadzone": 0.012,
       "rotationDeadzoneRad": 0.02,
