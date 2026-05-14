@@ -4,8 +4,6 @@ import { Link, useLocation } from "react-router-dom";
 import DashboardPhonePreview from "../components/DashboardPhonePreview";
 
 const HEADER_OFFSET = 104;
-const DEMO_QR_CODE_URL = "/site-demo/demo-qr.png";
-const DEMO_URL = "https://4c69zz.csb.app/";
 const APK_DOWNLOAD_URL =
   "https://github.com/yadegithub/EduARApp/releases/download/v1.0.0/EduAR_App.apk";
 
@@ -210,13 +208,6 @@ const LandingPage: React.FC = () => {
                     onClick={(event) => handleSectionLinkClick(event, "story-learning")}
                   >
                     Apprentissage narratif
-                  </a>
-                  <a
-                    href={sectionHref("demo")}
-                    className="transition hover:text-slate-950"
-                    onClick={(event) => handleSectionLinkClick(event, "demo")}
-                  >
-                    Demo
                   </a>
                   <a
                     href={sectionHref("subjects")}
@@ -442,80 +433,6 @@ const LandingPage: React.FC = () => {
                       </p>
                     </article>
                   ))}
-                </div>
-              </section>
-
-              <section id="demo" className="scroll-mt-24 py-8 md:py-10">
-                <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
-                  <div>
-                    <p className="text-sm font-medium uppercase tracking-[0.16em] text-slate-500">
-                      Demo
-                    </p>
-                    <h2 className="mt-2 text-2xl font-semibold tracking-tight text-slate-950 sm:text-3xl">
-                      Decouvrez l'experience avant de commencer.
-                    </h2>
-                  </div>
-                </div>
-
-                <div className="mt-6 grid gap-4 lg:grid-cols-[1.2fr_0.8fr]">
-                  <article className="rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm animate-fade-up hover-lift">
-                    <h3 className="text-lg font-semibold tracking-tight text-slate-950">
-                      Apercu video
-                    </h3>
-                    <p className="mt-3 text-sm leading-6 text-slate-600">
-                      La video de demonstration sera ajoutee plus tard. Pour l'instant, utilisez le QR code ou le lien de demo pour ouvrir l'experience.
-                    </p>
-                    <div className="mt-6 flex justify-center">
-                      <div
-                        className="flex w-full max-w-[18rem] flex-col items-center justify-center rounded-[2rem] border border-dashed border-slate-300 bg-slate-50 px-6 py-10 text-center shadow-inner sm:max-w-[20rem]"
-                        style={{ aspectRatio: "5 / 9" }}
-                      >
-                        <span className="text-sm font-semibold uppercase tracking-[0.18em] text-slate-500">
-                          Demo video
-                        </span>
-                        <p className="mt-4 text-sm leading-6 text-slate-600">
-                          Placeholder temporaire pour alleger l'application.
-                        </p>
-                        <p className="mt-3 text-xs uppercase tracking-[0.18em] text-slate-400">
-                          Video coming soon
-                        </p>
-                      </div>
-                    </div>
-                  </article>
-
-                  <article className="flex flex-col rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm animate-fade-up hover-lift" style={{ animationDelay: "100ms" }}>
-                    <h3 className="text-lg font-semibold tracking-tight text-slate-950">
-                      Scanner le QR de demo
-                    </h3>
-                    <p className="mt-3 text-sm leading-6 text-slate-600">
-                      Ajoutez ici un QR code pour ouvrir rapidement la demonstration sur mobile.
-                    </p>
-
-                    <div className="flex flex-1 items-center justify-center py-8">
-                      <img
-                        src={DEMO_QR_CODE_URL}
-                        alt="QR code de demonstration EduAR"
-                        className="mx-auto h-60 w-60 rounded-[2rem] border border-slate-200 bg-white object-contain p-5 shadow-inner sm:h-64 sm:w-64"
-                      />
-                    </div>
-
-                    <a
-                      className="mt-6 inline-flex w-full items-center justify-center rounded-full bg-slate-950 px-5 py-3 text-sm font-medium text-white transition hover:-translate-y-0.5 hover:bg-slate-800"
-                      href={DEMO_URL}
-                      rel="noreferrer"
-                      target="_blank"
-                    >
-                      Essayer la demo
-                    </a>
-                    <a
-                      className="mt-3 inline-flex w-full items-center justify-center rounded-full border border-sky-300 bg-sky-50 px-5 py-3 text-sm font-medium text-sky-900 transition hover:-translate-y-0.5 hover:border-sky-400 hover:bg-sky-100"
-                      href={APK_DOWNLOAD_URL}
-                      rel="noreferrer"
-                      target="_blank"
-                    >
-                      Telecharger l'APK Android
-                    </a>
-                  </article>
                 </div>
               </section>
 
