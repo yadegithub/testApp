@@ -252,6 +252,7 @@ input:checked + .slider::before {
 }
 
 .hotspot-label {
+    --label-scale: 1;
     position: relative;
     display: grid;
     place-items: center;
@@ -270,6 +271,8 @@ input:checked + .slider::before {
     direction: ltr;
     unicode-bidi: isolate;
     box-shadow: 0 6px 14px rgba(0, 0, 0, 0.18);
+    transform: scale(var(--label-scale));
+    transform-origin: center center;
     transition:
         background-color 180ms ease,
         border-color 180ms ease,
@@ -283,7 +286,7 @@ input:checked + .slider::before {
     border-color: rgba(125, 233, 255, 0.85);
     background: linear-gradient(135deg, #1f3c5a 0%, #10253a 100%);
     box-shadow: 0 0 0 2px rgba(41, 213, 255, 0.14), 0 8px 18px rgba(0, 0, 0, 0.2);
-    transform: scale(1.02);
+    transform: scale(calc(var(--label-scale) * 1.02));
 }
 
 html[dir="rtl"] #side-menu {

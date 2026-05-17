@@ -22,6 +22,9 @@ const CAMERA_IDEAL_HEIGHT = 540;
 const CAMERA_IDEAL_FRAME_RATE = 24;
 const CAMERA_MAX_FRAME_RATE = 30;
 const SHOW_DEBUG_CAMERA_CANVAS = false;
+const LABEL_SCALE_MIN = 0.9;
+const LABEL_SCALE_MAX = 1.2;
+const LABEL_SCALE_RESPONSE = 0.35;
 
 document.documentElement.dataset.theme = currentTheme;
 document.documentElement.lang = currentLanguage;
@@ -230,6 +233,7 @@ let isSoundPlaying = false;
 let isDragging = false;
 let prevPos = { x: 0, y: 0 };
 let arScale = 2.4;
+let baseHeartModelScale = 0.8;
 let animationFrameId = 0;
 let isArInitialized = false;
 let isSessionStarting = false;
@@ -359,6 +363,24 @@ function syncLabels() {
             : "none";
         entry.label.element.classList.toggle("hotspot-label--active", isActive);
         entry.label.element.setAttribute("aria-pressed", String(isActive));
+    });
+}
+
+function updateLabelScale() {
+    if (!heartModel) {
+        return;
+    }
+
+    const baseScale = baseHeartModelScale || 1;
+    const currentScale = heartModel.scale.x || baseScale;
+    const relativeScale = currentScale / baseScale;
+    const labelScale = Math.max(
+        LABEL_SCALE_MIN,
+        Math.min(LABEL_SCALE_MAX, 1 + (relativeScale - 1) * LABEL_SCALE_RESPONSE)
+    );
+
+    anatomyLabels.forEach((entry) => {
+        entry.label.element.style.transform = `scale(${labelScale})`;
     });
 }
 
@@ -644,6 +666,7 @@ function initThree(config) {
                 modelScale.y ?? 0.8,
                 modelScale.z ?? 0.8
             );
+            baseHeartModelScale = heartModel.scale.x || 0.8;
             heartModel.rotation.set(
                 modelRotation.x ?? DEFAULT_HEART_ROTATION.x,
                 modelRotation.y ?? DEFAULT_HEART_ROTATION.y,
@@ -658,6 +681,7 @@ function initThree(config) {
             setupInteraction();
             updateInfoCard();
             syncLabels();
+            updateLabelScale();
             positionInfoCard();
             setStatus(copy.statusReady);
         },
@@ -781,6 +805,7 @@ function setupInteraction() {
         } else if (currentMode === "scale") {
             const factor = Math.max(0.65, Math.min(1.45, 1 - deltaY * 0.005));
             heartModel.scale.multiplyScalar(factor);
+            updateLabelScale();
         }
 
         prevPos = { x: point.clientX, y: point.clientY };
@@ -1356,6 +1381,7 @@ function cleanup() {
     }
 
     anatomyLabels = [];
+    baseHeartModelScale = 0.8;
     renderer = undefined;
     labelRenderer = undefined;
     scene = undefined;
