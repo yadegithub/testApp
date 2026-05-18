@@ -1037,7 +1037,8 @@ function setupInteraction() {
             heartModel.rotation.x += deltaY * 0.01;
         } else if (currentMode === "scale") {
             const factor = Math.max(0.65, Math.min(1.45, 1 - deltaY * 0.005));
-            heartModel.scale.multiplyScalar(factor);
+            const scaleTarget = heartModel.parent ?? heartModel;
+            scaleTarget.scale.multiplyScalar(factor);
         }
 
         prevPos = { x: point.clientX, y: point.clientY };

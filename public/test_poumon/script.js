@@ -403,7 +403,12 @@ function positionOrganLabels() {
     const centerIsVisible = projectedModelCenter.z > -1 && projectedModelCenter.z < 1;
     const centerX = ((projectedModelCenter.x + 1) / 2) * window.innerWidth;
     const centerY = ((-projectedModelCenter.y + 1) / 2) * window.innerHeight;
-    const spread = clamp(Math.min(window.innerWidth, window.innerHeight) * 0.18, 82, 150);
+    const labelScale = clamp(userModelScale, MODEL_MIN_SCALE, MODEL_MAX_SCALE);
+    const spread = clamp(
+        Math.min(window.innerWidth, window.innerHeight) * 0.18 * labelScale,
+        42,
+        150
+    );
     const sidePadding = Math.min(120, Math.max(76, window.innerWidth * 0.16));
 
     let activeLabelIsVisible = false;
@@ -429,6 +434,7 @@ function positionOrganLabels() {
         entry.button.classList.toggle("organ-label--visible", isOnScreen);
         entry.button.style.left = `${x}px`;
         entry.button.style.top = `${y}px`;
+        entry.button.style.setProperty("--marker-scale", String(labelScale));
 
         if (index === activeOrganIndex) {
             activeLabelIsVisible = isOnScreen;
