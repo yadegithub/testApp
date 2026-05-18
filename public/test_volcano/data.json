@@ -221,7 +221,7 @@
     ]
   },
   "settings": {
-    "arScale": 2.6,
+    "arScale": 1,
     "debugMode": false
   }
 }

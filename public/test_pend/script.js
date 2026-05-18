@@ -39,6 +39,9 @@ let lastScanResult = {
 let AR_SCALE = 0.1;
 const BUILD_VERSION = "20260514-1";
 const DEFAULT_MODEL_PATH = "./assets/newtons_cradle (1).glb";
+const DEFAULT_MODEL_SCALE = { x: 0.45, y: 0.45, z: 0.45 };
+const DEFAULT_MODEL_POSITION = { x: 0, y: 0, z: 0 };
+const DEFAULT_MODEL_ROTATION = { x: -Math.PI / 2, y: 0, z: 0 };
 const MAX_RENDER_PIXEL_RATIO = 1.25;
 const CAMERA_IDEAL_WIDTH = 960;
 const CAMERA_IDEAL_HEIGHT = 540;
@@ -47,21 +50,21 @@ const CAMERA_MAX_FRAME_RATE = 30;
 const SHOW_DEBUG_CAMERA_CANVAS = false;
 
 const TRACKING_DEFAULTS = {
-    markerLostGraceFrames: 20,
-    trackingLerpAlpha: 0.28,
-    trackingScaleLerpAlpha: 0.22,
-    confirmFrames: 2,
+    markerLostGraceFrames: 6,
+    trackingLerpAlpha: 0.12,
+    trackingScaleLerpAlpha: 0.08,
+    confirmFrames: 3,
     minQrAreaRatio: 0.008,
     minQrEdge: 48,
     maxQrEdgeRatio: 2.3,
     maxCenterJumpRatio: 0.12,
-    qrScanIntervalMs: 80,
+    qrScanIntervalMs: 96,
     qrSearchIntervalMs: 120,
-    positionDeadzone: 0.01,
-    scaleDeadzone: 0.012,
-    rotationDeadzoneRad: 0.02,
-    fastFollowDistance: 0.08,
-    fastFollowAlpha: 0.68
+    positionDeadzone: 0.025,
+    scaleDeadzone: 0.035,
+    rotationDeadzoneRad: 0.055,
+    fastFollowDistance: 0.2,
+    fastFollowAlpha: 0.45
 };
 
 let markerLostGraceFrames = TRACKING_DEFAULTS.markerLostGraceFrames;
@@ -320,15 +323,16 @@ async function initProject() {
         const config = await response.json();
         AR_SCALE = Number(config?.settings?.arScale ?? AR_SCALE);
         applyTrackingSettings(config);
-        const path = normalizeModelPath(config?.assets?.models?.pendulum?.path);
-        startAR(path);
+        const modelConfig = config?.assets?.models?.pendulum ?? {};
+        const path = normalizeModelPath(modelConfig.path);
+        startAR(path, modelConfig);
     } catch (error) {
         console.error("Config error:", error);
-        startAR(withCacheBuster(DEFAULT_MODEL_PATH));
+        startAR(withCacheBuster(DEFAULT_MODEL_PATH), {});
     }
 }
 
-async function startAR(modelPath) {
+async function startAR(modelPath, modelConfig = {}) {
     document.body.classList.remove("camera-ready");
     UI.video.muted = true;
     UI.video.autoplay = true;
@@ -371,7 +375,7 @@ async function startAR(modelPath) {
 
         fitToScreen();
         await initQrScanner();
-        setupThreeJS(modelPath);
+        setupThreeJS(modelPath, modelConfig);
         initTrackingProjection();
         setupControls();
         animationFrameId = window.requestAnimationFrame(processFrame);
@@ -381,7 +385,7 @@ async function startAR(modelPath) {
     }
 }
 
-function setupThreeJS(modelPath) {
+function setupThreeJS(modelPath, modelConfig = {}) {
     const { width, height } = getVideoSize();
 
     if (UI.canvasOutput) {
@@ -413,7 +417,40 @@ function setupThreeJS(modelPath) {
     const loader = new THREE.GLTFLoader();
     loader.load(modelPath, (gltf) => {
         mainModel = gltf.scene;
-        arGroup.add(mainModel);
+        const modelPosition = modelConfig.position ?? DEFAULT_MODEL_POSITION;
+        const modelScale = modelConfig.scale ?? DEFAULT_MODEL_SCALE;
+        const modelRotation = modelConfig.rotation ?? DEFAULT_MODEL_ROTATION;
+        const autoCenter = modelConfig.autoCenter ?? true;
+        const localBounds = new THREE.Box3().setFromObject(mainModel);
+        const modelCenter = localBounds.getCenter(new THREE.Vector3());
+
+        const modelAnchor = new THREE.Group();
+        modelAnchor.position.set(
+            modelPosition.x ?? DEFAULT_MODEL_POSITION.x,
+            modelPosition.y ?? DEFAULT_MODEL_POSITION.y,
+            modelPosition.z ?? DEFAULT_MODEL_POSITION.z
+        );
+        arGroup.add(modelAnchor);
+
+        const modelRig = new THREE.Group();
+        modelRig.scale.set(
+            modelScale.x ?? DEFAULT_MODEL_SCALE.x,
+            modelScale.y ?? DEFAULT_MODEL_SCALE.y,
+            modelScale.z ?? DEFAULT_MODEL_SCALE.z
+        );
+        modelRig.rotation.set(
+            modelRotation.x ?? DEFAULT_MODEL_ROTATION.x,
+            modelRotation.y ?? DEFAULT_MODEL_ROTATION.y,
+            modelRotation.z ?? DEFAULT_MODEL_ROTATION.z
+        );
+        modelAnchor.add(modelRig);
+
+        mainModel.position.set(
+            autoCenter ? -modelCenter.x : 0,
+            autoCenter ? -modelCenter.y : 0,
+            autoCenter ? -modelCenter.z : 0
+        );
+        modelRig.add(mainModel);
         setupPendulumBalls();
         setupInteraction();
         setStatus(COPY.ready);

@@ -145,21 +145,12 @@ if (currentLanguage === "ar") {
     });
 }
 
-let src;
-let cap;
-let qrDetector;
-let camMatrix;
-let distCoeffs;
-let rvec;
-let tvec;
-let rotMatr;
-let objectPoints;
-
 let renderer;
 let scene;
 let camera;
 let arGroup;
 let mainModel;
+let activeStream;
 let organLabels = [];
 let activeOrganIndex = -1;
 let labelsVisible = true;
@@ -173,17 +164,17 @@ const CAMERA_IDEAL_HEIGHT = 540;
 const CAMERA_IDEAL_FRAME_RATE = 24;
 const CAMERA_MAX_FRAME_RATE = 30;
 const SHOW_DEBUG_CAMERA_CANVAS = false;
-const MARKER_LOST_GRACE_FRAMES = 3;
-const INITIAL_CONFIRM_FRAMES = 6;
-const TRACKED_CONFIRM_FRAMES = 2;
-const MIN_QR_AREA_RATIO = 0.006;
-const MIN_QR_EDGE = 56;
-const MAX_QR_EDGE_RATIO = 2.8;
+const MARKER_LOST_GRACE_FRAMES = 20;
+const CONFIRM_FRAMES = 2;
+const MIN_QR_AREA_RATIO = 0.008;
+const MIN_QR_EDGE = 48;
+const MAX_QR_EDGE_RATIO = 2.3;
 const MAX_CENTER_JUMP_RATIO = 0.12;
-const INITIAL_POSE_WARMUP_FRAMES = 4;
 const POSITION_SMOOTH_FACTOR = 0.28;
 const ROTATION_SMOOTH_FACTOR = 0.24;
 const SCALE_SMOOTH_FACTOR = 0.28;
+const QR_SCAN_INTERVAL_MS = 80;
+const QR_SEARCH_INTERVAL_MS = 120;
 
 let currentMode = "rotate";
 let isDragging = false;
@@ -195,8 +186,15 @@ let lostMarkerFrames = 0;
 let hasTrackingPose = false;
 let detectionStreak = 0;
 let lastDetectionCenter = null;
-let hasLockedOnQr = false;
-let poseWarmupFrames = 0;
+let lastQrScanTime = 0;
+let focalLength = 0;
+let qrScannerReady = false;
+let qrScanInFlight = false;
+let scanContext;
+let lastScanResult = {
+    markerFound: false,
+    shouldHoldSteady: false
+};
 
 let userModelScale = 1;
 let breathScale = 1;
@@ -635,30 +633,29 @@ function startAR(modelPath) {
             }
         }
     }).then(stream => {
+        activeStream = stream;
         UI.video.srcObject = stream;
         UI.video.onloadedmetadata = async () => {
-            await UI.video.play();
-            document.body.classList.add("camera-ready");
+            try {
+                await UI.video.play();
+                document.body.classList.add("camera-ready");
 
-            const { width, height } = getVideoSize();
-            UI.video.width = width;
-            UI.video.height = height;
-            UI.canvasOutput.width = UI.canvasThree.width = width;
-            UI.canvasOutput.height = UI.canvasThree.height = height;
-            fitToScreen();
+                const { width, height } = getVideoSize();
+                UI.video.width = width;
+                UI.video.height = height;
+                UI.canvasOutput.width = UI.canvasThree.width = width;
+                UI.canvasOutput.height = UI.canvasThree.height = height;
+                fitToScreen();
 
-            const checkCV = () => {
-                if (typeof cv !== "undefined" && cv.Mat) {
-                    setupThreeJS(modelPath);
-                    initOpenCV();
-                    setupControls();
-                    requestAnimationFrame(processFrame);
-                } else {
-                    setTimeout(checkCV, 100);
-                }
-            };
-
-            checkCV();
+                setupThreeJS(modelPath);
+                await initQrScanner();
+                initTrackingProjection();
+                setupControls();
+                requestAnimationFrame(processFrame);
+            } catch (error) {
+                console.error("Lung QR session failed to start.", error);
+                setStatus("Erreur initialisation QR");
+            }
         };
     }).catch(err => {
         console.error("Camera error:", err);
@@ -875,29 +872,31 @@ function setupInteraction() {
     window.addEventListener("touchend", end);
 }
 
-function initOpenCV() {
+async function initQrScanner() {
+    if (qrScannerReady) {
+        return;
+    }
+
+    if (!window.ZXingWASM?.readBarcodes) {
+        throw new Error("zxing-wasm reader was not loaded.");
+    }
+
+    scanContext =
+        UI.canvasOutput?.getContext("2d", { willReadFrequently: true }) ??
+        undefined;
+
+    if (!scanContext) {
+        throw new Error("A 2D scan context could not be created.");
+    }
+
+    await window.ZXingWASM.prepareZXingModule({ fireImmediately: true });
+    qrScannerReady = true;
+}
+
+function initTrackingProjection() {
     const { width, height } = getVideoSize();
 
-    src = new cv.Mat(height, width, cv.CV_8UC4);
-    cap = new cv.VideoCapture(UI.video);
-    qrDetector = new cv.QRCodeDetector();
-
-    const focalLength = Math.max(width, height);
-    camMatrix = cv.matFromArray(3, 3, cv.CV_64FC1, [
-        focalLength, 0, width / 2,
-        0, focalLength, height / 2,
-        0, 0, 1
-    ]);
-    distCoeffs = new cv.Mat.zeros(5, 1, cv.CV_64FC1);
-    objectPoints = cv.matFromArray(4, 3, cv.CV_64FC1, [
-        0, 0, 0,
-        1, 0, 0,
-        1, 1, 0,
-        0, 1, 0
-    ]);
-    rvec = new cv.Mat();
-    tvec = new cv.Mat();
-    rotMatr = new cv.Mat(3, 3, cv.CV_64FC1);
+    focalLength = Math.max(width, height);
 
     camera.projectionMatrix.set(
         (2 * focalLength) / width, 0, 0, 0,
@@ -907,22 +906,47 @@ function initOpenCV() {
     );
 }
 
-function getDetectedCorners(points) {
-    if (!points?.data32F || points.data32F.length < 8) {
+function getDetectedCorners(source) {
+    if (!source) {
         return null;
     }
 
-    return [
-        { x: points.data32F[0], y: points.data32F[1] },
-        { x: points.data32F[2], y: points.data32F[3] },
-        { x: points.data32F[4], y: points.data32F[5] },
-        { x: points.data32F[6], y: points.data32F[7] }
+    if (Array.isArray(source) && source.length >= 4) {
+        const corners = source
+            .slice(0, 4)
+            .map((point) => ({
+                x: Number(point.x),
+                y: Number(point.y)
+            }))
+            .filter((point) => Number.isFinite(point.x) && Number.isFinite(point.y));
+
+        return corners.length === 4 ? corners : null;
+    }
+
+    const position = source.position ?? source;
+    const orderedCorners = [
+        position.topLeft,
+        position.topRight,
+        position.bottomRight,
+        position.bottomLeft
     ];
+
+    if (orderedCorners.some((point) => !point)) {
+        return null;
+    }
+
+    const corners = orderedCorners
+        .map((point) => ({
+            x: Number(point.x),
+            y: Number(point.y)
+        }))
+        .filter((point) => Number.isFinite(point.x) && Number.isFinite(point.y));
+
+    return corners.length === 4 ? corners : null;
 }
 
-function getQrMetrics(points) {
-    const corners = getDetectedCorners(points);
-    if (!corners) {
+function getQrMetrics(corners) {
+    if (!corners?.length) {
         return null;
     }
 
@@ -992,8 +1016,7 @@ function updateDetectionConfidence(metrics) {
     }
 
     lastDetectionCenter = metrics.center;
-    const requiredFrames = hasLockedOnQr ? TRACKED_CONFIRM_FRAMES : INITIAL_CONFIRM_FRAMES;
-    return detectionStreak >= requiredFrames;
+    return detectionStreak >= CONFIRM_FRAMES;
 }
 
 function resetDetectionConfidence() {
@@ -1001,8 +1024,215 @@ function resetDetectionConfidence() {
     lastDetectionCenter = null;
 }
 
-function resetPoseWarmup() {
-    poseWarmupFrames = 0;
+function getQrScanInterval() {
+    return hasTrackingPose || detectionStreak > 0
+        ? QR_SCAN_INTERVAL_MS
+        : QR_SEARCH_INTERVAL_MS;
+}
+
+function solveLinearSystem(matrix, vector) {
+    const size = vector.length;
+    const augmented = matrix.map((row, rowIndex) => [...row, vector[rowIndex]]);
+
+    for (let pivotIndex = 0; pivotIndex < size; pivotIndex += 1) {
+        let bestRowIndex = pivotIndex;
+        let bestValue = Math.abs(augmented[pivotIndex][pivotIndex]);
+
+        for (let rowIndex = pivotIndex + 1; rowIndex < size; rowIndex += 1) {
+            const candidateValue = Math.abs(augmented[rowIndex][pivotIndex]);
+            if (candidateValue > bestValue) {
+                bestValue = candidateValue;
+                bestRowIndex = rowIndex;
+            }
+        }
+
+        if (bestValue < 1e-8) {
+            return null;
+        }
+
+        if (bestRowIndex !== pivotIndex) {
+            [augmented[pivotIndex], augmented[bestRowIndex]] = [
+                augmented[bestRowIndex],
+                augmented[pivotIndex]
+            ];
+        }
+
+        const pivot = augmented[pivotIndex][pivotIndex];
+        for (let columnIndex = pivotIndex; columnIndex <= size; columnIndex += 1) {
+            augmented[pivotIndex][columnIndex] /= pivot;
+        }
+
+        for (let rowIndex = 0; rowIndex < size; rowIndex += 1) {
+            if (rowIndex === pivotIndex) {
+                continue;
+            }
+
+            const factor = augmented[rowIndex][pivotIndex];
+            if (!factor) {
+                continue;
+            }
+
+            for (let columnIndex = pivotIndex; columnIndex <= size; columnIndex += 1) {
+                augmented[rowIndex][columnIndex] -=
+                    factor * augmented[pivotIndex][columnIndex];
+            }
+        }
+    }
+
+    return augmented.map((row) => row[size]);
+}
+
+function computeHomography(corners) {
+    if (!corners || corners.length !== 4) {
+        return null;
+    }
+
+    const sourceCorners = [
+        { x: 0, y: 0 },
+        { x: 1, y: 0 },
+        { x: 1, y: 1 },
+        { x: 0, y: 1 }
+    ];
+
+    const matrix = [];
+    const vector = [];
+
+    sourceCorners.forEach((sourcePoint, index) => {
+        const targetPoint = corners[index];
+        const { x, y } = sourcePoint;
+        const u = targetPoint.x;
+        const v = targetPoint.y;
+
+        matrix.push([x, y, 1, 0, 0, 0, -u * x, -u * y]);
+        vector.push(u);
+        matrix.push([0, 0, 0, x, y, 1, -v * x, -v * y]);
+        vector.push(v);
+    });
+
+    const solution = solveLinearSystem(matrix, vector);
+    if (!solution) {
+        return null;
+    }
+
+    return [
+        [solution[0], solution[1], solution[2]],
+        [solution[3], solution[4], solution[5]],
+        [solution[6], solution[7], 1]
+    ];
+}
+
+function vectorLength3(vector) {
+    return Math.hypot(vector[0], vector[1], vector[2]);
+}
+
+function dot3(left, right) {
+    return left[0] * right[0] + left[1] * right[1] + left[2] * right[2];
+}
+
+function scaleVector3(vector, scalar) {
+    return [vector[0] * scalar, vector[1] * scalar, vector[2] * scalar];
+}
+
+function subtractVector3(left, right) {
+    return [
+        left[0] - right[0],
+        left[1] - right[1],
+        left[2] - right[2]
+    ];
+}
+
+function cross3(left, right) {
+    return [
+        left[1] * right[2] - left[2] * right[1],
+        left[2] * right[0] - left[0] * right[2],
+        left[0] * right[1] - left[1] * right[0]
+    ];
+}
+
+function normalizeVector3(vector) {
+    const length = vectorLength3(vector);
+    if (length < 1e-8) {
+        return null;
+    }
+
+    return scaleVector3(vector, 1 / length);
+}
+
+function updateTrackedPoseFromCorners(corners) {
+    const homography = computeHomography(corners);
+    if (!homography || !focalLength) {
+        return false;
+    }
+
+    const principalX = UI.video.width / 2;
+    const principalY = UI.video.height / 2;
+
+    const toCameraVector = (column) => [
+        (column[0] - principalX * column[2]) / focalLength,
+        (column[1] - principalY * column[2]) / focalLength,
+        column[2]
+    ];
+
+    const column1 = [homography[0][0], homography[1][0], homography[2][0]];
+    const column2 = [homography[0][1], homography[1][1], homography[2][1]];
+    const column3 = [homography[0][2], homography[1][2], homography[2][2]];
+
+    const basis1 = toCameraVector(column1);
+    const basis2 = toCameraVector(column2);
+    const translationVector = toCameraVector(column3);
+
+    const averageBasisLength =
+        (vectorLength3(basis1) + vectorLength3(basis2)) * 0.5;
+    if (!averageBasisLength) {
+        return false;
+    }
+
+    const scaleFactor = 1 / averageBasisLength;
+    let rotation1 = normalizeVector3(scaleVector3(basis1, scaleFactor));
+    if (!rotation1) {
+        return false;
+    }
+
+    const rawRotation2 = scaleVector3(basis2, scaleFactor);
+    const rotation2Projected = subtractVector3(
+        rawRotation2,
+        scaleVector3(rotation1, dot3(rawRotation2, rotation1))
+    );
+    let rotation2 = normalizeVector3(rotation2Projected);
+    if (!rotation2) {
+        return false;
+    }
+
+    let rotation3 = normalizeVector3(cross3(rotation1, rotation2));
+    if (!rotation3) {
+        return false;
+    }
+
+    let translation = scaleVector3(translationVector, scaleFactor);
+    if (translation[2] < 0) {
+        rotation1 = scaleVector3(rotation1, -1);
+        rotation2 = scaleVector3(rotation2, -1);
+        translation = scaleVector3(translation, -1);
+        rotation3 = normalizeVector3(cross3(rotation1, rotation2));
+        if (!rotation3) {
+            return false;
+        }
+    }
+
+    trackedMatrix.set(
+        rotation1[0] * AR_SCALE,  rotation1[1] * AR_SCALE,  rotation1[2] * AR_SCALE,  translation[0],
+       -rotation2[0] * AR_SCALE, -rotation2[1] * AR_SCALE, -rotation2[2] * AR_SCALE, -translation[1],
+       -rotation3[0] * AR_SCALE, -rotation3[1] * AR_SCALE, -rotation3[2] * AR_SCALE, -translation[2],
+        0,                       0,                       0,                       1
+    );
+
+    trackedMatrix.decompose(
+        trackedPosition,
+        trackedQuaternion,
+        trackedScale
+    );
+
+    return Number.isFinite(trackedPosition.x) && Number.isFinite(trackedScale.x);
 }
 
 function applyTrackedPose(immediate = false) {
@@ -1045,107 +1275,101 @@ function updateTrackingStatus(markerFound, shouldHoldSteady) {
     setStatus(STATUS_READY);
 }
 
-function processFrame() {
-    if (!cap || !src) {
-        requestAnimationFrame(processFrame);
+async function runQrDetection() {
+    if (!qrScannerReady || qrScanInFlight || !scanContext) {
         return;
     }
 
-    cap.read(src);
-    if (SHOW_DEBUG_CAMERA_CANVAS) {
-        cv.imshow("canvasOutput", src);
-    }
-
-    const points = new cv.Mat();
+    qrScanInFlight = true;
     let markerFound = false;
     let shouldHoldSteady = false;
-    let isWarmingUpPose = false;
 
-    if (qrDetector.detect(src, points)) {
-        const metrics = getQrMetrics(points);
-        const confirmedDetection = updateDetectionConfidence(metrics);
-        shouldHoldSteady = Boolean(metrics);
+    try {
+        scanContext.drawImage(
+            UI.video,
+            0,
+            0,
+            UI.canvasOutput.width,
+            UI.canvasOutput.height
+        );
 
-        if (confirmedDetection) {
-            const imgPts = cv.matFromArray(4, 1, cv.CV_32FC2, [
-                points.data32F[0], points.data32F[1],
-                points.data32F[2], points.data32F[3],
-                points.data32F[4], points.data32F[5],
-                points.data32F[6], points.data32F[7]
-            ]);
+        const frame = scanContext.getImageData(
+            0,
+            0,
+            UI.canvasOutput.width,
+            UI.canvasOutput.height
+        );
 
-            if (cv.solvePnP(objectPoints, imgPts, camMatrix, distCoeffs, rvec, tvec)) {
-                cv.Rodrigues(rvec, rotMatr);
-                const rotation = rotMatr.data64F;
-                const translation = tvec.data64F;
+        const results = await window.ZXingWASM.readBarcodes(frame, {
+            formats: ["QRCode"],
+            maxNumberOfSymbols: 1,
+            tryDownscale: true,
+            tryHarder: true,
+            tryInvert: true,
+            tryRotate: true
+        });
 
-                trackedMatrix.set(
-                    rotation[0] * AR_SCALE,  rotation[1] * AR_SCALE,  rotation[2] * AR_SCALE,  translation[0],
-                   -rotation[3] * AR_SCALE, -rotation[4] * AR_SCALE, -rotation[5] * AR_SCALE, -translation[1],
-                   -rotation[6] * AR_SCALE, -rotation[7] * AR_SCALE, -rotation[8] * AR_SCALE, -translation[2],
-                    0,                        0,                        0,                        1
-                );
+        const detectedBarcode = results.find((result) => result?.position);
 
-                trackedMatrix.decompose(
-                    trackedPosition,
-                    trackedQuaternion,
-                    trackedScale
-                );
+        if (detectedBarcode) {
+            const corners = getDetectedCorners(detectedBarcode.position);
+            const metrics = getQrMetrics(corners);
+            const confirmedDetection = updateDetectionConfidence(metrics);
+            shouldHoldSteady = Boolean(metrics);
 
+            if (confirmedDetection && corners && updateTrackedPoseFromCorners(corners)) {
                 poseTargetPosition.copy(trackedPosition);
                 poseTargetQuaternion.copy(trackedQuaternion);
                 poseTargetScale.copy(trackedScale);
 
-                if (!hasTrackingPose) {
-                    poseWarmupFrames += 1;
-                    isWarmingUpPose = poseWarmupFrames < INITIAL_POSE_WARMUP_FRAMES;
-
-                    if (!isWarmingUpPose) {
-                        applyTrackedPose(true);
-                        hasTrackingPose = true;
-                        hasLockedOnQr = true;
-                        arGroup.visible = true;
-                        markerFound = true;
-                        lostMarkerFrames = 0;
-                    } else {
-                        arGroup.visible = false;
-                        shouldHoldSteady = true;
-                    }
-                } else {
-                    applyTrackedPose();
-                    arGroup.visible = true;
-                    markerFound = true;
-                    lostMarkerFrames = 0;
-                }
+                applyTrackedPose(!hasTrackingPose);
+                hasTrackingPose = true;
+                arGroup.visible = true;
+                markerFound = true;
+                lostMarkerFrames = 0;
             }
-
-            imgPts.delete();
-        }
-    } else {
-        resetDetectionConfidence();
-        resetPoseWarmup();
-    }
-
-    if (!markerFound && !isWarmingUpPose) {
-        if (hasTrackingPose && lostMarkerFrames < MARKER_LOST_GRACE_FRAMES) {
-            lostMarkerFrames += 1;
-            arGroup.visible = true;
-            markerFound = true;
         } else {
-            arGroup.visible = false;
-            hasTrackingPose = false;
-            hasLockedOnQr = false;
-            lostMarkerFrames = 0;
-            resetPoseWarmup();
+            resetDetectionConfidence();
         }
+
+        if (!markerFound) {
+            if (hasTrackingPose && lostMarkerFrames < MARKER_LOST_GRACE_FRAMES) {
+                lostMarkerFrames += 1;
+                arGroup.visible = true;
+                markerFound = true;
+            } else {
+                arGroup.visible = false;
+                hasTrackingPose = false;
+                lostMarkerFrames = 0;
+            }
+        }
+
+        lastScanResult = { markerFound, shouldHoldSteady };
+    } catch (error) {
+        console.error("Lung QR scan failed.", error);
+    } finally {
+        qrScanInFlight = false;
     }
+}
+
+function processFrame(timestamp) {
+    if (!activeStream || !renderer) {
+        requestAnimationFrame(processFrame);
+        return;
+    }
+
+    if (!lastQrScanTime || timestamp - lastQrScanTime >= getQrScanInterval()) {
+        lastQrScanTime = timestamp;
+        void runQrDetection();
+    }
+
+    const { markerFound, shouldHoldSteady } = lastScanResult;
 
     updateBreathingAnimation(performance.now());
     updateTrackingStatus(markerFound, shouldHoldSteady);
     renderer.render(scene, camera);
     positionOrganLabels();
     positionInfoCard();
-    points.delete();
     requestAnimationFrame(processFrame);
 }
 

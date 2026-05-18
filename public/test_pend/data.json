@@ -3,28 +3,44 @@
     "models": {
       "pendulum": {
         "name": "Pendule de Newton",
-        "path": "./assets/newtons_cradle (1).glb"
+        "path": "./assets/newtons_cradle (1).glb",
+        "scale": {
+          "x": 0.45,
+          "y": 0.45,
+          "z": 0.45
+        },
+        "position": {
+          "x": 0,
+          "y": 0,
+          "z": 0
+        },
+        "rotation": {
+          "x": -1.5707963267948966,
+          "y": 3.141592653589793,
+          "z": 0
+        },
+        "autoCenter": true
       }
     }
   },
   "settings": {
     "arScale": 0.1,
     "tracking": {
-      "markerLostGraceFrames": 20,
-      "trackingLerpAlpha": 0.28,
-      "trackingScaleLerpAlpha": 0.22,
-      "confirmFrames": 2,
+      "markerLostGraceFrames": 6,
+      "trackingLerpAlpha": 0.12,
+      "trackingScaleLerpAlpha": 0.08,
+      "confirmFrames": 3,
       "minQrAreaRatio": 0.008,
       "minQrEdge": 48,
       "maxQrEdgeRatio": 2.3,
       "maxCenterJumpRatio": 0.12,
-      "qrScanIntervalMs": 80,
+      "qrScanIntervalMs": 96,
       "qrSearchIntervalMs": 120,
-      "positionDeadzone": 0.01,
-      "scaleDeadzone": 0.012,
-      "rotationDeadzoneRad": 0.02,
-      "fastFollowDistance": 0.08,
-      "fastFollowAlpha": 0.68
+      "positionDeadzone": 0.025,
+      "scaleDeadzone": 0.035,
+      "rotationDeadzoneRad": 0.055,
+      "fastFollowDistance": 0.2,
+      "fastFollowAlpha": 0.45
     }
   }
 }

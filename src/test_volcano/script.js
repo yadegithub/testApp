@@ -136,17 +136,6 @@ let copy = {
     overview: { ...defaultCopy.overview }
 };
 
-let src;
-let cap;
-let qrDetector;
-let qrPoints;
-let imagePoints;
-let camMatrix;
-let distCoeffs;
-let rvec;
-let tvec;
-let rotMatr;
-let objectPoints;
 let renderer;
 let labelRenderer;
 let scene;
@@ -172,13 +161,20 @@ let trackingScaleLerpAlpha = TRACKING_SCALE_LERP_ALPHA;
 let confirmFrames = CONFIRM_FRAMES;
 let qrScanIntervalMs = QR_SCAN_INTERVAL_MS;
 let qrSearchIntervalMs = QR_SEARCH_INTERVAL_MS;
+let focalLength = 0;
+let qrScannerReady = false;
+let qrScanInFlight = false;
+let scanContext;
+let lastScanResult = {
+    markerFound: false,
+    shouldHoldSteady: false
+};
 let positionDeadzone = 0;
 let scaleDeadzone = 0;
 let rotationDeadzoneRad = 0;
 let fastFollowDistance = 0;
 let fastFollowAlpha = TRACKING_LERP_ALPHA;
 let animationFrameId = 0;
-let openCvCheckTimerId = 0;
 let isArInitialized = false;
 let isSessionStarting = false;
 let focusedPartIndex = -1;
@@ -609,27 +605,37 @@ async function startCamera(config) {
         });
 
         fitToScreen();
-        checkOpenCV(config ?? defaultConfig);
+        await initQrScanner();
+        isArInitialized = true;
+        initThree(config ?? defaultConfig);
+        initTrackingProjection();
+        setupControls();
+        animationFrameId = window.requestAnimationFrame(processFrame);
     } catch (error) {
+        console.error("Volcano QR session failed to start.", error);
         setStatus(copy.statusCameraError);
     }
 }
 
-function checkOpenCV(config) {
-    if (!activeStream || isArInitialized) {
+async function initQrScanner() {
+    if (qrScannerReady) {
         return;
     }
 
-    if (typeof cv !== "undefined" && cv.Mat) {
-        isArInitialized = true;
-        initThree(config);
-        initCV(config);
-        setupControls();
-        animationFrameId = window.requestAnimationFrame(processFrame);
-        return;
+    if (!window.ZXingWASM?.readBarcodes) {
+        throw new Error("zxing-wasm reader was not loaded.");
     }
 
-    openCvCheckTimerId = window.setTimeout(() => checkOpenCV(config), 120);
+    scanContext =
+        UI.canvasOutput?.getContext("2d", { willReadFrequently: true }) ??
+        undefined;
+
+    if (!scanContext) {
+        throw new Error("A 2D scan context could not be created.");
+    }
+
+    await window.ZXingWASM.prepareZXingModule({ fireImmediately: true });
+    qrScannerReady = true;
 }
 
 function initThree(config) {
@@ -923,38 +929,11 @@ function setupInteraction() {
     });
 }
 
-function initCV() {
-    src = new cv.Mat(UI.video.height, UI.video.width, cv.CV_8UC4);
-    cap = new cv.VideoCapture(UI.video);
-    qrDetector = new cv.QRCodeDetector();
-    qrPoints = new cv.Mat();
-    imagePoints = new cv.Mat(4, 1, cv.CV_32FC2);
-
-    const focalLength = Math.max(UI.video.width, UI.video.height);
-    camMatrix = cv.matFromArray(3, 3, cv.CV_64FC1, [
-        focalLength,
-        0,
-        UI.video.width / 2,
-        0,
-        focalLength,
-        UI.video.height / 2,
-        0,
-        0,
-        1
-    ]);
-    distCoeffs = new cv.Mat.zeros(5, 1, cv.CV_64FC1);
-    objectPoints = cv.matFromArray(4, 3, cv.CV_64FC1, [
-        0, 0, 0,
-        1, 0, 0,
-        1, 1, 0,
-        0, 1, 0
-    ]);
-    rvec = new cv.Mat();
-    tvec = new cv.Mat();
-    rotMatr = new cv.Mat(3, 3, cv.CV_64FC1);
-
+function initTrackingProjection() {
+    focalLength = Math.max(UI.video.width, UI.video.height);
     const depthNear = 0.1;
     const depthFar = 1000;
+
     camera.projectionMatrix.set(
         (2 * focalLength) / UI.video.width,
         0,
@@ -981,32 +960,47 @@ function getQrScanInterval() {
         : qrSearchIntervalMs;
 }
 
-function updateImagePoints(points) {
-    const source = points.data32F;
-    const target = imagePoints.data32F;
-
-    for (let index = 0; index < 8; index += 1) {
-        target[index] = source[index];
-    }
-}
-
-function getDetectedCorners(points) {
-    if (!points?.data32F || points.data32F.length < 8) {
+function getDetectedCorners(source) {
+    if (!source) {
         return null;
     }
 
-    return [
-        { x: points.data32F[0], y: points.data32F[1] },
-        { x: points.data32F[2], y: points.data32F[3] },
-        { x: points.data32F[4], y: points.data32F[5] },
-        { x: points.data32F[6], y: points.data32F[7] }
+    if (Array.isArray(source) && source.length >= 4) {
+        const corners = source
+            .slice(0, 4)
+            .map((point) => ({
+                x: Number(point.x),
+                y: Number(point.y)
+            }))
+            .filter((point) => Number.isFinite(point.x) && Number.isFinite(point.y));
+
+        return corners.length === 4 ? corners : null;
+    }
+
+    const position = source.position ?? source;
+    const orderedCorners = [
+        position.topLeft,
+        position.topRight,
+        position.bottomRight,
+        position.bottomLeft
     ];
+
+    if (orderedCorners.some((point) => !point)) {
+        return null;
+    }
+
+    const corners = orderedCorners
+        .map((point) => ({
+            x: Number(point.x),
+            y: Number(point.y)
+        }))
+        .filter((point) => Number.isFinite(point.x) && Number.isFinite(point.y));
+
+    return corners.length === 4 ? corners : null;
 }
 
-function getQrMetrics(points) {
-    const corners = getDetectedCorners(points);
-
-    if (!corners) {
+function getQrMetrics(corners) {
+    if (!corners?.length) {
         return null;
     }
 
@@ -1088,143 +1082,335 @@ function resetDetectionConfidence() {
     lastDetectionCenter = null;
 }
 
-function runQrDetection() {
+function solveLinearSystem(matrix, vector) {
+    const size = vector.length;
+    const augmented = matrix.map((row, rowIndex) => [...row, vector[rowIndex]]);
+
+    for (let pivotIndex = 0; pivotIndex < size; pivotIndex += 1) {
+        let bestRowIndex = pivotIndex;
+        let bestValue = Math.abs(augmented[pivotIndex][pivotIndex]);
+
+        for (let rowIndex = pivotIndex + 1; rowIndex < size; rowIndex += 1) {
+            const candidateValue = Math.abs(augmented[rowIndex][pivotIndex]);
+            if (candidateValue > bestValue) {
+                bestValue = candidateValue;
+                bestRowIndex = rowIndex;
+            }
+        }
+
+        if (bestValue < 1e-8) {
+            return null;
+        }
+
+        if (bestRowIndex !== pivotIndex) {
+            [augmented[pivotIndex], augmented[bestRowIndex]] = [
+                augmented[bestRowIndex],
+                augmented[pivotIndex]
+            ];
+        }
+
+        const pivot = augmented[pivotIndex][pivotIndex];
+        for (let columnIndex = pivotIndex; columnIndex <= size; columnIndex += 1) {
+            augmented[pivotIndex][columnIndex] /= pivot;
+        }
+
+        for (let rowIndex = 0; rowIndex < size; rowIndex += 1) {
+            if (rowIndex === pivotIndex) {
+                continue;
+            }
+
+            const factor = augmented[rowIndex][pivotIndex];
+            if (!factor) {
+                continue;
+            }
+
+            for (let columnIndex = pivotIndex; columnIndex <= size; columnIndex += 1) {
+                augmented[rowIndex][columnIndex] -=
+                    factor * augmented[pivotIndex][columnIndex];
+            }
+        }
+    }
+
+    return augmented.map((row) => row[size]);
+}
+
+function computeHomography(corners) {
+    if (!corners || corners.length !== 4) {
+        return null;
+    }
+
+    const sourceCorners = [
+        { x: 0, y: 0 },
+        { x: 1, y: 0 },
+        { x: 1, y: 1 },
+        { x: 0, y: 1 }
+    ];
+
+    const matrix = [];
+    const vector = [];
+
+    sourceCorners.forEach((sourcePoint, index) => {
+        const targetPoint = corners[index];
+        const { x, y } = sourcePoint;
+        const u = targetPoint.x;
+        const v = targetPoint.y;
+
+        matrix.push([x, y, 1, 0, 0, 0, -u * x, -u * y]);
+        vector.push(u);
+        matrix.push([0, 0, 0, x, y, 1, -v * x, -v * y]);
+        vector.push(v);
+    });
+
+    const solution = solveLinearSystem(matrix, vector);
+    if (!solution) {
+        return null;
+    }
+
+    return [
+        [solution[0], solution[1], solution[2]],
+        [solution[3], solution[4], solution[5]],
+        [solution[6], solution[7], 1]
+    ];
+}
+
+function vectorLength3(vector) {
+    return Math.hypot(vector[0], vector[1], vector[2]);
+}
+
+function dot3(left, right) {
+    return left[0] * right[0] + left[1] * right[1] + left[2] * right[2];
+}
+
+function scaleVector3(vector, scalar) {
+    return [vector[0] * scalar, vector[1] * scalar, vector[2] * scalar];
+}
+
+function subtractVector3(left, right) {
+    return [
+        left[0] - right[0],
+        left[1] - right[1],
+        left[2] - right[2]
+    ];
+}
+
+function cross3(left, right) {
+    return [
+        left[1] * right[2] - left[2] * right[1],
+        left[2] * right[0] - left[0] * right[2],
+        left[0] * right[1] - left[1] * right[0]
+    ];
+}
+
+function normalizeVector3(vector) {
+    const length = vectorLength3(vector);
+    if (length < 1e-8) {
+        return null;
+    }
+
+    return scaleVector3(vector, 1 / length);
+}
+
+function updateTrackedPoseFromCorners(corners) {
+    const homography = computeHomography(corners);
+    if (!homography || !focalLength) {
+        return false;
+    }
+
+    const principalX = UI.video.width / 2;
+    const principalY = UI.video.height / 2;
+
+    const toCameraVector = (column) => [
+        (column[0] - principalX * column[2]) / focalLength,
+        (column[1] - principalY * column[2]) / focalLength,
+        column[2]
+    ];
+
+    const column1 = [homography[0][0], homography[1][0], homography[2][0]];
+    const column2 = [homography[0][1], homography[1][1], homography[2][1]];
+    const column3 = [homography[0][2], homography[1][2], homography[2][2]];
+
+    const basis1 = toCameraVector(column1);
+    const basis2 = toCameraVector(column2);
+    const translationVector = toCameraVector(column3);
+
+    const averageBasisLength =
+        (vectorLength3(basis1) + vectorLength3(basis2)) * 0.5;
+    if (!averageBasisLength) {
+        return false;
+    }
+
+    const scaleFactor = 1 / averageBasisLength;
+    let rotation1 = normalizeVector3(scaleVector3(basis1, scaleFactor));
+    if (!rotation1) {
+        return false;
+    }
+
+    const rawRotation2 = scaleVector3(basis2, scaleFactor);
+    const rotation2Projected = subtractVector3(
+        rawRotation2,
+        scaleVector3(rotation1, dot3(rawRotation2, rotation1))
+    );
+    let rotation2 = normalizeVector3(rotation2Projected);
+    if (!rotation2) {
+        return false;
+    }
+
+    let rotation3 = normalizeVector3(cross3(rotation1, rotation2));
+    if (!rotation3) {
+        return false;
+    }
+
+    let translation = scaleVector3(translationVector, scaleFactor);
+    if (translation[2] < 0) {
+        rotation1 = scaleVector3(rotation1, -1);
+        rotation2 = scaleVector3(rotation2, -1);
+        translation = scaleVector3(translation, -1);
+        rotation3 = normalizeVector3(cross3(rotation1, rotation2));
+        if (!rotation3) {
+            return false;
+        }
+    }
+
+    trackedMatrix.set(
+        rotation1[0] * arScale,
+        rotation1[1] * arScale,
+        rotation1[2] * arScale,
+        translation[0],
+        -rotation2[0] * arScale,
+        -rotation2[1] * arScale,
+        -rotation2[2] * arScale,
+        -translation[1],
+        -rotation3[0] * arScale,
+        -rotation3[1] * arScale,
+        -rotation3[2] * arScale,
+        -translation[2],
+        0,
+        0,
+        0,
+        1
+    );
+
+    trackedMatrix.decompose(trackedPosition, trackedQuaternion, trackedScale);
+
+    const uniformTrackedScale = Math.max(
+        arScale * 0.84,
+        Math.min(
+            arScale * 1.16,
+            (trackedScale.x + trackedScale.y + trackedScale.z) / 3
+        )
+    );
+    trackedScale.setScalar(uniformTrackedScale);
+
+    return Number.isFinite(trackedPosition.x) && Number.isFinite(trackedScale.x);
+}
+
+function applyTrackedPose(immediate = false) {
+    if (!arGroup) {
+        return;
+    }
+
+    if (immediate || !hasTrackingPose) {
+        arGroup.position.copy(trackedPosition);
+        arGroup.quaternion.copy(trackedQuaternion);
+        arGroup.scale.copy(trackedScale);
+        return;
+    }
+
+    const positionDistance = arGroup.position.distanceTo(trackedPosition);
+    const rotationDistance = arGroup.quaternion.angleTo(trackedQuaternion);
+    const scaleDistance = Math.abs(arGroup.scale.x - trackedScale.x);
+    const followAlpha =
+        fastFollowDistance > 0 && positionDistance > fastFollowDistance
+            ? fastFollowAlpha
+            : trackingLerpAlpha;
+
+    if (positionDistance > positionDeadzone) {
+        arGroup.position.lerp(trackedPosition, followAlpha);
+    }
+
+    if (rotationDistance > rotationDeadzoneRad) {
+        arGroup.quaternion.slerp(trackedQuaternion, followAlpha);
+    }
+
+    if (scaleDistance > scaleDeadzone) {
+        arGroup.scale.lerp(trackedScale, trackingScaleLerpAlpha);
+    }
+}
+
+async function runQrDetection() {
+    if (!qrScannerReady || qrScanInFlight || !scanContext) {
+        return;
+    }
+
+    qrScanInFlight = true;
     let markerFound = false;
     let shouldHoldSteady = false;
     let liveMarkerDetected = false;
 
-    if (qrDetector.detect(src, qrPoints)) {
-        const metrics = getQrMetrics(qrPoints);
-        const confirmedDetection = updateDetectionConfidence(metrics);
-        shouldHoldSteady = Boolean(metrics);
+    try {
+        scanContext.drawImage(UI.video, 0, 0, UI.video.width, UI.video.height);
+        const frame = scanContext.getImageData(0, 0, UI.video.width, UI.video.height);
+        const results = await window.ZXingWASM.readBarcodes(frame, {
+            formats: ["QRCode"],
+            maxNumberOfSymbols: 1,
+            tryDownscale: true,
+            tryHarder: true,
+            tryInvert: true,
+            tryRotate: true
+        });
 
-        if (confirmedDetection) {
-            updateImagePoints(qrPoints);
+        const detectedBarcode = results.find((result) => result?.position);
 
-            if (
-                cv.solvePnP(objectPoints, imagePoints, camMatrix, distCoeffs, rvec, tvec)
-            ) {
-                cv.Rodrigues(rvec, rotMatr);
-                const rotation = rotMatr.data64F;
-                const translation = tvec.data64F;
+        if (detectedBarcode) {
+            const corners = getDetectedCorners(detectedBarcode.position);
+            const metrics = getQrMetrics(corners);
+            const confirmedDetection = updateDetectionConfidence(metrics);
+            shouldHoldSteady = Boolean(metrics);
 
-                trackedMatrix.set(
-                    rotation[0] * arScale,
-                    rotation[1] * arScale,
-                    rotation[2] * arScale,
-                    translation[0],
-                    -rotation[3] * arScale,
-                    -rotation[4] * arScale,
-                    -rotation[5] * arScale,
-                    -translation[1],
-                    -rotation[6] * arScale,
-                    -rotation[7] * arScale,
-                    -rotation[8] * arScale,
-                    -translation[2],
-                    0,
-                    0,
-                    0,
-                    1
-                );
-
-                trackedMatrix.decompose(
-                    trackedPosition,
-                    trackedQuaternion,
-                    trackedScale
-                );
-
-                const uniformTrackedScale = Math.max(
-                    arScale * 0.84,
-                    Math.min(
-                        arScale * 1.16,
-                        (trackedScale.x + trackedScale.y + trackedScale.z) / 3
-                    )
-                );
-                trackedScale.setScalar(uniformTrackedScale);
-
-                if (!hasTrackingPose) {
-                    arGroup.position.copy(trackedPosition);
-                    arGroup.quaternion.copy(trackedQuaternion);
-                    arGroup.scale.copy(trackedScale);
-                    hasTrackingPose = true;
-                } else {
-                    const positionDistance =
-                        arGroup.position.distanceTo(trackedPosition);
-                    const rotationDistance =
-                        arGroup.quaternion.angleTo(trackedQuaternion);
-                    const scaleDistance = Math.abs(
-                        arGroup.scale.x - trackedScale.x
-                    );
-                    const followAlpha =
-                        fastFollowDistance > 0 &&
-                        positionDistance > fastFollowDistance
-                            ? fastFollowAlpha
-                            : trackingLerpAlpha;
-
-                    if (positionDistance > positionDeadzone) {
-                        arGroup.position.lerp(trackedPosition, followAlpha);
-                    }
-
-                    if (rotationDistance > rotationDeadzoneRad) {
-                        arGroup.quaternion.slerp(
-                            trackedQuaternion,
-                            followAlpha
-                        );
-                    }
-
-                    if (scaleDistance > scaleDeadzone) {
-                        arGroup.scale.lerp(
-                            trackedScale,
-                            trackingScaleLerpAlpha
-                        );
-                    }
-                }
-
+            if (confirmedDetection && corners && updateTrackedPoseFromCorners(corners)) {
+                applyTrackedPose(!hasTrackingPose);
+                hasTrackingPose = true;
                 arGroup.visible = true;
                 markerFound = true;
                 liveMarkerDetected = true;
                 lostMarkerFrames = 0;
             }
-        }
-    } else {
-        resetDetectionConfidence();
-    }
-
-    if (!markerFound) {
-        if (hasTrackingPose && lostMarkerFrames < markerLostGraceFrames) {
-            lostMarkerFrames += 1;
-            arGroup.visible = true;
-            markerFound = true;
         } else {
-            arGroup.visible = false;
-            hasTrackingPose = false;
-            lostMarkerFrames = 0;
+            resetDetectionConfidence();
         }
+
+        if (!markerFound) {
+            if (hasTrackingPose && lostMarkerFrames < markerLostGraceFrames) {
+                lostMarkerFrames += 1;
+                arGroup.visible = true;
+                markerFound = true;
+            } else {
+                arGroup.visible = false;
+                hasTrackingPose = false;
+                lostMarkerFrames = 0;
+            }
+        }
+
+        hasLiveMarkerDetection = liveMarkerDetected;
+        lastScanResult = { markerFound, shouldHoldSteady };
+    } catch (error) {
+        console.error("Volcano QR scan failed.", error);
+    } finally {
+        qrScanInFlight = false;
     }
-
-    hasLiveMarkerDetection = liveMarkerDetected;
-
-    return { markerFound, shouldHoldSteady };
 }
 
 function processFrame(timestamp) {
-    if (!activeStream || !cap || !src || !renderer || !labelRenderer) {
+    if (!activeStream || !renderer || !labelRenderer) {
         return;
     }
 
-    cap.read(src);
-
-    if (SHOW_DEBUG_CAMERA_CANVAS) {
-        cv.imshow("canvasOutput", src);
-    }
-
-    let markerFound = arGroup.visible;
-    let shouldHoldSteady = detectionStreak > 0 && !hasTrackingPose;
-
     if (!lastQrScanTime || timestamp - lastQrScanTime >= getQrScanInterval()) {
         lastQrScanTime = timestamp;
-        ({ markerFound, shouldHoldSteady } = runQrDetection());
+        void runQrDetection();
     }
+
+    const { markerFound, shouldHoldSteady } = lastScanResult;
 
     if (markerFound) {
         setStatus(copy.statusTracking);
@@ -1277,11 +1463,6 @@ function fitToScreen() {
 }
 
 function cleanup() {
-    if (openCvCheckTimerId) {
-        window.clearTimeout(openCvCheckTimerId);
-        openCvCheckTimerId = 0;
-    }
-
     if (animationFrameId) {
         window.cancelAnimationFrame(animationFrameId);
         animationFrameId = 0;
@@ -1312,6 +1493,14 @@ function cleanup() {
     hasLiveMarkerDetection = false;
     resetDetectionConfidence();
     lastQrScanTime = 0;
+    focalLength = 0;
+    qrScannerReady = false;
+    qrScanInFlight = false;
+    scanContext = undefined;
+    lastScanResult = {
+        markerFound: false,
+        shouldHoldSteady: false
+    };
 
     if (renderer) {
         renderer.dispose();
@@ -1321,28 +1510,7 @@ function cleanup() {
         labelRenderer.domElement.parentNode.removeChild(labelRenderer.domElement);
     }
 
-    [src, qrPoints, imagePoints, camMatrix, distCoeffs, objectPoints, rvec, tvec, rotMatr].forEach((mat) => {
-        if (mat && typeof mat.delete === "function") {
-            mat.delete();
-        }
-    });
-
-    if (qrDetector && typeof qrDetector.delete === "function") {
-        qrDetector.delete();
-    }
-
     anatomyLabels = [];
-    src = undefined;
-    cap = undefined;
-    qrDetector = undefined;
-    qrPoints = undefined;
-    imagePoints = undefined;
-    camMatrix = undefined;
-    distCoeffs = undefined;
-    rvec = undefined;
-    tvec = undefined;
-    rotMatr = undefined;
-    objectPoints = undefined;
     renderer = undefined;
     labelRenderer = undefined;
     scene = undefined;
